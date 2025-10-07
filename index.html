@@ -187,19 +187,14 @@
         font-size: 1.1rem; 
       }
 
-      /* MODIFICACION PARA CARRUSEL */
       .channels-grid {
-        display: block; /* Desactivamos el grid principal para no interferir */
-        gap: 0; 
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+        align-items: flex-start;
       }
       
       .channel-card {
-          /* Ajustes de ancho para el carrusel */
-          min-width: 280px; 
-          max-width: 280px; 
-          flex: 0 0 auto; /* No crecer, no encoger, usar ancho fijo */
-          scroll-snap-align: start; /* Alinear al inicio del elemento al hacer snap */
-          
           background: var(--card-bg);
           border: 1px solid var(--border-color);
           border-radius: var(--radius-md);
@@ -299,29 +294,12 @@
         padding: 0;
       }
       
-      /* MODIFICACION PARA CARRUSEL */
       .channel-group__content {
-          display: flex; /* Cambiamos a Flexbox */
-          gap: 0.8rem;
-          padding: 0.8rem;
-          overflow-x: auto; /* Habilitar scroll horizontal */
-          overflow-y: hidden;
-          white-space: nowrap; /* Asegurar que los elementos estén en una sola línea */
-          -webkit-overflow-scrolling: touch; /* Suavizado para iOS */
-          scroll-snap-type: x mandatory; /* Habilitar scroll snap */
-          padding-bottom: 1rem; /* Espacio extra para el scrollbar */
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 0.8rem;
+        padding: 0.8rem;
       }
-
-      /* Ocultar el scrollbar pero mantener la funcionalidad */
-      .channel-group__content::-webkit-scrollbar {
-          height: 6px;
-      }
-
-      .channel-group__content::-webkit-scrollbar-thumb {
-          background: rgba(var(--primary-rgb), 0.5);
-          border-radius: 3px;
-      }
-      /* FIN MODIFICACION PARA CARRUSEL */
       
       .offline-message {
         background: #fef2f2;
@@ -655,55 +633,42 @@
       .events-badge { background-color: var(--events-source-color); color: white; }
       .shickat-badge { background-color: var(--shickat-badge); color: white; }
       
-      /* ESTILOS PARA EL NUEVO BOTÓN QUE ACTÚA COMO INDICADOR DE NÚMERO */
-      .channel-number-badge-button {
+      .channel-number-badge {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
         right: 10px;
         padding: 4px;
-        border-radius: var(--radius-sm); /* Un poco menos redondo que el 50% para el badge */
+        border-radius: 20%;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        line-height: 1.2; 
+        line-height: 1;
         transition: background-color 0.3s ease;
         
-        width: 40px; 
-        height: 40px;
-        
-        background: rgba(var(--primary-rgb), 0.9);
-        color: white;
-        border: none;
-        cursor: pointer;
-        z-index: 20;
+        width: 30px;
+        height: 30px;
       }
 
-      .channel-number-badge-button.gist-badge { background-color: var(--gist-source-color); }
-      .channel-number-badge-button.elcano-badge { background-color: var(--elcano-source-color); }
-      .channel-number-badge-button.events-badge { background-color: var(--events-source-color); }
-      .channel-number-badge-button.shickat-badge { background-color: var(--shickat-badge); }
-
-      .channel-number-badge-button .channel-number {
+      .channel-number-badge .channel-number {
         font-weight: 600;
         white-space: nowrap;
-        color: white; 
-        font-size: 0.8rem; 
-        margin-bottom: 2px;
+        color: var(--text);
+        font-size: 0.75rem;
       }
 
-      .channel-number-badge-button .source-initials {
+      .channel-number-badge .source-initials {
         font-size: 0.6rem;
         font-weight: bold;
         color: white;
+        margin-top: 2px;
       }
-
-      .channel-number-badge-button:hover {
-        transform: translateY(-50%) scale(1.1);
+      
+      body.dark-mode .channel-number-badge .channel-number {
+        color: white;
       }
-      /* FIN ESTILOS PARA EL NUEVO BOTÓN */
 
       .retry-button {
           padding: 0.5rem 1rem;
@@ -759,35 +724,26 @@
       }
 
       @media (max-width: 768px) {
-        /* Eliminamos la configuración de grid para que funcione el carrusel */
-        /* .channels-grid {
+        .channels-grid {
           grid-template-columns: 1fr;
-        } */
+        }
         
         .filter-buttons {
           flex-wrap: wrap;
         }
         
-        /* Eliminamos la configuración de grid para que funcione el carrusel */
-        /* .channel-group__content {
+        .channel-group__content {
           grid-template-columns: 1fr;
-        } */
+        }
       }
       
       @media (min-width: 768px) {
-        /* Eliminamos la configuración de grid para que funcione el carrusel */
-        /* .channels-grid {
+        .channels-grid {
           grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        } */
+        }
         
         .channel-name {
           font-size: 1.1rem;
-        }
-        
-        /* Ajuste de ancho en desktop si el carrusel debe ser ligeramente más grande */
-        .channel-card {
-            min-width: 300px;
-            max-width: 300px;
         }
       }
 
@@ -1030,11 +986,6 @@
           transform: translate(-100%, 0);
         }
       }
-      
-      /* NUEVO ESTILO PARA EL BOTÓN DE ENLACE - OCULTO */
-      .copy-link-btn {
-          display: none; /* Ocultamos el botón original */
-      }
     </style>
 </head>
 <body>
@@ -1057,7 +1008,7 @@
         
         <div class="search-filters">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Buscar canales, ID (ej: #123)" autofocus>
+                <input type="text" id="searchInput" placeholder="Buscar canales, número (ej: #123)" autofocus>
             </div>
             <div class="filter-buttons">
                 <button class="filter-button filter-button--favorites" id="filterFavorites">★</button>
@@ -1181,7 +1132,12 @@
           sportFilter: 'all' 
       };
 
-      // RANGES ELIMINADO
+      const RANGES = {
+          NE: { start: 1, end: 249, source: 'gist' },
+          EC: { start: 250, end: 499, source: 'elcano' },
+          EV: { start: 500, end: 749, source: 'events' },
+          SH: { start: 750, end: 999, source: 'shickat' }
+      };
 
       const PROXIES = [
           'https://api.allorigins.win/raw?url=',
@@ -1370,39 +1326,6 @@
         return eventChannels.concat(mergedOtherChannels);
       }
       
-      function loadAndRenderBackupChannels() {
-          let allBackupChannels = [];
-          let hasBackup = false;
-
-          // Cargar y combinar copias de seguridad de todas las fuentes
-          for (const key in BACKUP_KEYS) {
-              const backup = loadBackup(BACKUP_KEYS[key]);
-              if (backup) {
-                  allBackupChannels = allBackupChannels.concat(backup.map(c => ({
-                      ...c,
-                      source: key, 
-                      name: c.name || `Canal de ${key.toUpperCase()}`,
-                      id: c.id || `${key}_${Math.random()}`,
-                      // Al cargar del backup, re-generamos el 'number' con los primeros 3 del ID
-                      number: (c.id || `${key}_${Math.random()}`).substring(0, 3), 
-                      displayableName: c.displayableName || c.name 
-                  })));
-                  hasBackup = true;
-              }
-          }
-
-          if (allBackupChannels.length > 0) {
-              const newChannels = mergeChannels(allBackupChannels); 
-              state.channelsData = newChannels;
-              processChannelNames(); 
-              renderResults();
-              
-              // [MODIFICACIÓN] Ya no mostramos la notificación de uso de historial aquí
-              return true;
-          }
-          return false;
-      }
-
       async function fetchAndProcessSource(sourceName, url, processor, backupKey) {
           let channels = null;
           let message = '';
@@ -1421,6 +1344,37 @@
               }
           }
           return { name: sourceName, channels, message };
+      }
+
+      function loadAndRenderBackupChannels() {
+          let allBackupChannels = [];
+          let hasBackup = false;
+
+          // Cargar y combinar copias de seguridad de todas las fuentes
+          for (const key in BACKUP_KEYS) {
+              const backup = loadBackup(BACKUP_KEYS[key]);
+              if (backup) {
+                  allBackupChannels = allBackupChannels.concat(backup.map(c => ({
+                      ...c,
+                      source: key, 
+                      name: c.name || `Canal de ${key.toUpperCase()}`,
+                      id: c.id || `${key}_${Math.random()}`,
+                      displayableName: c.displayableName || c.name 
+                  })));
+                  hasBackup = true;
+              }
+          }
+
+          if (allBackupChannels.length > 0) {
+              const newChannels = mergeChannels(allBackupChannels); 
+              state.channelsData = newChannels;
+              processChannelNames(); 
+              renderResults();
+              
+              // [MODIFICACIÓN] Ya no mostramos la notificación de uso de historial aquí
+              return true;
+          }
+          return false;
       }
 
       async function loadInitialChannels() {
@@ -1530,7 +1484,7 @@
         const numberedChannels = [];
         const lines = infoCanales.split('\n').filter(line => line.trim() !== '');
 
-        // const channelMappings = ... (MANTENEMOS ESTO)
+        let currentNumber = RANGES.NE.start;
         const channelMappings = {
           'MOVISTAR': 'M+',
           'CLASICOS': 'Clásicos',
@@ -1586,8 +1540,7 @@
 
                     numberedChannels.push({
                         id: acestreamId,
-                        // MODIFICACIÓN CLAVE: number = primeros 3 caracteres del ID
-                        number: acestreamId.substring(0, 3), 
+                        number: (currentNumber++).toString(),
                         name: simplifiedName,
                         quality: quality,
                         multiAudio: multiAudio,
@@ -1676,6 +1629,7 @@
           const doc = parser.parseFromString(htmlContent, 'text/html');
           const cards = doc.querySelectorAll('article.canal-card');
           
+          let currentNumber = RANGES.SH.start;
           
           const nameMappings = {
               'Movistar': 'M+',
@@ -1730,8 +1684,7 @@
                       
                       numberedChannels.push({
                           id: acestreamId,
-                          // MODIFICACIÓN CLAVE: number = primeros 3 caracteres del ID
-                          number: acestreamId.substring(0, 3), 
+                          number: currentNumber.toString(),
                           name: simplifiedName,
                           quality: quality,
                           multiAudio: multiAudio,
@@ -1739,6 +1692,8 @@
                           source: 'shickat'
                       });
                       trackFirstSeen(acestreamId);
+                      
+                      currentNumber++;
                   }
               }
           });
@@ -1748,6 +1703,7 @@
 
       function processElcanoData(links) {
           const numberedChannels = [];
+          let currentNumber = RANGES.EC.start;
 
           const nameMap = {
               'M. LaLiga': 'M+ La Liga',
@@ -1792,8 +1748,7 @@
 
                   numberedChannels.push({
                       id: acestreamId,
-                      // MODIFICACIÓN CLAVE: number = primeros 3 caracteres del ID
-                      number: acestreamId.substring(0, 3), 
+                      number: currentNumber.toString(),
                       name: simplifiedName,
                       quality: quality,
                       multiAudio: multiAudio,
@@ -1801,6 +1756,8 @@
                       source: 'elcano'
                   });
                   trackFirstSeen(acestreamId);
+
+                  currentNumber++;
               }
           });
 
@@ -1813,6 +1770,7 @@
           const doc = parser.parseFromString(htmlContent, 'text/html');
           const dateHeaders = doc.querySelectorAll('h2.fecha');
           
+          let currentNumber = RANGES.EV.start;
           
           const channelMappings = {
               'Movistar': 'M+',
@@ -1866,8 +1824,7 @@
                                   
                                   numberedChannels.push({
                                       id: acestreamId,
-                                      // MODIFICACIÓN CLAVE: number = primeros 3 caracteres del ID
-                                      number: acestreamId.substring(0, 3), 
+                                      number: currentNumber.toString(),
                                       name: simplifiedName,
                                       quality: quality,
                                       multiAudio: multiAudio,
@@ -1876,6 +1833,8 @@
                                       event: { time, competition, match, date, sportEmoji, sportName }
                                   });
                                   trackFirstSeen(acestreamId);
+                                  
+                                  currentNumber++;
                               });
                           }
                       }
@@ -2006,8 +1965,7 @@
             const normalizedSearchTerm = normalizeText(searchTerm);
             
             const nameMatches = normalizeText(channel.name).includes(normalizedSearchTerm);
-            // Búsqueda por los 3 caracteres del ID de AceStream
-            const idMatches = channel.id && channel.id.toLowerCase().includes(normalizedSearchTerm.replace('#', ''));
+            const numberMatches = channel.number && channel.number.includes(searchTerm.replace('#', ''));
             
             let eventDetailsMatch = false;
             if (channel.event) {
@@ -2020,7 +1978,7 @@
                     normalizeText(date || '').includes(normalizedSearchTerm); 
             }
 
-            return nameMatches || idMatches || eventDetailsMatch;
+            return nameMatches || numberMatches || eventDetailsMatch;
           });
         }
 
@@ -2090,9 +2048,10 @@
               if (sourceB !== sourceA) {
                   return sourceB - sourceA;
               }
-              
-              // No es necesario ordenar por los 3 caracteres del ID aquí, el nombre es más relevante.
-              return a.name.localeCompare(b.name); 
+
+              const numA = parseInt(a.number, 10);
+              const numB = parseInt(b.number, 10);
+              return numA - numB;
           });
 
           const groups = {};
@@ -2293,41 +2252,36 @@
 
           let sourceBadgeClass = '';
           let sourceBadgeText = '';
-          
-          // Lógica de asignación de clase/texto de fuente simplificada
-          switch (channel.source) {
-              case 'gist':
-                  sourceBadgeClass = 'gist-badge';
-                  sourceBadgeText = 'NE';
+          const channelNumber = parseInt(channel.number, 10);
+
+          for (const key in RANGES) {
+              if (channelNumber >= RANGES[key].start && channelNumber <= RANGES[key].end) {
+                  switch (key) {
+                      case 'NE':
+                          sourceBadgeClass = 'gist-badge';
+                          sourceBadgeText = 'NE';
+                          break;
+                      case 'EC':
+                          sourceBadgeClass = 'elcano-badge';
+                          sourceBadgeText = 'EC';
+                          break;
+                      case 'EV':
+                          sourceBadgeClass = 'events-badge';
+                          sourceBadgeText = 'EV';
+                          break;
+                      case 'SH':
+                          sourceBadgeClass = 'shickat-badge';
+                          sourceBadgeText = 'SH';
+                          break;
+                  }
                   break;
-              case 'elcano':
-                  sourceBadgeClass = 'elcano-badge';
-                  sourceBadgeText = 'EC';
-                  break;
-              case 'events':
-                  sourceBadgeClass = 'events-badge';
-                  sourceBadgeText = 'EV';
-                  break;
-              case 'shickat':
-                  sourceBadgeClass = 'shickat-badge';
-                  sourceBadgeText = 'SH';
-                  break;
+              }
           }
           
           const isNew = isChannelNew(channel.id);
           const newIndicator = isNew ? '<div class="new-channel-indicator"></div>' : '';
 
           const displayQuality = standardizeQuality(channel.quality);
-          
-          // MODIFICACIÓN: El indicador de número/fuente
-          const sourceButton = `
-              <button class="channel-number-badge-button ${sourceBadgeClass}" 
-                      data-id="${channel.id}" 
-                      title="Copiar enlace (AceStream ID: ${channel.id})">
-                  <span class="channel-number">${channel.number}</span>
-                  <span class="source-initials">${sourceBadgeText}</span>
-              </button>
-          `;
 
           return `
               <div class="${cardClass}"
@@ -2340,9 +2294,12 @@
                   <div class="channel-header">
                       <div class="channel-name">${channel.displayableName}</div>
                   </div>
-                  ${sourceButton}
-                  <div class="rating-stars">${getStarRating(rating)}</div>
+                  <div class="channel-number-badge ${sourceBadgeClass}">
+                      <span class="channel-number">${channel.number}</span>
+                      <span class="source-initials">${sourceBadgeText}</span>
                   </div>
+                  <div class="rating-stars">${getStarRating(rating)}</div>
+              </div>
           `;
       }
 
@@ -2358,7 +2315,9 @@
       }
       
       let currentCard = null;
-
+      let isSwiping = false;
+      const SWIPE_THRESHOLD = 80;
+      const VERTICAL_TOLERANCE = 40;
       let longPressTimer;
       let isLongPress = false;
       
@@ -2369,6 +2328,10 @@
       const TAP_THRESHOLD_DISTANCE = 10;
 
       function handleChannelPlay(channel) {
+          if (isSwiping) {
+              isSwiping = false;
+              return;
+          }
           const now = new Date().getTime();
 
           if (state.lastChannelPlay) {
@@ -2415,13 +2378,8 @@
       }
 
       function handleTap(event) {
-        if (!currentCard) { 
+        if (!currentCard || isSwiping) {
             return;
-        }
-        
-        // Comprobación extra: si el target es el botón de copiar (el indicador de número), no reproducir.
-        if (event.target.closest('.channel-number-badge-button')) {
-             return;
         }
 
         if (state.isFavoriteMode) {
@@ -2481,7 +2439,7 @@
       function handleSearchInput() {
         state.searchTerm = document.getElementById('searchInput').value.trim();
         document.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('filter-button--active'));
-        document.querySelectorAll('.sport-filter-button').forEach(btn => btn.classList.remove('filter-filter-button--active'));
+        document.querySelectorAll('.sport-filter-button').forEach(btn => btn.classList.remove('filter-button--active'));
         renderResults();
       }
 
@@ -2685,99 +2643,90 @@
           });
           changePrimaryColor(state.primaryColor);
           
-          // Listener para el nuevo botón de copia de enlace (el indicador de número)
-          document.addEventListener('click', (e) => {
-              if (e.target.closest('.channel-number-badge-button')) {
-                  const button = e.target.closest('.channel-number-badge-button');
-                  e.stopPropagation(); // Evita que dispare la reproducción del canal
-                  const channelId = button.dataset.id;
-                  showCopyModal(channelId);
-              }
-          });
-          
-          // [INICIO DE LA CORRECCIÓN] - Listener delegado de clic/tap para la reproducción y favoritos
-          document.addEventListener('click', (e) => {
-              const card = e.target.closest('.channel-card');
-              const numberButton = e.target.closest('.channel-number-badge-button');
-
-              if (card && !numberButton) {
-                  const channelId = card.dataset.id;
-                  const channelData = state.channelsData.find(c => c.id === channelId);
-
-                  if (state.isFavoriteMode) {
-                      e.stopPropagation();
-                      toggleFavorite(channelId);
-                  } else if (channelData) {
-                      handleChannelPlay(channelData);
-                  }
-              }
-          });
-          // [FIN DE LA CORRECCIÓN]
-          
           applyFilter('all');
           loadInitialChannels();
       });
 
-      // [BLOQUES ELIMINADOS/COMENTADOS] - Se ha eliminado la lógica de detección de tap en mousedown/mouseup/touchstart/touchend
-      //                                 ya que causaba la doble acción en modo favoritos.
-      
       document.addEventListener('mousedown', (e) => {
-          // Solo capturar si no estamos haciendo clic en el botón de copia (el indicador de número).
-          if (e.target.closest('.channel-card') && !e.target.closest('.channel-number-badge-button')) {
+          if (e.target.closest('.channel-card')) {
               currentCard = e.target.closest('.channel-card');
               touchStartX = e.clientX;
               touchStartY = e.clientY;
               touchStartTime = new Date().getTime();
+              isSwiping = false;
           }
       });
 
       document.addEventListener('mousemove', (e) => {
-          // Lógica de detección de SWIPE ELIMINADA.
+          if (!currentCard) return;
+
+          const diffX = e.clientX - touchStartX;
+          const diffY = e.clientY - touchStartY;
+
+          if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffY) < VERTICAL_TOLERANCE) {
+              isSwiping = true;
+              e.preventDefault(); 
+              showCopyModal(currentCard.dataset.id);
+              currentCard = null; 
+          }
       });
 
       document.addEventListener('mouseup', (e) => {
           if (currentCard) {
+              if (!isSwiping) {
                 const mouseUpTime = new Date().getTime();
                 const touchDuration = mouseUpTime - touchStartTime;
                 const touchDistanceX = Math.abs(e.clientX - touchStartX);
                 const touchDistanceY = Math.abs(e.clientY - touchStartY);
 
                 if (touchDuration < TAP_THRESHOLD_TIME && touchDistanceX < TAP_THRESHOLD_DISTANCE && touchDistanceY < TAP_THRESHOLD_DISTANCE) {
-                    // handleTap(e);  <-- ¡Esta llamada era la duplicada en modo favoritos! Eliminada de aquí.
+                    handleTap(e);
                 }
+              }
           }
           currentCard = null;
+          isSwiping = false;
       });
 
       document.addEventListener('touchstart', (e) => {
-          // Solo capturar si no estamos tocando el botón de copia (el indicador de número).
-          if (e.target.closest('.channel-card') && !e.target.closest('.channel-number-badge-button')) {
+          if (e.target.closest('.channel-card')) {
               e.stopPropagation(); 
               currentCard = e.target.closest('.channel-card');
               const touch = e.touches[0];
               touchStartX = touch.clientX;
               touchStartY = touch.clientY;
               touchStartTime = new Date().getTime();
+              isSwiping = false; 
               longPressTimer = setTimeout(() => {
                   isLongPress = true;
               }, 500);
           }
-      }, {passive: true}); // Cambiado a passive: true para no bloquear el scroll
+      }, {passive: false});
 
       document.addEventListener('touchmove', (e) => {
           if (!currentCard) return;
-          clearTimeout(longPressTimer);
-      }, {passive: true}); // Cambiado a passive: true
+          const touch = e.touches[0];
+          const diffX = touch.clientX - touchStartX;
+          const diffY = touch.clientY - touchStartY;
+
+          if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffY) < VERTICAL_TOLERANCE) {
+              isSwiping = true;
+              e.preventDefault(); 
+              showCopyModal(currentCard.dataset.id);
+              currentCard = null;
+              clearTimeout(longPressTimer);
+          }
+      }, {passive: false});
 
       document.addEventListener('touchend', (e) => {
-          clearTimeout(longPressTimer);
-
           if (isLongPress) {
               isLongPress = false;
+              clearTimeout(longPressTimer);
               return;
           }
 
           if (currentCard) {
+              if (!isSwiping) {
                   const endElement = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
                   const touchEndTime = new Date().getTime();
                   const touchDuration = touchEndTime - touchStartTime;
@@ -2785,11 +2734,14 @@
                   const touchDistanceY = Math.abs(e.changedTouches[0].clientY - touchStartY);
 
                   if (endElement && endElement.closest('.channel-card') === currentCard && touchDuration < TAP_THRESHOLD_TIME && touchDistanceX < TAP_THRESHOLD_DISTANCE && touchDistanceY < TAP_THRESHOLD_DISTANCE) {
-                    // handleTap(e); <-- ¡Esta llamada era la duplicada en modo favoritos! Eliminada de aquí.
+                    handleTap(e);
                   }
+              }
           }
           currentCard = null;
-      }, {passive: true});
+          isSwiping = false;
+      });
     </script>
 </body>
 </html>
+
