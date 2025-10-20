@@ -8,7 +8,7 @@
       :root {
         --primary: #2563eb;
         --primary-light: rgba(37, 99, 235, 0.1);
-        --primary-dark: #1e50c7;
+        --primary-dark: #1e50c7; /* Color oscuro simple */
         --bg-light: #f1f5f9;
         --card-bg: #ffffff;
         --text: #1e293b;
@@ -22,13 +22,14 @@
         --success: #4cc9f0;
         --warning: #f8961e;
         --info: #4895ef;
+        
+        /* Colores consolidados */
         --movistar-blue: #0085C1;
         --eurosport-blue: #5e17eb;
         --dazn-black: #000000;
         --f1-red:#ff3535;
-        --channel-name-color: #888888;
         --action-red: #ff544d;
-        --classics-red: #fa3732;
+        --cinema-red: #fa3732; /* Consolida classics, hits, premieres, indie, drama, spanish-film */
         --sports-green: #11a45b;
         --vamos-green: #1fc23d;
         --copadelrey-green: #449653;
@@ -37,24 +38,22 @@
         --hypermotion-cyan: #04d2d7;
         --golf-teal: #4ee1b0;
         --eurosport-number-red: #ff3535;
+        --plus-blue: #3399ff;
+        --western-red: #e60000;
+        --documentary-purple: #a06cf5;
+        --originals-blue: #3985b0;
+        --ellas-green: #35fd9b;
+        --series-orange: #ff8c1f;
+        
         --gist-source-color: #2d077d;
         --elcano-source-color: #7d070e;
         --special-gist-color: #9c27b0;
         --events-source-color: #074f7d;
         --shickat-badge: #077b3b;
+        
+        --channel-name-color: #888888;
         --player-bg: black;
         --channel-number-color: #4b5563;
-        --plus-blue: #3399ff;
-        --western-red: #e60000;
-        --documentary-purple: #a06cf5;
-        --originals-blue: #3985b0;
-        --hits-red: #fa3732;
-        --premieres-red: #fa3934;
-        --indie-red: #fa3732;
-        --spanish-film-red: #fa3732;
-        --drama-red: #fa3732;
-        --ellas-green: #35fd9b;
-        --series-orange: #ff8c1f;
       }
       
       body.dark-mode {
@@ -89,7 +88,7 @@
         background: var(--card-bg);
         border-radius: var(--radius-md);
         padding: 1rem;
-        margin-bottom: 1rem;
+        margin-bottom: 0rem;
         box-shadow: var(--shadow-sm);
         display: flex;
         flex-direction: column;
@@ -169,15 +168,12 @@
       
       #sportFiltersContainer {
         margin-top: 0.6rem; 
-        /* --- MODIFICACIÓN CLAVE --- */
         display: flex;
         gap: 0.6rem;
         flex-wrap: wrap;
-        justify-content: center; /* Centra los botones de deporte */
-        /* -------------------------- */
+        justify-content: center; 
       }
       
-      /* REGLAS: Botones de filtro de deportes (emoji) redondos */
       .sport-filter-button {
         flex: 0 0 auto; 
         width: 36px;
@@ -188,13 +184,16 @@
       }
 
       .channels-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 1rem;
-        align-items: flex-start;
+        display: block; 
+        gap: 0; 
       }
       
       .channel-card {
+          min-width: 280px; 
+          max-width: 280px; 
+          flex: 0 0 auto;
+          scroll-snap-align: start; 
+          
           background: var(--card-bg);
           border: 1px solid var(--border-color);
           border-radius: var(--radius-md);
@@ -295,10 +294,24 @@
       }
       
       .channel-group__content {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 0.8rem;
-        padding: 0.8rem;
+          display: flex; 
+          gap: 0.8rem;
+          padding: 0.8rem;
+          overflow-x: auto; 
+          overflow-y: hidden;
+          white-space: nowrap; 
+          -webkit-overflow-scrolling: touch; 
+          scroll-snap-type: x mandatory; 
+          padding-bottom: 1rem;
+      }
+
+      .channel-group__content::-webkit-scrollbar {
+          height: 6px;
+      }
+
+      .channel-group__content::-webkit-scrollbar-thumb {
+          background: rgba(var(--primary-rgb), 0.5);
+          border-radius: 3px;
       }
       
       .offline-message {
@@ -313,7 +326,7 @@
       .update-notification {
         color: var(--primary);
         background: var(--primary-light);
-        padding: 0.5rem;
+        padding: 0.2rem;
         border-radius: var(--radius-sm);
         margin-bottom: 1rem;
         text-align: center;
@@ -580,7 +593,7 @@
       .dazn { color: var(--dazn-black) !important; }
       .f1 { color: var(--f1-red) !important; }
       .action { color: var(--action-red) !important; }
-      .classics { color: var(--classics-red) !important; }
+      .cinema-red { color: var(--cinema-red) !important; } /* Clase consolidada */
       .sports { color: var(--sports-green) !important; }
       .vamos { color: var(--vamos-green) !important; }
       .copadelrey { color: var(--copadelrey-green) !important; }
@@ -594,11 +607,6 @@
       .western { color: var(--western-red) !important; }
       .documentary { color: var(--documentary-purple) !important; }
       .originals { color: var(--originals-blue) !important; }
-      .hits { color: var(--hits-red) !important; }
-      .premieres { color: var(--premieres-red) !important; }
-      .indie { color: var(--indie-red) !important; }
-      .spanish-film { color: var(--spanish-film-red) !important; }
-      .drama { color: var(--drama-red) !important; }
       .ellas { color: var(--ellas-green) !important; }
       .series { color: var(--series-orange) !important; }
       
@@ -633,41 +641,52 @@
       .events-badge { background-color: var(--events-source-color); color: white; }
       .shickat-badge { background-color: var(--shickat-badge); color: white; }
       
-      .channel-number-badge {
+      .channel-number-badge-button {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
         right: 10px;
         padding: 4px;
-        border-radius: 20%;
+        border-radius: var(--radius-sm); 
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        line-height: 1;
+        line-height: 1.2; 
         transition: background-color 0.3s ease;
         
-        width: 30px;
-        height: 30px;
+        width: 40px; 
+        height: 40px;
+        
+        background: rgba(var(--primary-rgb), 0.9);
+        color: white;
+        border: none;
+        cursor: pointer;
+        z-index: 20;
       }
 
-      .channel-number-badge .channel-number {
+      .channel-number-badge-button.gist-badge { background-color: var(--gist-source-color); }
+      .channel-number-badge-button.elcano-badge { background-color: var(--elcano-source-color); }
+      .channel-number-badge-button.events-badge { background-color: var(--events-source-color); }
+      .channel-number-badge-button.shickat-badge { background-color: var(--shickat-badge); }
+
+      .channel-number-badge-button .channel-number {
         font-weight: 600;
         white-space: nowrap;
-        color: var(--text);
-        font-size: 0.75rem;
+        color: white; 
+        font-size: 0.8rem; 
+        margin-bottom: 2px;
       }
 
-      .channel-number-badge .source-initials {
+      .channel-number-badge-button .source-initials {
         font-size: 0.6rem;
         font-weight: bold;
         color: white;
-        margin-top: 2px;
       }
-      
-      body.dark-mode .channel-number-badge .channel-number {
-        color: white;
+
+      .channel-number-badge-button:hover {
+        transform: translateY(-50%) scale(1.1);
       }
 
       .retry-button {
@@ -723,64 +742,15 @@
         to { transform: rotate(360deg); }
       }
 
-      @media (max-width: 768px) {
-        .channels-grid {
-          grid-template-columns: 1fr;
-        }
-        
-        .filter-buttons {
-          flex-wrap: wrap;
-        }
-        
-        .channel-group__content {
-          grid-template-columns: 1fr;
-        }
-      }
-      
       @media (min-width: 768px) {
-        .channels-grid {
-          grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        }
-        
         .channel-name {
           font-size: 1.1rem;
         }
-      }
-
-      .floating-btn {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background-color: var(--primary);
-        color: white;
-        font-size: 1.5rem;
-        border: none;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: all 0.3s ease;
-        z-index: 1000;
-      }
-
-      .floating-btn:hover {
-        background-color: var(--primary-dark);
-        transform: scale(1.05);
-      }
-
-      .floating-btn.active {
-        animation: pulse 1.5s infinite ease-in-out;
-        background-color: #ff544d;
-      }
-
-      @keyframes pulse {
-        0% { transform: scale(1); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
-        50% { transform: scale(1.1); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); }
-        100% { transform: scale(1); box-shadow: 0 4-4px 8px rgba(0, 0, 0, 0.2); }
+        
+        .channel-card {
+            min-width: 300px;
+            max-width: 300px;
+        }
       }
 
       .degradado-comedia {
@@ -851,6 +821,7 @@
         font-family: monospace;
         word-break: break-all;
         font-size: 0.85rem;
+        display: block; /* Asegurarse de que se muestre si es necesario para depuración */
       }
       
       body.dark-mode .copy-modal-url {
@@ -986,36 +957,35 @@
           transform: translate(-100%, 0);
         }
       }
+      
+      .copy-link-btn {
+          display: none; 
+      }
+      
+      .event-date-header {
+        font-size: 1.2rem; 
+        font-weight: 600; 
+        color: var(--text); 
+        margin-top: 1rem; 
+        margin-bottom: 0.5rem; 
+        padding-left: 0.5rem;
+        border-left: 4px solid var(--primary); /* Estilo visual mejorado para la fecha */
+        padding-left: 10px;
+      }
     </style>
 </head>
 <body>
     <div class="main-container">
-        <div class="player-section" id="playerSection" style="display: none;">
-            <div class="player-container" id="playerContainer">
-                <iframe id="videoFrame" allowfullscreen></iframe>
-                <iframe id="scheduleFrame" allowfullscreen></iframe>
-            </div>
-            <div class="player-controls" id="playerControls">
-                <span class="channel-info" id="channelInfo"></span>
-                <button class="control-btn" id="prevChannelBtn" title="Canal anterior">◄</button>
-                <button class="control-btn" id="nextChannelBtn" title="Canal siguiente">►</button>
-                <button class="control-btn" id="toggleStickyBtn" title="Fijar reproductor">⛊</button>
-                <button class="control-btn" id="favoriteBtn" title="Guardar favorito">★</button>
-                <button class="control-btn" id="closePlayerBtn" title="Cerrar">×</button>
-                <span class="channel-number-display" id="channelNumberDisplay"></span>
-            </div>
-        </div>
-        
         <div class="search-filters">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Buscar canales, número (ej: #123)" autofocus>
+                <input type="text" id="searchInput" placeholder="Buscar canales, ID (ej: #123)" autofocus>
             </div>
             <div class="filter-buttons">
                 <button class="filter-button filter-button--favorites" id="filterFavorites">★</button>
                 <button class="filter-button" id="filterDAZN">DAZN</button>
                 <button class="filter-button" id="filterMovistar">MOVISTAR+</button>
                 <button class="filter-button" id="filterEurosport">★EUROSPORT</button>
-                <button class="filter-button filter-button--clear" id="clearEmojiFilters">x</button>
+                <button class="filter-button filter-button--clear filter-button--active" id="clearEmojiFilters">x</button>
             </div>
             <div class="filter-buttons" id="sportFiltersContainer" style="margin-top: 0.6rem;">
                 <button class="filter-button sport-filter-button" data-sport-key="futbol" id="filterFutbol">⚽</button>
@@ -1088,7 +1058,18 @@
                     </div>
                     <button class="modal__btn" onclick="resetRatings()">Reiniciar</button>
                 </div>
-            </div>
+                
+                <div class="settings-item">
+                    <div class="settings-item__info">
+                        <span class="settings-icon">📤</span>
+                        <div>
+                            <span class="settings-label">Exportar a VLC (M3U)</span>
+                            <span class="settings-description">Descarga la lista de canales (permanentes y eventos) en formato M3U</span>
+                        </div>
+                    </div>
+                    <button class="modal__btn" id="exportVlcM3UBtn">Exportar</button>
+                </div>
+                </div>
             
             <div class="modal__actions">
                 <button class="modal__btn modal__btn--primary" id="closeSettingsBtn">Cerrar</button>
@@ -1098,9 +1079,13 @@
     
     <div class="copy-modal" id="copyModal">
         <div class="copy-modal-icon">🔗</div>
-        <div class="copy-modal-text">¿Quieres copiar la URL de este canal?</div>
-        <p id="copyUrlDisplay" class="copy-modal-url"></p>
-        <button class="copy-modal-button" id="confirmCopyBtn">Copiar enlace</button>
+        <div class="copy-modal-text">Selecciona el formato de enlace a copiar:</div>
+        <p id="copyUrlDisplayAceStream" class="copy-modal-url" style="display:none;"></p>
+        <p id="copyUrlDisplayVLC" class="copy-modal-url" style="display:none;"></p>
+        
+        <button class="copy-modal-button" id="copyAceStreamBtn" data-format="acestream">Copiar AceStream</button>
+        <button class="copy-modal-button" id="copyVLCBtn" data-format="vlc">Copiar VLC</button>
+        
         <button class="modal__btn modal__btn--cancel" id="cancelCopyBtn">Cancelar</button>
     </div>
 
@@ -1128,21 +1113,18 @@
           lastChannelPlay: JSON.parse(localStorage.getItem('lastChannelPlay')) || null,
           firstSeen: JSON.parse(localStorage.getItem('firstSeen')) || {},
           
-          // NUEVA PROPIEDAD PARA EL FILTRO DE DEPORTES
           sportFilter: 'all' 
-      };
-
-      const RANGES = {
-          NE: { start: 1, end: 249, source: 'gist' },
-          EC: { start: 250, end: 499, source: 'elcano' },
-          EV: { start: 500, end: 749, source: 'events' },
-          SH: { start: 750, end: 999, source: 'shickat' }
       };
 
       const PROXIES = [
           'https://api.allorigins.win/raw?url=',
           'https://cors-anywhere.herokuapp.com/',
-          'https://api.codetabs.com/v1/proxy/?quest='
+          'https://api.codetabs.com/v1/proxy/?quest=',
+          // PROXIES ADICIONALES
+          'https://proxy-cors-simple.vercel.app/api?url=', 
+          'https://yacdn.org/proxy/',                       
+          'https://cors-proxy.fringe.co.kr/?'              
+          // FIN PROXIES ADICIONALES
       ];
       const GIST_URL = "https://gist.githubusercontent.com/Ciento20/f7847e86d06e5011706fa76f2dab90be/raw";
       const ELCANO_URL = 'https://ipfs.io/ipns/elcano.top';
@@ -1159,12 +1141,106 @@
       const MAX_RETRIES = 3;
       const BACKUP_EXPIRY_HOURS = 6;
       const HISTORY_EXPIRY_HOURS = 168;
+      const SPORT_FILTER_BUTTON_IDS = ['filterFutbol', 'filterBaloncesto', 'filterTenis', 'filterBoxeo', 'filterCiclismo', 'filterMotorsport', 'filterF1'];
+      const BRAND_FILTER_BUTTON_IDS = ['filterDAZN', 'filterMovistar', 'filterEurosport', 'filterFavorites', 'clearEmojiFilters'];
       
       // Función auxiliar para normalizar texto (eliminar tildes y convertir a minúsculas)
       function normalizeText(text) {
           if (!text) return '';
           return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
       }
+      
+      // 💡 NUEVAS FUNCIONES DE CONVERSIÓN VLC
+      /**
+       * Extrae el AceStream PID del enlace.
+       * @param {string} enlace - URL completa o solo el PID.
+       * @returns {string} El AceStream PID (hash) puro.
+       */
+      function extractPID(enlace) {
+          if (!enlace) return '';
+          return enlace.replace('acestream://', '').trim();
+      }
+
+      /**
+       * Convierte un AceStream PID en una URL de VLC.
+       * @param {string} pid - El AceStream PID puro.
+       * @returns {string} La URL compatible con VLC.
+       */
+      function convertToVLCUrl(pid) {
+          if (!pid) return '';
+          return `http://vlc.shickat.me:8000/pid/${pid}/stream.mp4`;
+      }
+      // 💡 FIN NUEVAS FUNCIONES DE CONVERSIÓN VLC
+      
+      // 💡 FUNCIÓN DE EXPORTACIÓN A M3U MODIFICADA
+      /**
+       * Genera el contenido del archivo M3U para la lista de reproducción de VLC.
+       * Incluye todos los canales que tengan un ID válido (AceStream ID de 40 caracteres).
+       * @returns {string} Contenido M3U.
+       */
+      function exportToM3U() {
+          const header = '#EXTM3U\n';
+          let content = '';
+
+          // MODIFICACIÓN: Se elimina el filtro 'c.source !== 'events'' para incluir todos los canales.
+          const channelsToExport = state.channelsData.filter(c => 
+              c.id && c.id.length === 40
+          );
+
+          if (channelsToExport.length === 0) {
+              showStatusMessage("No hay canales válidos para exportar.", "warning");
+              return null;
+          }
+
+          channelsToExport.forEach(channel => {
+              const pid = extractPID(channel.id); 
+              const vlcUrl = convertToVLCUrl(pid);
+              
+              // Atributo 'group-title' con la fuente
+              const groupTitle = `group-title="${channel.source.toUpperCase()}"`; 
+              
+              // Atributo 'tvg-id' con el AceStream ID (para herramientas avanzadas)
+              const tvgId = `tvg-id="${channel.id}"`; 
+              
+              // Atributo 'tvg-logo' con la calidad
+              const tvgLogo = `tvg-logo="${standardizeQuality(channel.quality)}"`;
+
+              // Atributo 'tvg-name'
+              const tvgName = `tvg-name="${channel.name}"`;
+              
+              // La línea #EXTINF con la información del canal. Se añade la fuente al nombre para diferenciar en VLC.
+              content += `#EXTINF:-1 ${groupTitle} ${tvgId} ${tvgLogo} ${tvgName},[${channel.source.toUpperCase()}] ${channel.name}\n`; 
+              // La URL compatible con VLC
+              content += `${vlcUrl}\n`; 
+          });
+
+          return header + content;
+      }
+      // 💡 FIN FUNCIÓN DE EXPORTACIÓN A M3U MODIFICADA
+      
+      // 💡 NUEVA FUNCIÓN PARA DESCARGA DE ARCHIVO
+      /**
+       * Crea un blob a partir del contenido M3U y fuerza la descarga del archivo.
+       * @param {string} content - El contenido del archivo M3U.
+       */
+      function downloadM3UFile(content) {
+          const filename = 'playlist.m3u';
+          const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+          
+          // Crear un enlace temporal para la descarga
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = filename;
+          
+          // Simular el clic para iniciar la descarga
+          document.body.appendChild(a);
+          a.click();
+          
+          // Limpiar el enlace y el objeto URL
+          document.body.removeChild(a);
+          URL.revokeObjectURL(a.href);
+      }
+      // 💡 FIN NUEVA FUNCIÓN PARA DESCARGA DE ARCHIVO
 
       function trackFirstSeen(channelId) {
           if (!state.firstSeen[channelId]) {
@@ -1201,6 +1277,8 @@
               state.favorites.push(channelId);
           }
           localStorage.setItem('favorites', JSON.stringify(state.favorites));
+          
+          // Re-renderizado optimizado si solo se altera un favorito
           renderResults();
       }
 
@@ -1212,36 +1290,55 @@
         updatePrimaryLightColor();
       }
       
-      // MODIFICACIÓN DE applyFilter para filtros de marca
+      // Función auxiliar para limpiar la activación de filtros
+      function clearAllFilterVisuals() {
+          BRAND_FILTER_BUTTON_IDS.forEach(id => {
+              const btn = document.getElementById(id);
+              if(btn) btn.classList.remove('filter-button--active');
+          });
+          SPORT_FILTER_BUTTON_IDS.forEach(id => {
+              const btn = document.getElementById(id);
+              if(btn) btn.classList.remove('filter-button--active');
+          });
+      }
+
+      // MODIFICACIÓN DE applyFilter para filtros de marca (OPTIMIZADO)
       function applyFilter(filter) {
         state.currentFilter = filter;
         document.getElementById('searchInput').value = '';
         state.searchTerm = '';
+        state.sportFilter = 'all'; // Desactiva filtro de deporte
+
+        clearAllFilterVisuals();
         
-        // Desactivar filtros de marca
-        document.querySelectorAll('.filter-buttons:first-of-type .filter-button').forEach(btn => btn.classList.remove('filter-button--active'));
-        
-        const targetBtn = document.getElementById(`filter${filter.charAt(0).toUpperCase() + filter.slice(1)}`);
-        if (targetBtn) {
-            targetBtn.classList.add('filter-button--active');
-        } else if (filter === 'all') {
-            document.getElementById('clearEmojiFilters').classList.add('filter-button--active');
+        let targetId;
+        if (filter === 'dazn') targetId = 'filterDAZN';
+        else if (filter === 'm+') targetId = 'filterMovistar';
+        else if (filter === 'eurosport') targetId = 'filterEurosport';
+        else if (filter === 'favorites') targetId = 'filterFavorites';
+        else if (filter === 'all') targetId = 'clearEmojiFilters'; 
+
+        if (targetId) {
+            document.getElementById(targetId).classList.add('filter-button--active');
         }
         
         renderResults();
       }
       
-      // NUEVA FUNCIÓN para filtros de deporte
+      // NUEVA FUNCIÓN para filtros de deporte (OPTIMIZADA)
       function applySportFilter(sportKey) {
           state.sportFilter = state.sportFilter === sportKey ? 'all' : sportKey; // Alterna el filtro
           document.getElementById('searchInput').value = '';
           state.searchTerm = '';
-          
-          // Quitar activación de todos los botones de deporte
-          document.querySelectorAll('.sport-filter-button').forEach(btn => btn.classList.remove('filter-button--active'));
+          state.currentFilter = 'all'; // Desactiva filtro de marca
+
+          clearAllFilterVisuals();
           
           if (state.sportFilter !== 'all') {
               document.querySelector(`.sport-filter-button[data-sport-key="${sportKey}"]`).classList.add('filter-button--active');
+          } else {
+              // Si se desactiva el filtro de deporte, activar el filtro 'x' (all)
+              document.getElementById('clearEmojiFilters').classList.add('filter-button--active');
           }
 
           renderResults();
@@ -1326,6 +1423,35 @@
         return eventChannels.concat(mergedOtherChannels);
       }
       
+      function loadAndRenderBackupChannels() {
+          let allBackupChannels = [];
+          let hasBackup = false;
+
+          for (const key in BACKUP_KEYS) {
+              const backup = loadBackup(BACKUP_KEYS[key]);
+              if (backup) {
+                  allBackupChannels = allBackupChannels.concat(backup.map(c => ({
+                      ...c,
+                      source: key, 
+                      name: c.name || `Canal de ${key.toUpperCase()}`,
+                      id: c.id || `${key}_${Math.random()}`,
+                      number: (c.id || `${key}_${Math.random()}`).substring(0, 3), 
+                      displayableName: c.displayableName || c.name 
+                  })));
+                  hasBackup = true;
+              }
+          }
+
+          if (allBackupChannels.length > 0) {
+              const newChannels = mergeChannels(allBackupChannels); 
+              state.channelsData = newChannels;
+              processChannelNames(); 
+              renderResults();
+              return true;
+          }
+          return false;
+      }
+
       async function fetchAndProcessSource(sourceName, url, processor, backupKey) {
           let channels = null;
           let message = '';
@@ -1346,56 +1472,21 @@
           return { name: sourceName, channels, message };
       }
 
-      function loadAndRenderBackupChannels() {
-          let allBackupChannels = [];
-          let hasBackup = false;
-
-          // Cargar y combinar copias de seguridad de todas las fuentes
-          for (const key in BACKUP_KEYS) {
-              const backup = loadBackup(BACKUP_KEYS[key]);
-              if (backup) {
-                  allBackupChannels = allBackupChannels.concat(backup.map(c => ({
-                      ...c,
-                      source: key, 
-                      name: c.name || `Canal de ${key.toUpperCase()}`,
-                      id: c.id || `${key}_${Math.random()}`,
-                      displayableName: c.displayableName || c.name 
-                  })));
-                  hasBackup = true;
-              }
-          }
-
-          if (allBackupChannels.length > 0) {
-              const newChannels = mergeChannels(allBackupChannels); 
-              state.channelsData = newChannels;
-              processChannelNames(); 
-              renderResults();
-              
-              // [MODIFICACIÓN] Ya no mostramos la notificación de uso de historial aquí
-              return true;
-          }
-          return false;
-      }
-
       async function loadInitialChannels() {
           const channelsGrid = document.getElementById("channelsGrid");
           
-          // 1. Mostrar historial si está disponible (silenciosamente)
           const isShowingBackup = loadAndRenderBackupChannels();
 
-          // 2. Si no hay historial, mostrar spinner de carga inicial
           if (!isShowingBackup) {
               channelsGrid.innerHTML = '<div class="loading-container"><div class="loading-spinner"></div><span>Cargando canales...</span></div>';
           }
           
-          // Muestra un mensaje temporal de carga. Se ocultará solo (showStatusMessage usa 'info').
           const temporaryLoadMessage = isShowingBackup 
             ? "Mostrando historial. Obteniendo datos en tiempo real..." 
             : "Cargando datos en tiempo real...";
           showStatusMessage(temporaryLoadMessage, "info");
 
 
-          // 3. Iniciar la carga de todas las fuentes en línea
           const results = await Promise.allSettled([ 
               fetchAndProcessSource('events', EVENTS_URL, loadEventsSource, BACKUP_KEYS.events),
               fetchAndProcessSource('gist', GIST_URL, loadGistChannels, BACKUP_KEYS.gist),
@@ -1403,7 +1494,6 @@
               fetchAndProcessSource('elcano', ELCANO_URL, loadElcanoSource, BACKUP_KEYS.elcano)
           ]);
           
-          // 4. Procesar resultados
           let allChannels = [];
           let hasFallback = false; 
           let hasOnlineSuccess = false; 
@@ -1420,16 +1510,16 @@
               }
           });
           
-          // 5. Determinar el conjunto final de canales y la ÚNICA notificación final
           if (allChannels.length > 0) {
               const newChannels = mergeChannels(allChannels);
               state.channelsData = newChannels;
               processChannelNames();
               renderResults(); 
               cleanObsoleteRatings();
-              // document.getElementById('offlineMessage').style.display = 'none'; // REFERENCIA ELIMINADA
 
-              // Notificación ÚNICA FINAL
+              const loadingContainer = channelsGrid.querySelector('.loading-container');
+              if (loadingContainer) loadingContainer.remove();
+
               if (hasOnlineSuccess) {
                 if (hasFallback) {
                     showStatusMessage("Canales actualizados (algunos con historial).", "warning");
@@ -1437,17 +1527,15 @@
                     showStatusMessage("Canales actualizados correctamente.", "success");
                 }
               } else if (hasFallback) {
-                  // Esto solo ocurre si todo falló online, pero se tenía un backup completo
                   showStatusMessage("Fallo al actualizar. Se sigue mostrando el historial completo.", "error");
               } else {
-                   // Fallo completo, pero el arreglo tiene canales (caso límite)
                    showStatusMessage("Error al actualizar, se cargaron canales desconocidos.", "error");
               }
           } else if (isShowingBackup) {
-              // Fallo en la carga online, pero ya se había renderizado el backup
               showStatusMessage("Fallo al actualizar canales. Se sigue mostrando el historial.", "error");
+              const loadingContainer = channelsGrid.querySelector('.loading-container');
+              if (loadingContainer) loadingContainer.remove();
           } else {
-              // Fallo total y no hay backup.
               channelsGrid.innerHTML = `
                   <div class="no-results">
                       <div class="no-results-icon">📡</div>
@@ -1484,7 +1572,6 @@
         const numberedChannels = [];
         const lines = infoCanales.split('\n').filter(line => line.trim() !== '');
 
-        let currentNumber = RANGES.NE.start;
         const channelMappings = {
           'MOVISTAR': 'M+',
           'CLASICOS': 'Clásicos',
@@ -1538,9 +1625,11 @@
                       }
                     }
 
+                    simplifiedName = normalizeChannelName(simplifiedName);
+                    
                     numberedChannels.push({
                         id: acestreamId,
-                        number: (currentNumber++).toString(),
+                        number: acestreamId.substring(0, 3), 
                         name: simplifiedName,
                         quality: quality,
                         multiAudio: multiAudio,
@@ -1629,7 +1718,6 @@
           const doc = parser.parseFromString(htmlContent, 'text/html');
           const cards = doc.querySelectorAll('article.canal-card');
           
-          let currentNumber = RANGES.SH.start;
           
           const nameMappings = {
               'Movistar': 'M+',
@@ -1684,7 +1772,7 @@
                       
                       numberedChannels.push({
                           id: acestreamId,
-                          number: currentNumber.toString(),
+                          number: acestreamId.substring(0, 3), 
                           name: simplifiedName,
                           quality: quality,
                           multiAudio: multiAudio,
@@ -1692,8 +1780,6 @@
                           source: 'shickat'
                       });
                       trackFirstSeen(acestreamId);
-                      
-                      currentNumber++;
                   }
               }
           });
@@ -1703,7 +1789,6 @@
 
       function processElcanoData(links) {
           const numberedChannels = [];
-          let currentNumber = RANGES.EC.start;
 
           const nameMap = {
               'M. LaLiga': 'M+ La Liga',
@@ -1748,7 +1833,7 @@
 
                   numberedChannels.push({
                       id: acestreamId,
-                      number: currentNumber.toString(),
+                      number: acestreamId.substring(0, 3), 
                       name: simplifiedName,
                       quality: quality,
                       multiAudio: multiAudio,
@@ -1756,8 +1841,6 @@
                       source: 'elcano'
                   });
                   trackFirstSeen(acestreamId);
-
-                  currentNumber++;
               }
           });
 
@@ -1770,7 +1853,6 @@
           const doc = parser.parseFromString(htmlContent, 'text/html');
           const dateHeaders = doc.querySelectorAll('h2.fecha');
           
-          let currentNumber = RANGES.EV.start;
           
           const channelMappings = {
               'Movistar': 'M+',
@@ -1822,9 +1904,11 @@
                                   
                                   const multiAudio = false;
                                   
+                                  simplifiedName = normalizeChannelName(simplifiedName);
+
                                   numberedChannels.push({
                                       id: acestreamId,
-                                      number: currentNumber.toString(),
+                                      number: acestreamId.substring(0, 3), 
                                       name: simplifiedName,
                                       quality: quality,
                                       multiAudio: multiAudio,
@@ -1833,8 +1917,6 @@
                                       event: { time, competition, match, date, sportEmoji, sportName }
                                   });
                                   trackFirstSeen(acestreamId);
-                                  
-                                  currentNumber++;
                               });
                           }
                       }
@@ -1845,6 +1927,7 @@
           return numberedChannels;
       }
       
+      // MODIFICACIÓN: Consolidación de reemplazos de color a la clase '.cinema-red'
       function processChannelNames() {
           const brands = [
               { name: 'M+', class: 'movistar' },
@@ -1853,9 +1936,7 @@
               { name: 'F1', class: 'f1' },
               { name: 'Acción', class: 'action' },
               { name: 'Deportes', class: 'sports' },
-              { name: 'hits', class: 'action' },
-              { name: 'clásicos', class: 'action' },
-              { name: 'Clásicos', class: 'classics' },
+              { name: 'Clásicos', class: 'cinema-red' }, /* CONSOLIDADO */
               { name: 'Vamos', class: 'vamos' },
               { name: 'Copa del Rey', class: 'copadelrey' },
               { name: 'Liga de Campeones', class: 'champions' },
@@ -1868,11 +1949,11 @@
               { name: 'Western', class: 'western' },
               { name: 'Documentales', class: 'documentary' },
               { name: 'Originales', class: 'originals' },
-              { name: 'Hits', class: 'hits' },
-              { name: 'Estrenos', class: 'premieres' },
-              { name: 'Indie', class: 'indie' },
-              { name: 'Cine Español', class: 'spanish-film' },
-              { name: 'Drama', class: 'drama' },
+              { name: 'Hits', class: 'cinema-red' }, /* CONSOLIDADO */
+              { name: 'Estrenos', class: 'cinema-red' }, /* CONSOLIDADO */
+              { name: 'Indie', class: 'cinema-red' }, /* CONSOLIDADO */
+              { name: 'Cine Español', class: 'cinema-red' }, /* CONSOLIDADO */
+              { name: 'Drama', class: 'cinema-red' }, /* CONSOLIDADO */
               { name: 'Ellas', class: 'ellas' },
               { name: 'Series', class: 'series' }
           ];
@@ -1895,7 +1976,6 @@
           });
       }
 
-      // MODIFICACIÓN DE filterChannels para incluir el filtrado por deporte
       function filterChannels() {
         let filteredChannels = state.channelsData;
         const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -1927,26 +2007,31 @@
             filteredChannels = historyChannels;
         }
 
-        // 3. NUEVO FILTRADO POR DEPORTE
+        // 3. FILTRADO POR DEPORTE
         if (state.sportFilter !== 'all') {
             const normalizedSportFilter = normalizeText(state.sportFilter);
             
             const sportSearchTerms = {
-                'futbol': ['futbol', 'soccer', 'campeones', 'copa del rey', 'premier', 'bundesliga', 'serie a'],
+                'futbol': ['futbol', 'soccer', 'campeones', 'copa del rey', 'premier league', 'bundesliga', 'serie a'],
                 'baloncesto': ['baloncesto', 'basket', 'nba', 'euroliga'],
                 'tenis': ['tenis', 'wimbledon', 'roland garros', 'us open', 'atp', 'wta'],
                 'boxeo': ['boxeo', 'boxing', 'lucha', 'ufc', 'mma'],
                 'ciclismo': ['ciclismo', 'tour', 'giro', 'vuelta'],
+                // OPTIMIZACIÓN: Se usa la lógica de f1 para motorsport
                 'motorsport': ['motor', 'f1', 'fórmula', 'formula', 'moto', 'motociclismo', 'dakar', 'rally', 'motogp', 'wrc', 'nascar'],
                 'f1': ['f1', 'fórmula 1', 'formula 1', 'formulaone', 'fórmulaone']
             };
             
-            const targetTerms = sportSearchTerms[normalizedSportFilter] || [normalizedSportFilter];
+            let targetTerms = sportSearchTerms[normalizedSportFilter] || [normalizedSportFilter];
+            
+            // Si el filtro es motorsport, se añaden los términos de f1 para que funcione con ambos botones (f1 es subconjunto de motorsport)
+            if (normalizedSportFilter === 'motorsport' && sportSearchTerms['f1']) {
+                targetTerms = targetTerms.concat(sportSearchTerms['f1']);
+            }
             
             filteredChannels = filteredChannels.filter(channel => {
                 const normalizedName = normalizeText(channel.name);
                 
-                // Buscar en el nombre del canal o en los detalles del evento
                 const eventDetailsMatch = channel.event && (
                     normalizeText(channel.event.sportName || '').includes(normalizedSportFilter) ||
                     targetTerms.some(term => normalizeText(channel.event.competition || '').includes(term)) ||
@@ -1965,7 +2050,7 @@
             const normalizedSearchTerm = normalizeText(searchTerm);
             
             const nameMatches = normalizeText(channel.name).includes(normalizedSearchTerm);
-            const numberMatches = channel.number && channel.number.includes(searchTerm.replace('#', ''));
+            const idMatches = channel.id && channel.id.toLowerCase().includes(normalizedSearchTerm.replace('#', ''));
             
             let eventDetailsMatch = false;
             if (channel.event) {
@@ -1978,7 +2063,7 @@
                     normalizeText(date || '').includes(normalizedSearchTerm); 
             }
 
-            return nameMatches || numberMatches || eventDetailsMatch;
+            return nameMatches || idMatches || eventDetailsMatch;
           });
         }
 
@@ -2003,6 +2088,100 @@
       function getChannelNumberFromName(name) {
           const match = name.match(/\d+/);
           return match ? parseInt(match[0], 10) : 1;
+      }
+
+      /**
+       * NUEVA FUNCIÓN: Formatea la fecha del evento a '(Día de la semana) (XX) de (Mes)'
+       * @param {string} dateString - Cadena de fecha original (ej: "Hoy", "Mañana", "19/10/2025")
+       * @returns {string} Fecha formateada
+       */
+      function formatEventDate(dateString) {
+          if (dateString.toLowerCase() === 'hoy') {
+              return 'Hoy';
+          }
+          if (dateString.toLowerCase() === 'mañana') {
+              return 'Mañana';
+          }
+
+          const today = new Date();
+          const date = parseDateString(dateString, today);
+          
+          if (isNaN(date.getTime())) {
+              return dateString; 
+          }
+
+          const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+          const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+          const dayOfWeek = weekdays[date.getDay()];
+          const dayOfMonth = date.getDate();
+          const monthName = months[date.getMonth()];
+          
+          // Comprueba si la fecha es igual a la actual (solo día, mes, año)
+          const isToday = date.getDate() === today.getDate() &&
+                          date.getMonth() === today.getMonth() &&
+                          date.getFullYear() === today.getFullYear();
+          
+          if (isToday) {
+              return 'Hoy';
+          }
+          
+          return `${dayOfWeek} ${dayOfMonth} de ${monthName}`;
+      }
+
+      function compareEventDates(eventA, eventB) {
+          const today = new Date();
+          
+          // Normaliza 'Hoy' y 'Mañana' para la comparación
+          const dateStringA = eventA.date.toLowerCase();
+          const dateStringB = eventB.date.toLowerCase();
+          
+          const isTodayA = dateStringA === 'hoy';
+          const isTodayB = dateStringB === 'hoy';
+          const isTomorrowA = dateStringA === 'mañana';
+          const isTomorrowB = dateStringB === 'mañana';
+          
+          if (isTodayA && !isTodayB) return -1;
+          if (!isTodayA && isTodayB) return 1;
+          if (isTodayA && isTodayB) return eventA.time.localeCompare(eventB.time); 
+
+          if (isTomorrowA && !isTomorrowB) return -1;
+          if (!isTomorrowA && isTomorrowB) return 1;
+          if (isTomorrowA && isTomorrowB) return eventA.time.localeCompare(eventB.time);
+          
+          if (isTodayA || isTodayB || isTomorrowA || isTomorrowB) {
+              const dateA = isTodayA ? today : (isTomorrowA ? new Date(today.getTime() + 86400000) : parseDateString(dateStringA, today));
+              const dateB = isTodayB ? today : (isTomorrowB ? new Date(today.getTime() + 86400000) : parseDateString(dateStringB, today));
+
+              if (dateA.getTime() !== dateB.getTime()) {
+                  return dateA.getTime() - dateB.getTime();
+              }
+              return eventA.time.localeCompare(eventB.time);
+          }
+          
+          const dateA = parseDateString(eventA.date, today);
+          const dateB = parseDateString(eventB.date, today);
+
+          if (dateA.getTime() !== dateB.getTime()) {
+              return dateA.getTime() - dateB.getTime();
+          }
+
+          return eventA.time.localeCompare(eventB.time);
+      }
+
+      function parseDateString(dateString, today) {
+          if (dateString.toLowerCase() === 'mañana') {
+              const tomorrow = new Date(today);
+              tomorrow.setDate(today.getDate() + 1);
+              return tomorrow;
+          }
+          const parts = dateString.split('/');
+          if (parts.length === 3) {
+              // Asume formato DD/MM/AAAA. Año actual si no está presente.
+              const year = parts[2] ? parseInt(parts[2], 10) : today.getFullYear(); 
+              return new Date(year, parseInt(parts[1]) - 1, parseInt(parts[0]));
+          }
+          return today;
       }
 
       function renderResults() {
@@ -2048,15 +2227,13 @@
               if (sourceB !== sourceA) {
                   return sourceB - sourceA;
               }
-
-              const numA = parseInt(a.number, 10);
-              const numB = parseInt(b.number, 10);
-              return numA - numB;
+              
+              return a.name.localeCompare(b.name); 
           });
 
           const groups = {};
-          const otherChannels = [];
-          
+          const eventGroupKeysByChannelName = new Map();
+
           const groupOrder = [
               'DAZN F1', 
               'DAZN',
@@ -2074,7 +2251,7 @@
 
           const groupRegexes = {
               'DAZN F1': /DAZN F1/i,
-              'DAZN': /DAZN/i,
+              'DAZN': /DAZN(?!.*F1|.*La Liga)/i, // Excluir F1 y La Liga para DAZN general
               'DAZN La Liga': /DAZN La Liga/i,
               'Liga de Campeones': /Liga de Campeones/i,
               'La Liga Hypermotion': /La Liga Hypermotion/i,
@@ -2083,21 +2260,66 @@
               'M+ Deportes': /M\+ Deportes/i,
               'M+ Plus': /M\+ Plus/i,
               'M+ Golf': /M\+ Golf/i,
-              'M+': /M\+/i,
+              'M+': /M\+(?!.*La Liga|.*Vamos|.*Deportes|.*Plus|.*Golf|.*Liga de Campeones)/i, // M+ Genérico (ajustado)
               '★EUROSPORT': /★EUROSPORT/i,
           };
           
-          sortedChannels.forEach(channel => {
-              if (channel.source === 'events' && channel.event) {
-                  const eventGroupKey = `${channel.event.date}-${channel.event.time}-${channel.event.competition}-${channel.event.match}`;
-                  if (!groups[eventGroupKey]) {
-                      groups[eventGroupKey] = { name: `${channel.event.competition}: ${channel.event.match}`, channels: [], time: channel.event.time, date: channel.event.date, isEvent: true, sportEmoji: channel.event.sportEmoji, sportName: channel.event.sportName };
-                  }
-                  groups[eventGroupKey].channels.push(channel);
-              } else {
-                  let groupFound = false;
+          const eventChannels = sortedChannels.filter(c => c.source === 'events' && c.event);
+          const otherChannels = sortedChannels.filter(c => !(c.source === 'events' && c.event));
 
-                  // Lógica específica para ELEVEN DAZN y DAZN EVENTOS
+          // 1. CREAR GRUPOS DE EVENTO y mapear nombres de canal
+          eventChannels.forEach(channel => {
+              // CLAVE DE AGRUPACIÓN: Fecha + Competición + Partido
+              const eventGroupKey = `${channel.event.date}###${channel.event.competition}###${channel.event.match}`; 
+              const normalizedChannelName = normalizeText(channel.name);
+              
+              if (!groups[eventGroupKey]) {
+                  groups[eventGroupKey] = { 
+                    name: `${channel.event.competition}: ${channel.event.match}`, 
+                    channels: [], 
+                    time: channel.event.time, 
+                    date: channel.event.date, 
+                    isEvent: true, 
+                    sportEmoji: channel.event.sportEmoji, 
+                    sportName: channel.event.sportName 
+                  };
+              }
+              
+              const isDuplicateInGroup = groups[eventGroupKey].channels.some(c => c.id === channel.id);
+              if (!isDuplicateInGroup) {
+                  groups[eventGroupKey].channels.push(channel);
+              }
+              
+              if (!eventGroupKeysByChannelName.has(normalizedChannelName)) {
+                  eventGroupKeysByChannelName.set(normalizedChannelName, new Set());
+              }
+              eventGroupKeysByChannelName.get(normalizedChannelName).add(eventGroupKey);
+          });
+          
+          // 2. AGRUPAR CANALES NO-EVENTO (GIST, ELCANO, SHICKAT)
+          otherChannels.forEach(channel => {
+              let groupFound = false;
+              const normalizedChannelName = normalizeText(channel.name);
+              
+              // **PRIORIDAD 1: Intenta agrupar por nombre de canal en un evento existente**
+              if (eventGroupKeysByChannelName.has(normalizedChannelName)) {
+                  const eventGroupKeys = eventGroupKeysByChannelName.get(normalizedChannelName);
+                  
+                  for (const eventGroupKey of eventGroupKeys) {
+                      const eventGroup = groups[eventGroupKey];
+                      if (eventGroup) {
+                          const isDuplicateInGroup = eventGroup.channels.some(c => c.id === channel.id);
+                          
+                          if (!isDuplicateInGroup) {
+                              eventGroup.channels.push(channel);
+                              groupFound = true; 
+                          }
+                      }
+                  }
+              }
+              
+              // PRIO 2: Si no se agrupa en un evento, usa la lógica de grupos de marca (actual)
+              if (!groupFound) {
                   if (channel.name.toUpperCase().includes('ELEVEN DAZN') || channel.name.toUpperCase().includes('DAZN EVENTOS')) {
                       if (!groups['Otros']) {
                           groups['Otros'] = { name: 'Otros', channels: [] };
@@ -2106,9 +2328,6 @@
                       groupFound = true;
                   } else {
                       for (const groupName of groupOrder) {
-                          if (groupName === 'DAZN' && /DAZN La Liga/i.test(channel.name)) {
-                              continue;
-                          }
                           if (groupRegexes[groupName] && groupRegexes[groupName].test(channel.name)) {
                               if (!groups[groupName]) {
                                   groups[groupName] = { name: groupName, channels: [] };
@@ -2119,22 +2338,29 @@
                           }
                       }
                   }
-                  
-                  if (!groupFound) {
-                      if (!groups['Otros']) {
-                          groups['Otros'] = { name: 'Otros', channels: [] };
-                      }
-                      groups['Otros'].channels.push(channel);
+              }
+              
+              // PRIO 3: Si nada funciona, al grupo "Otros"
+              if (!groupFound) {
+                  if (!groups['Otros']) {
+                      groups['Otros'] = { name: 'Otros', channels: [] };
                   }
+                  groups['Otros'].channels.push(channel);
               }
           });
 
+          // ORDENACIÓN DE GRUPOS
           const sortedGroupKeys = Object.keys(groups).sort((a, b) => {
               const groupA = groups[a];
               const groupB = groups[b];
 
               if (groupA.isEvent && groupB.isEvent) {
-                  return compareEventDates(groupA, groupB);
+                  // Agrupación de eventos: compara la fecha real (para asegurar que 'Hoy' va primero)
+                  const dateCompare = compareEventDates(groupA, groupB); 
+                  if (dateCompare !== 0) return dateCompare;
+                  
+                  // Luego por hora, competición y partido (usa las claves de agrupación)
+                  return a.localeCompare(b);
               }
 
               if (groupA.isEvent && !groupB.isEvent) return -1;
@@ -2157,25 +2383,71 @@
           }
           
           const fragment = document.createDocumentFragment();
+          let lastDateRendered = null; // Variable para rastrear la última fecha renderizada
+          
           sortedGroupKeys.forEach(groupKey => {
               const group = groups[groupKey];
+              
+              if (group.isEvent) {
+                  group.channels.sort((a, b) => {
+                      const sourcePriorityMap = { 'events': 4, 'gist': 3, 'shickat': 2, 'elcano': 1, 'history': 0 };
+                      const sourceA = sourcePriorityMap[a.source] || 0;
+                      const sourceB = sourcePriorityMap[b.source] || 0;
+                      if (sourceB !== sourceA) {
+                          return sourceB - sourceA;
+                      }
+                      const qualityMap = { '4K': 5, 'FHD': 4, 'HD': 3, 'SD': 2, 'N/A': 1, 'UHD': 6 };
+                      const qualityA = qualityMap[standardizeQuality(a.quality)] || 0;
+                      const qualityB = qualityMap[standardizeQuality(b.quality)] || 0;
+                      if (qualityB !== qualityA) {
+                          return qualityB - qualityA;
+                      }
+                      return 0;
+                  });
+              }
+              
+              group.channels.sort((a, b) => {
+                  const aIsFavorite = state.favorites.includes(a.id);
+                  const bIsFavorite = state.favorites.includes(b.id);
+
+                  if (aIsFavorite && !bIsFavorite) return -1;
+                  if (!aIsFavorite && bIsFavorite) return 1;
+                  
+                  return 0;
+              });
+              
+              // **************** MODIFICACIÓN INICIO: Nuevo encabezado de fecha ****************
+              if (group.isEvent) {
+                  const formattedDate = formatEventDate(group.date); // <-- APLICA EL NUEVO FORMATO
+                  if (formattedDate !== lastDateRendered) {
+                      const dateHeaderElement = document.createElement('h3');
+                      dateHeaderElement.className = 'event-date-header'; 
+                      dateHeaderElement.textContent = formattedDate;
+                      fragment.appendChild(dateHeaderElement);
+                      lastDateRendered = formattedDate; 
+                  }
+              } else {
+                  lastDateRendered = null; // Reiniciar si no es un grupo de eventos
+              }
+              // **************** MODIFICACIÓN FIN: Nuevo encabezado de fecha ****************
+
               const groupElement = document.createElement('div');
               groupElement.className = 'channel-group';
 
               let groupTitleContent;
               if (group.isEvent) {
+                  // Se elimina la fecha del encabezado del grupo
                   groupTitleContent = `
                       <div style="display: flex; flex-direction: column; width: 100%;">
-                        <div style="display: flex; justify-content: space-between; width: 100%;">
-                          <div>${group.date}</div>
-                          <div class="group-title-emoji">${group.sportEmoji}</div>
-                        </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                          <div style="margin-right: 10px;">${group.channels[0].event.time}</div>
+                          <div style="margin-right: 10px; font-weight: bold;">${group.channels[0].event.time}</div>
                           <div class="marquee-container" style="flex: 1;">
                             <div class="competition-text">${group.channels[0].event.competition}</div>
                           </div>
-                          <div style="margin-left: 10px;">${group.channels[0].event.match}</div>
+                          <div style="margin-left: 10px;">
+                            ${group.channels[0].event.match}
+                            <span class="group-title-emoji" style="margin-left: 10px;">${group.channels[0].event.sportEmoji}</span>
+                          </div>
                         </div>
                       </div>
                   `;
@@ -2195,53 +2467,18 @@
           });
           channelsGrid.appendChild(fragment);
 
+          // OPTIMIZACIÓN: Solo se evalúa el marquee después de la renderización
           document.querySelectorAll('.competition-text').forEach(textElement => {
               const container = textElement.closest('.marquee-container');
-              if (container && textElement.scrollWidth > container.clientWidth) {
-                  textElement.classList.add('is-overflowing');
-              } else {
-                  textElement.classList.remove('is-overflowing');
-              }
+              // Se añade un pequeño retraso para asegurar que el DOM ha calculado el layout
+              setTimeout(() => {
+                  if (container && textElement.scrollWidth > container.clientWidth) {
+                      textElement.classList.add('is-overflowing');
+                  } else {
+                      textElement.classList.remove('is-overflowing');
+                  }
+              }, 0); 
           });
-      }
-
-      function compareEventDates(eventA, eventB) {
-          const today = new Date();
-          const isTodayA = eventA.date.toLowerCase() === 'hoy';
-          const isTodayB = eventB.date.toLowerCase() === 'hoy';
-
-          if (isTodayA && !isTodayB) return -1;
-          if (!isTodayA && isTodayB) return 1;
-
-          if (isTodayA && isTodayB) {
-              const timeA = eventA.time.replace(':', '');
-              const timeB = eventB.time.replace(':', '');
-              return parseInt(timeA, 10) - parseInt(timeB, 10);
-          }
-
-          const dateA = parseDateString(eventA.date, today);
-          const dateB = parseDateString(eventB.date, today);
-
-          if (dateA.getTime() !== dateB.getTime()) {
-              return dateA.getTime() - dateB.getTime();
-          }
-
-          const timeA = eventA.time.replace(':', '');
-          const timeB = eventB.time.replace(':', '');
-          return parseInt(timeA, 10) - parseInt(timeB, 10);
-      }
-
-      function parseDateString(dateString, today) {
-          if (dateString.toLowerCase() === 'mañana') {
-              const tomorrow = new Date(today);
-              tomorrow.setDate(today.getDate() + 1);
-              return tomorrow;
-          }
-          const parts = dateString.split('/');
-          if (parts.length === 3) {
-              return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-          }
-          return today;
       }
 
       function createChannelCard(channel) {
@@ -2252,36 +2489,39 @@
 
           let sourceBadgeClass = '';
           let sourceBadgeText = '';
-          const channelNumber = parseInt(channel.number, 10);
-
-          for (const key in RANGES) {
-              if (channelNumber >= RANGES[key].start && channelNumber <= RANGES[key].end) {
-                  switch (key) {
-                      case 'NE':
-                          sourceBadgeClass = 'gist-badge';
-                          sourceBadgeText = 'NE';
-                          break;
-                      case 'EC':
-                          sourceBadgeClass = 'elcano-badge';
-                          sourceBadgeText = 'EC';
-                          break;
-                      case 'EV':
-                          sourceBadgeClass = 'events-badge';
-                          sourceBadgeText = 'EV';
-                          break;
-                      case 'SH':
-                          sourceBadgeClass = 'shickat-badge';
-                          sourceBadgeText = 'SH';
-                          break;
-                  }
+          
+          switch (channel.source) {
+              case 'gist':
+                  sourceBadgeClass = 'gist-badge';
+                  sourceBadgeText = 'NE';
                   break;
-              }
+              case 'elcano':
+                  sourceBadgeClass = 'elcano-badge';
+                  sourceBadgeText = 'EC';
+                  break;
+              case 'events':
+                  sourceBadgeClass = 'events-badge';
+                  sourceBadgeText = 'EV';
+                  break;
+              case 'shickat':
+                  sourceBadgeClass = 'shickat-badge';
+                  sourceBadgeText = 'SH';
+                  break;
           }
           
           const isNew = isChannelNew(channel.id);
           const newIndicator = isNew ? '<div class="new-channel-indicator"></div>' : '';
 
           const displayQuality = standardizeQuality(channel.quality);
+          
+          const sourceButton = `
+              <button class="channel-number-badge-button ${sourceBadgeClass}" 
+                      data-id="${channel.id}" 
+                      title="Copiar enlace (AceStream ID: ${channel.id})">
+                  <span class="channel-number">${channel.number}</span>
+                  <span class="source-initials">${sourceBadgeText}</span>
+              </button>
+          `;
 
           return `
               <div class="${cardClass}"
@@ -2294,12 +2534,9 @@
                   <div class="channel-header">
                       <div class="channel-name">${channel.displayableName}</div>
                   </div>
-                  <div class="channel-number-badge ${sourceBadgeClass}">
-                      <span class="channel-number">${channel.number}</span>
-                      <span class="source-initials">${sourceBadgeText}</span>
-                  </div>
+                  ${sourceButton}
                   <div class="rating-stars">${getStarRating(rating)}</div>
-              </div>
+                  </div>
           `;
       }
 
@@ -2314,24 +2551,13 @@
           }, 500);
       }
       
-      let currentCard = null;
-      let isSwiping = false;
-      const SWIPE_THRESHOLD = 80;
-      const VERTICAL_TOLERANCE = 40;
-      let longPressTimer;
-      let isLongPress = false;
-      
-      let touchStartX = 0;
-      let touchStartY = 0;
-      let touchStartTime = 0;
-      const TAP_THRESHOLD_TIME = 200;
-      const TAP_THRESHOLD_DISTANCE = 10;
-
+      /**
+       * Lógica de puntuación de estabilidad de canales optimizada.
+       * Premia una duración larga, penaliza una duración corta SÓLO si se cambia a un canal
+       * con el mismo nombre (indicando búsqueda de un enlace funcional) o si la duración fue muy corta.
+       * Si se cambia a un canal con nombre diferente, el canal anterior no se penaliza.
+       */
       function handleChannelPlay(channel) {
-          if (isSwiping) {
-              isSwiping = false;
-              return;
-          }
           const now = new Date().getTime();
 
           if (state.lastChannelPlay) {
@@ -2342,27 +2568,39 @@
               let rating = state.channelRatings[previousChannelId] !== undefined ? state.channelRatings[previousChannelId] : 2.5;
               let newRating = rating;
 
-              const previousName = previousChannelData ? previousChannelData.name.toLowerCase().trim() : '';
-              const currentName = channel.name.toLowerCase().trim();
-
-              if (previousName === currentName) {
-                  if (duration >= (30 * 60)) {
-                      newRating += 1.5;
-                  } else if (duration >= (15 * 60)) {
-                      newRating -= 0.5;
-                  } else if (duration >= (5 * 60)) {
-                      newRating -= 1;
-                  } else if (duration >= 10) {
-                      newRating -= 1.5;
-                  }
-              } else {
-                  if (duration >= (30 * 60)) {
-                      newRating += 1.5;
+              if (previousChannelId !== channel.id && previousChannelData) {
+                  const previousName = previousChannelData.name.toLowerCase().trim();
+                  const currentName = channel.name.toLowerCase().trim();
+                  
+                  // Lógica de puntuación SÓLO si se cambia a un canal diferente
+                  if (previousName === currentName) {
+                      // Mismo nombre (diferentes IDs) -> Asume intento de cambio por fallo
+                      if (duration >= (30 * 60)) {
+                          newRating += 1.5; // Muy estable
+                      } else if (duration >= (15 * 60)) {
+                          newRating += 0.5; // Estable
+                      } else if (duration >= (5 * 60)) {
+                          newRating -= 1; // Falló relativamente pronto
+                      } else if (duration >= 10) {
+                          newRating -= 1.5; // Falló muy pronto
+                      } else {
+                          newRating -= 2; // Fallo inmediato
+                      }
                   } else {
-                      newRating = rating;
+                      // Cambio a canal diferente
+                      if (duration >= (30 * 60)) {
+                          newRating += 1.5; // Se premia la duración, fue estable
+                      } else {
+                          // Si se cerró y se fue a otro canal en menos de 30 min, NO se resta al anterior.
+                          // Esto evita penalizar al canal anterior cuando el usuario simplemente quería cambiar de programa.
+                          newRating = rating; 
+                      }
                   }
+              } else if (previousChannelId === channel.id) {
+                  // Mismo enlace pulsado de nuevo (sin cambio de ID)
+                  newRating = rating; // Mantiene el rating sin cambios
               }
-
+              
               state.channelRatings[previousChannelId] = Math.max(1, Math.min(5, newRating));
               saveRatings();
               renderResults();
@@ -2377,38 +2615,26 @@
           playChannel(channel.id);
       }
 
-      function handleTap(event) {
-        if (!currentCard || isSwiping) {
-            return;
-        }
-
-        if (state.isFavoriteMode) {
-            const channelId = currentCard.dataset.id;
-            toggleFavorite(channelId);
-            const channelCard = document.querySelector(`[data-id="${channelId}"]`);
-            if (state.favorites.includes(channelId)) {
-                channelCard.classList.add('channel-card--favorite');
-            } else {
-                channelCard.classList.remove('channel-card--favorite');
-            }
-        } else {
-            const channelId = currentCard.dataset.id;
-            const channelData = state.channelsData.find(c => c.id === channelId);
-            if (channelData) {
-                handleChannelPlay(channelData);
-            }
-        }
-      }
-
+      // 💡 MODIFICACIÓN DE showCopyModal
       function showCopyModal(acestreamId) {
-          const url = `acestream://${acestreamId}`;
-          const copyModal = document.getElementById('copyModal');
-          const confirmBtn = document.getElementById('confirmCopyBtn');
-          const urlDisplay = document.getElementById('copyUrlDisplay');
-
-          urlDisplay.textContent = url;
+          const acestreamUrl = `acestream://${acestreamId}`;
+          const pid = extractPID(acestreamUrl);
+          const vlcUrl = convertToVLCUrl(pid); 
           
-          confirmBtn.onclick = () => copyUrlToClipboard(acestreamId);
+          const copyModal = document.getElementById('copyModal');
+          const copyAceStreamBtn = document.getElementById('copyAceStreamBtn');
+          const copyVLCBtn = document.getElementById('copyVLCBtn');
+          const urlDisplayAceStream = document.getElementById('copyUrlDisplayAceStream');
+          const urlDisplayVLC = document.getElementById('copyUrlDisplayVLC');
+
+          // Almacenar las URLs en el display (oculto por CSS)
+          urlDisplayAceStream.textContent = acestreamUrl;
+          urlDisplayVLC.textContent = vlcUrl;
+
+          // Asignar handlers para copiar la URL correcta y el formato
+          copyAceStreamBtn.onclick = () => copyUrlToClipboard(acestreamUrl, 'AceStream');
+          copyVLCBtn.onclick = () => copyUrlToClipboard(vlcUrl, 'VLC');
+          
           copyModal.classList.add('active');
       }
 
@@ -2416,30 +2642,43 @@
           document.getElementById('copyModal').classList.remove('active');
       }
 
-      function showCopySuccessMessage() {
+      // 💡 MODIFICACIÓN DE showCopySuccessMessage
+      function showCopySuccessMessage(format = 'AceStream') {
           const messageElement = document.getElementById('copyMessage');
+          messageElement.textContent = `${format} URL copiada con éxito!`; 
           messageElement.classList.add('show');
           setTimeout(() => {
               messageElement.classList.remove('show');
           }, 2000);
       }
 
-      async function copyUrlToClipboard(acestreamId) {
-          const url = `acestream://${acestreamId}`;
+      // 💡 MODIFICACIÓN DE copyUrlToClipboard
+      async function copyUrlToClipboard(urlToCopy, format) {
           try {
-              await navigator.clipboard.writeText(url);
+              await navigator.clipboard.writeText(urlToCopy);
               hideCopyModal();
-              showCopySuccessMessage();
+              showCopySuccessMessage(format); 
           } catch (err) {
               console.error('Error al copiar el texto: ', err);
               alert('No se pudo copiar la URL. Por favor, hazlo manualmente.');
           }
       }
 
+      // OPTIMIZACIÓN: Lógica de búsqueda simplificada
       function handleSearchInput() {
         state.searchTerm = document.getElementById('searchInput').value.trim();
-        document.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('filter-button--active'));
-        document.querySelectorAll('.sport-filter-button').forEach(btn => btn.classList.remove('filter-button--active'));
+        
+        clearAllFilterVisuals();
+        
+        if (!state.searchTerm) {
+            document.getElementById('clearEmojiFilters').classList.add('filter-button--active');
+            state.currentFilter = 'all'; 
+            state.sportFilter = 'all';
+        } else {
+            state.currentFilter = 'all'; 
+            state.sportFilter = 'all';
+        }
+        
         renderResults();
       }
 
@@ -2448,7 +2687,8 @@
         const rgb = hexToRgb(color);
         document.documentElement.style.setProperty('--primary-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);
         document.documentElement.style.setProperty('--primary', color);
-        document.documentElement.style.setProperty('--primary-dark', shadeColor(color, -20));
+        // MODIFICACIÓN: Color oscuro simple (el color predeterminado es #1e50c7)
+        document.documentElement.style.setProperty('--primary-dark', color === '#2563eb' ? '#1e50c7' : color); 
         updatePrimaryLightColor();
         document.querySelectorAll('.color-option').forEach(btn => {
           btn.classList.remove('active');
@@ -2463,18 +2703,6 @@
         const g = parseInt(hex.slice(3, 5), 16);
         const b = parseInt(hex.slice(5, 7), 16);
         return { r, g, b };
-      }
-
-      function shadeColor(color, percent) {
-        let R = parseInt(color.substring(1,3), 16);
-        let G = parseInt(color.substring(3,5), 16);
-        let B = parseInt(color.substring(5,7), 16);
-
-        R = (R<255)?R:255;  
-        G = (G<255)?G:255;  
-        B = (B<255)?B:255;  
-
-        return `#${R.toString(16).padStart(2,'0')}${G.toString(16).padStart(2,'0')}${B.toString(16).padStart(2,'0')}`;
       }
 
       function updatePrimaryLightColor() {
@@ -2535,83 +2763,60 @@
           const clearButton = document.getElementById('clearEmojiFilters');
           const copyModal = document.getElementById('copyModal');
           const cancelCopyBtn = document.getElementById('cancelCopyBtn');
+          const exportVlcM3UBtn = document.getElementById('exportVlcM3UBtn'); // Botón de Exportar
 
           cleanupOldFirstSeenRecords();
 
-          favoriteButton.addEventListener('mousedown', (e) => {
-              if (e.button !== 0) return;
-              pressTimerFav = setTimeout(() => {
+          // Lógica de MOUSE/TOUCH para MODO FAVORITOS
+          const setupLongPress = (btn, onLongPress, onClick) => {
+              let pressTimer = null;
+              let isLongPress = false;
+
+              const startPress = () => {
+                  isLongPress = false;
+                  pressTimer = setTimeout(() => {
+                      isLongPress = true;
+                      onLongPress();
+                  }, LONG_PRESS_THRESHOLD);
+              };
+
+              const endPress = () => {
+                  clearTimeout(pressTimer);
+                  if (pressTimer && !isLongPress) {
+                      onClick();
+                  }
+                  pressTimer = null;
+              };
+
+              btn.addEventListener('mousedown', (e) => { if (e.button === 0) startPress(); });
+              btn.addEventListener('mouseup', endPress);
+              btn.addEventListener('touchstart', startPress, {passive: true});
+              btn.addEventListener('touchend', endPress);
+              btn.addEventListener('touchmove', () => clearTimeout(pressTimer));
+          };
+
+          setupLongPress(
+              favoriteButton, 
+              () => {
                   state.isFavoriteMode = !state.isFavoriteMode;
-                  
                   if (state.isFavoriteMode) {
                       showStatusMessage("Modo de selección de favoritos activado. Pulsa un canal para marcarlo/desmarcarlo.");
                   } else {
                       showStatusMessage("Modo de selección de favoritos desactivado.", "success");
                   }
-                  
                   renderResults();
-                  pressTimerFav = null;
-              }, LONG_PRESS_THRESHOLD);
-          });
-
-          favoriteButton.addEventListener('mouseup', () => {
-              clearTimeout(pressTimerFav);
-              if (pressTimerFav) {
-                  applyFilter('favorites');
-              }
-          });
+              }, 
+              () => applyFilter('favorites')
+          );
           
-          favoriteButton.addEventListener('touchstart', () => {
-              pressTimerFav = setTimeout(() => {
-                  state.isFavoriteMode = !state.isFavoriteMode;
-                  
-                  if (state.isFavoriteMode) {
-                      showStatusMessage("Modo de selección de favoritos activado. Pulsa un canal para marcarlo/desmarcarlo.");
-                  } else {
-                      showStatusMessage("Modo de selección de favoritos desactivado.", "success");
-                  }
-                  
-                  renderResults();
-                  pressTimerFav = null;
-              }, LONG_PRESS_THRESHOLD);
-          });
-
-          favoriteButton.addEventListener('touchend', () => {
-              clearTimeout(pressTimerFav);
-              if (pressTimerFav) {
-                  applyFilter('favorites');
-              }
-          });
-          
-          clearButton.addEventListener('mousedown', (e) => {
-              if (e.button !== 0) return;
-              pressTimerClear = setTimeout(() => {
+          setupLongPress(
+              clearButton,
+              () => {
                   document.getElementById('settingsModal').classList.add('modal--active');
-                  pressTimerClear = null;
-              }, LONG_PRESS_THRESHOLD);
-          });
+              },
+              () => applyFilter('all')
+          );
 
-          clearButton.addEventListener('mouseup', () => {
-              clearTimeout(pressTimerClear);
-              if (pressTimerClear) {
-                  applyFilter('all');
-              }
-          });
-
-          clearButton.addEventListener('touchstart', () => {
-              pressTimerClear = setTimeout(() => {
-                  document.getElementById('settingsModal').classList.add('modal--active');
-                  pressTimerClear = null;
-              }, LONG_PRESS_THRESHOLD);
-          });
-
-          clearButton.addEventListener('touchend', () => {
-              clearTimeout(pressTimerClear);
-              if (pressTimerClear) {
-                  applyFilter('all');
-              }
-          });
-          
           if(cancelCopyBtn) {
               cancelCopyBtn.addEventListener('click', hideCopyModal);
           }
@@ -2621,13 +2826,26 @@
                   hideCopyModal();
               }
           });
-
+          
+          // ****************** LISTENER PARA EXPORTAR M3U (MODIFICADO A DESCARGA TXT) ******************
+          if (exportVlcM3UBtn) {
+              exportVlcM3UBtn.addEventListener('click', () => {
+                  const m3uContent = exportToM3U();
+                  if (m3uContent) {
+                      // 💡 LLAMADA A LA NUEVA FUNCIÓN DE DESCARGA
+                      downloadM3UFile(m3uContent); 
+                      
+                      document.getElementById('settingsModal').classList.remove('modal--active');
+                      showStatusMessage("Archivo 'playlist.m3u' (TXT) descargado.", "success");
+                  }
+              });
+          }
+          // ****************** FIN LISTENER EXPORTAR M3U (MODIFICADO) ******************
 
           document.getElementById('filterDAZN').addEventListener('click', () => applyFilter('dazn'));
           document.getElementById('filterMovistar').addEventListener('click', () => applyFilter('m+'));
           document.getElementById('filterEurosport').addEventListener('click', () => applyFilter('eurosport'));
           
-          // Listeners para los NUEVOS filtros de Deporte
           document.querySelectorAll('.sport-filter-button').forEach(button => {
               button.addEventListener('click', () => {
                   applySportFilter(button.dataset.sportKey);
@@ -2643,105 +2861,40 @@
           });
           changePrimaryColor(state.primaryColor);
           
+          // Listener delegado para el botón de copia (el indicador de número)
+          document.addEventListener('click', (e) => {
+              if (e.target.closest('.channel-number-badge-button')) {
+                  const button = e.target.closest('.channel-number-badge-button');
+                  e.stopPropagation(); 
+                  const channelId = button.dataset.id;
+                  showCopyModal(channelId);
+              }
+          });
+          
+          // Listener delegado de clic/tap para la reproducción y favoritos (OPTIMIZADO - Única fuente de acción de tarjeta)
+          document.addEventListener('click', (e) => {
+              const card = e.target.closest('.channel-card');
+              const numberButton = e.target.closest('.channel-number-badge-button');
+
+              if (card && !numberButton) {
+                  const channelId = card.dataset.id;
+                  const channelData = state.channelsData.find(c => c.id === channelId);
+
+                  if (state.isFavoriteMode) {
+                      e.stopPropagation();
+                      toggleFavorite(channelId);
+                  } else if (channelData) {
+                      handleChannelPlay(channelData);
+                  }
+              }
+          });
+          
+          // Asegurar que el filtro 'all' se active visualmente al inicio
           applyFilter('all');
+          
           loadInitialChannels();
       });
 
-      document.addEventListener('mousedown', (e) => {
-          if (e.target.closest('.channel-card')) {
-              currentCard = e.target.closest('.channel-card');
-              touchStartX = e.clientX;
-              touchStartY = e.clientY;
-              touchStartTime = new Date().getTime();
-              isSwiping = false;
-          }
-      });
-
-      document.addEventListener('mousemove', (e) => {
-          if (!currentCard) return;
-
-          const diffX = e.clientX - touchStartX;
-          const diffY = e.clientY - touchStartY;
-
-          if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffY) < VERTICAL_TOLERANCE) {
-              isSwiping = true;
-              e.preventDefault(); 
-              showCopyModal(currentCard.dataset.id);
-              currentCard = null; 
-          }
-      });
-
-      document.addEventListener('mouseup', (e) => {
-          if (currentCard) {
-              if (!isSwiping) {
-                const mouseUpTime = new Date().getTime();
-                const touchDuration = mouseUpTime - touchStartTime;
-                const touchDistanceX = Math.abs(e.clientX - touchStartX);
-                const touchDistanceY = Math.abs(e.clientY - touchStartY);
-
-                if (touchDuration < TAP_THRESHOLD_TIME && touchDistanceX < TAP_THRESHOLD_DISTANCE && touchDistanceY < TAP_THRESHOLD_DISTANCE) {
-                    handleTap(e);
-                }
-              }
-          }
-          currentCard = null;
-          isSwiping = false;
-      });
-
-      document.addEventListener('touchstart', (e) => {
-          if (e.target.closest('.channel-card')) {
-              e.stopPropagation(); 
-              currentCard = e.target.closest('.channel-card');
-              const touch = e.touches[0];
-              touchStartX = touch.clientX;
-              touchStartY = touch.clientY;
-              touchStartTime = new Date().getTime();
-              isSwiping = false; 
-              longPressTimer = setTimeout(() => {
-                  isLongPress = true;
-              }, 500);
-          }
-      }, {passive: false});
-
-      document.addEventListener('touchmove', (e) => {
-          if (!currentCard) return;
-          const touch = e.touches[0];
-          const diffX = touch.clientX - touchStartX;
-          const diffY = touch.clientY - touchStartY;
-
-          if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffY) < VERTICAL_TOLERANCE) {
-              isSwiping = true;
-              e.preventDefault(); 
-              showCopyModal(currentCard.dataset.id);
-              currentCard = null;
-              clearTimeout(longPressTimer);
-          }
-      }, {passive: false});
-
-      document.addEventListener('touchend', (e) => {
-          if (isLongPress) {
-              isLongPress = false;
-              clearTimeout(longPressTimer);
-              return;
-          }
-
-          if (currentCard) {
-              if (!isSwiping) {
-                  const endElement = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-                  const touchEndTime = new Date().getTime();
-                  const touchDuration = touchEndTime - touchStartTime;
-                  const touchDistanceX = Math.abs(e.changedTouches[0].clientX - touchStartX);
-                  const touchDistanceY = Math.abs(e.changedTouches[0].clientY - touchStartY);
-
-                  if (endElement && endElement.closest('.channel-card') === currentCard && touchDuration < TAP_THRESHOLD_TIME && touchDistanceX < TAP_THRESHOLD_DISTANCE && touchDistanceY < TAP_THRESHOLD_DISTANCE) {
-                    handleTap(e);
-                  }
-              }
-          }
-          currentCard = null;
-          isSwiping = false;
-      });
     </script>
 </body>
 </html>
-
