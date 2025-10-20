@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=0.7 maximum-scale=0.8, user-scalable=no">
-    <title>🅰️</title>
+    <title>⏏️</title>
     <style>
       :root {
         --primary: #2563eb;
@@ -272,6 +272,8 @@
         padding: 0.8rem 1rem;
         background: var(--primary-light);
         border-bottom: 1px solid var(--border-color);
+        border-top-left-radius: var(--radius-md);
+        border-top-right-radius: var(--radius-md);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -2551,15 +2553,16 @@
           `;
       }
 
-      // 🛑 FUNCIÓN ELIMINADA: playChannel(acestreamId)
+      // 💡 NUEVA FUNCIÓN para copiar la URL de VLC al portapapeles
+      function copyVLCUrl(channelData) {
+          const pid = extractPID(channelData.id);
+          const vlcUrl = convertToVLCUrl(pid);
+          
+          copyUrlToClipboard(vlcUrl, 'URL VLC');
+      }
 
-      /**
-       * Lógica de puntuación de estabilidad de canales optimizada.
-       * Premia una duración larga, penaliza una duración corta SÓLO si se cambia a un canal
-       * con el mismo nombre (indicando búsqueda de un enlace funcional) o si la duración fue muy corta.
-       * Si se cambia a un canal con nombre diferente, el canal anterior no se penaliza.
-       */
-      function handleChannelPlay(channel) {
+      // 💡 NUEVA FUNCIÓN para manejar solo el tracking del rating
+      function handleChannelPlayTracking(channel) {
           const now = new Date().getTime();
 
           if (state.lastChannelPlay) {
@@ -2594,7 +2597,6 @@
                           newRating += 1.5; // Se premia la duración, fue estable
                       } else {
                           // Si se cerró y se fue a otro canal en menos de 30 min, NO se resta al anterior.
-                          // Esto evita penalizar al canal anterior cuando el usuario simplemente quería cambiar de programa.
                           newRating = rating; 
                       }
                   }
@@ -2613,10 +2615,18 @@
               timestamp: now
           };
           localStorage.setItem('lastChannelPlay', JSON.stringify(state.lastChannelPlay));
-
-          // 🛑 CAMBIO CLAVE: Llama a openVLCUrl en lugar de playChannel
-          openVLCUrl(channel.id);
       }
+
+      /**
+       * FUNCIÓN MODIFICADA: Ahora solo llama a la copia y al tracking de rating.
+       */
+      function handleChannelPlay(channel) {
+          // Copia la URL de VLC al portapapeles
+          copyVLCUrl(channel); 
+          // Mantiene el seguimiento de la última reproducción para el rating
+          handleChannelPlayTracking(channel);
+      }
+
 
       // 💡 MODIFICACIÓN DE showCopyModal
       function showCopyModal(acestreamId) {
@@ -2636,7 +2646,7 @@
 
           // Asignar handlers para copiar la URL correcta y el formato
           copyAceStreamBtn.onclick = () => copyUrlToClipboard(acestreamId, 'AceStream ID'); // Copia solo el ID
-          copyVLCBtn.onclick = () => copyUrlToClipboard(vlcUrl, 'VLC URL'); // Copia la URL de VLC
+          copyVLCBtn.onclick = () => copyUrlToClipboard(vlcUrl, 'URL VLC'); // Copia la URL de VLC
           
           copyModal.classList.add('active');
       }
@@ -2874,7 +2884,7 @@
               }
           });
           
-          // Listener delegado de clic/tap para la reproducción y favoritos (OPTIMIZADO - Única fuente de acción de tarjeta)
+          // Listener delegado de clic/tap para la copia y favoritos (MODIFICADO)
           document.addEventListener('click', (e) => {
               const card = e.target.closest('.channel-card');
               const numberButton = e.target.closest('.channel-number-badge-button');
@@ -2887,7 +2897,8 @@
                       e.stopPropagation();
                       toggleFavorite(channelId);
                   } else if (channelData) {
-                      // 🛑 CAMBIO CLAVE: Llama a handleChannelPlay
+                      // 🛑 CAMBIO CLAVE: Llama a handleChannelPlay que ahora copia y hace el tracking
+                      e.stopPropagation(); 
                       handleChannelPlay(channelData); 
                   }
               }
