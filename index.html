@@ -1083,8 +1083,7 @@
         <p id="copyUrlDisplayAceStream" class="copy-modal-url" style="display:none;"></p>
         <p id="copyUrlDisplayVLC" class="copy-modal-url" style="display:none;"></p>
         
-        <button class="copy-modal-button" id="copyAceStreamBtn" data-format="acestream">Copiar AceStream</button>
-        <button class="copy-modal-button" id="copyVLCBtn" data-format="vlc">Copiar VLC</button>
+        <button class="copy-modal-button" id="copyVLCBtn" data-format="vlc">Copiar URL VLC</button> <button class="copy-modal-button" id="copyAceStreamBtn" data-format="acestream">Copiar AceStream ID</button>
         
         <button class="modal__btn modal__btn--cancel" id="cancelCopyBtn">Cancelar</button>
     </div>
@@ -1150,7 +1149,7 @@
           return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
       }
       
-      // 💡 NUEVAS FUNCIONES DE CONVERSIÓN VLC
+      // 💡 FUNCIONES DE CONVERSIÓN VLC
       /**
        * Extrae el AceStream PID del enlace.
        * @param {string} enlace - URL completa o solo el PID.
@@ -1168,9 +1167,21 @@
        */
       function convertToVLCUrl(pid) {
           if (!pid) return '';
-          return `http://vlc.shickat.me:8000/pid/${pid}/stream.mp4`;
+          // URL modificada para la reproducción directa en VLC a través de la interfaz web
+          return `http://vlc.shickat.me:8000/pid/${pid}/stream.mp4`; 
       }
-      // 💡 FIN NUEVAS FUNCIONES DE CONVERSIÓN VLC
+      
+      // 🛑 NUEVA FUNCIÓN PARA ABRIR DIRECTAMENTE EN VLC
+      /**
+       * Abre la URL compatible con VLC en una nueva pestaña.
+       * @param {string} acestreamId - El AceStream ID del canal.
+       */
+      function openVLCUrl(acestreamId) {
+          const pid = extractPID(acestreamId);
+          const vlcUrl = convertToVLCUrl(pid);
+          window.open(vlcUrl, '_blank');
+      }
+      // 🛑 FIN NUEVA FUNCIÓN PARA ABRIR DIRECTAMENTE EN VLC
       
       // 💡 FUNCIÓN DE EXPORTACIÓN A M3U MODIFICADA
       /**
@@ -1182,13 +1193,13 @@
           const header = '#EXTM3U\n';
           let content = '';
 
-          // MODIFICACIÓN: Se elimina el filtro 'c.source !== 'events'' para incluir todos los canales.
+          // Se eliminan los canales de eventos temporales para la exportación (opcional, pero ayuda a la limpieza de la lista)
           const channelsToExport = state.channelsData.filter(c => 
-              c.id && c.id.length === 40
+              c.id && c.id.length === 40 && c.source !== 'events' 
           );
 
           if (channelsToExport.length === 0) {
-              showStatusMessage("No hay canales válidos para exportar.", "warning");
+              showStatusMessage("No hay canales permanentes válidos para exportar.", "warning");
               return null;
           }
 
@@ -2517,7 +2528,7 @@
           const sourceButton = `
               <button class="channel-number-badge-button ${sourceBadgeClass}" 
                       data-id="${channel.id}" 
-                      title="Copiar enlace (AceStream ID: ${channel.id})">
+                      title="Copiar URL VLC/AceStream ID">
                   <span class="channel-number">${channel.number}</span>
                   <span class="source-initials">${sourceBadgeText}</span>
               </button>
@@ -2540,17 +2551,8 @@
           `;
       }
 
-      function playChannel(acestreamId) {
-          const acestreamUrl = `acestream://${acestreamId}`;
-          const newWindow = window.open(acestreamUrl, '_blank');
-          
-          setTimeout(() => {
-              if (newWindow && newWindow.closed) {
-              } else {
-              }
-          }, 500);
-      }
-      
+      // 🛑 FUNCIÓN ELIMINADA: playChannel(acestreamId)
+
       /**
        * Lógica de puntuación de estabilidad de canales optimizada.
        * Premia una duración larga, penaliza una duración corta SÓLO si se cambia a un canal
@@ -2612,7 +2614,8 @@
           };
           localStorage.setItem('lastChannelPlay', JSON.stringify(state.lastChannelPlay));
 
-          playChannel(channel.id);
+          // 🛑 CAMBIO CLAVE: Llama a openVLCUrl en lugar de playChannel
+          openVLCUrl(channel.id);
       }
 
       // 💡 MODIFICACIÓN DE showCopyModal
@@ -2628,12 +2631,12 @@
           const urlDisplayVLC = document.getElementById('copyUrlDisplayVLC');
 
           // Almacenar las URLs en el display (oculto por CSS)
-          urlDisplayAceStream.textContent = acestreamUrl;
+          urlDisplayAceStream.textContent = acestreamId; // Muestra solo el PID
           urlDisplayVLC.textContent = vlcUrl;
 
           // Asignar handlers para copiar la URL correcta y el formato
-          copyAceStreamBtn.onclick = () => copyUrlToClipboard(acestreamUrl, 'AceStream');
-          copyVLCBtn.onclick = () => copyUrlToClipboard(vlcUrl, 'VLC');
+          copyAceStreamBtn.onclick = () => copyUrlToClipboard(acestreamId, 'AceStream ID'); // Copia solo el ID
+          copyVLCBtn.onclick = () => copyUrlToClipboard(vlcUrl, 'VLC URL'); // Copia la URL de VLC
           
           copyModal.classList.add('active');
       }
@@ -2643,9 +2646,9 @@
       }
 
       // 💡 MODIFICACIÓN DE showCopySuccessMessage
-      function showCopySuccessMessage(format = 'AceStream') {
+      function showCopySuccessMessage(format = 'VLC URL') {
           const messageElement = document.getElementById('copyMessage');
-          messageElement.textContent = `${format} URL copiada con éxito!`; 
+          messageElement.textContent = `${format} copiada con éxito!`; 
           messageElement.classList.add('show');
           setTimeout(() => {
               messageElement.classList.remove('show');
@@ -2884,7 +2887,8 @@
                       e.stopPropagation();
                       toggleFavorite(channelId);
                   } else if (channelData) {
-                      handleChannelPlay(channelData);
+                      // 🛑 CAMBIO CLAVE: Llama a handleChannelPlay
+                      handleChannelPlay(channelData); 
                   }
               }
           });
