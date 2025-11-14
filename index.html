@@ -1,8 +1,570 @@
-<!doctype html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=0.7maximum-scale=0.8,user-scalable=no"><title>🅰️</title><style>:root{--primary:#2563eb;--primary-light:rgba(37, 99, 235, 0.1);--primary-dark:#1e50c7;--bg-light:#f1f5f9;--card-bg:#ffffff;--text:#1e293b;--border-color:#e2e8f0;--white:#ffffff;--radius-md:10px;--radius-sm:6px;--shadow-sm:0 1px 3px rgba(0,0,0,0.1);--primary-rgb:37,99,235;--secondary:#000000;--success:#4cc9f0;--warning:#f8961e;--info:#4895ef;--movistar-blue:#0085C1;--eurosport-blue:#5e17eb;--dazn-black:#000000;--f1-red:#ff3535;--action-red:#ff544d;--cinema-red:#fa3732;--sports-green:#11a45b;--vamos-green:#1fc23d;--copadelrey-green:#449653;--champions-teal:#52c29c;--liga-teal:#21ffb8;--hypermotion-cyan:#04d2d7;--golf-teal:#4ee1b0;--eurosport-number-red:#ff3535;--plus-blue:#3399ff;--western-red:#e60000;--documentary-purple:#a06cf5;--originals-blue:#3985b0;--ellas-green:#35fd9b;--series-orange:#ff8c1f;--gist-source-color:#2d077d;--elcano-source-color:#7d070e;--special-gist-color:#9c27b0;--events-source-color:#074f7d;--shickat-badge:#077b3b;--era-source-color:#f55d3e; /* AÑADIDO */--channel-name-color:#888888;--player-bg:black;--channel-number-color:#4b5563}body.dark-mode{--bg-light:#131313;--card-bg:#333436;--text:#f8fafc;--border-color:#555555;--shadow-sm:0 1px 3px rgba(0,0,0,0.3);--primary-light:rgba(var(--primary-rgb), 0.2);--channel-name-color:#e2e2ff;--player-bg:#1e1e1e;--channel-number-color:#b0b0b0}body{background:var(--bg-light);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;line-height:1.6;margin:0;padding:0;transition:all .3s}.main-container{max-width:1400px;margin:1rem auto;padding:0 1rem}.search-filters{background:var(--card-bg);border-radius:var(--radius-md);padding:1rem;margin-bottom:0;box-shadow:var(--shadow-sm);display:flex;flex-direction:column}.search-box{position:relative;margin-bottom:.8rem}.search-box input{width:100%;padding:.6rem 1rem .6rem 2.2rem;border:1px solid var(--border-color);border-radius:var(--radius-sm);font-size:.9rem;background-color:var(--card-bg);color:var(--text);box-sizing:border-box}.search-box::before{content:"🔍";position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:var(--text);font-size:.9rem}.filter-buttons{display:flex;gap:.6rem;margin-top:.8rem;flex-wrap:wrap;align-items:center}.filter-button{flex:1;padding:.5rem;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--card-bg);color:var(--text);cursor:pointer;font-size:.8rem;font-weight:500;transition:all .2s;display:flex;justify-content:center;align-items:center;white-space:nowrap}.filter-button:hover{border-color:var(--primary)}.filter-button--active{background:var(--primary);color:#fff;border-color:var(--primary)}.filter-button--clear,.filter-button--favorites{flex:0 0 auto;width:36px;min-width:36px;padding:.5rem 0}#filterDAZN,#filterEurosport,#filterMovistar{flex:1}#sportFiltersContainer{margin-top:.6rem;display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center}.sport-filter-button{flex:0 0 auto;width:36px;height:36px;padding:0;border-radius:50%;font-size:1.1rem}.channels-grid{display:block;gap:0}.channel-card{min-width:280px;max-width:280px;flex:0 0 auto;scroll-snap-align:start;background:var(--card-bg);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:.5rem 1rem 1rem 1rem;cursor:pointer;box-shadow:var(--shadow-sm);transition:all .2s;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;text-align:center}.channel-card:hover{transform:translateY(-3px);box-shadow:0 4px 6px rgba(0,0,0,.1);border-color:var(--primary-light)}.channel-card--favorite-mode{border-style:dashed;border-width:2px;border-color:var(--primary);opacity:.8;transition:all .3s ease}.channel-card .channel-header{display:flex;justify-content:center;align-items:center;margin-bottom:.5rem;width:100%}.channel-name{font-weight:600;flex-grow:1;text-align:center;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 .5rem}.channel-info-line{display:flex;justify-content:space-between;align-items:center;margin-top:.5rem;font-size:.8rem;color:#6b7280}body.dark-mode .channel-info-line{color:#a0a0a0}.channel-card--favorite{border:2px solid var(--primary)}.channel-group{background:var(--card-bg);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:0;margin-bottom:1rem;box-shadow:var(--shadow-sm)}.channel-group__header{padding:.8rem 1rem;background:var(--primary-light);border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center}.channel-group__title{font-weight:600;color:var(--text);font-size:1rem;display:flex;flex-direction:column;align-items:flex-start;text-align:left;width:100%}.channel-group__title>div{margin:0;padding:0}.channel-group__content{display:flex;gap:.8rem;padding:.8rem;overflow-x:auto;overflow-y:hidden;white-space:nowrap;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;padding-bottom:1rem}
-.subgroup-content--single-item {
-    justify-content: center;
-}
-.channel-group__content::-webkit-scrollbar{height:6px}.channel-group__content::-webkit-scrollbar-thumb{background:rgba(var(--primary-rgb),.5);border-radius:3px}.offline-message{background:#fef2f2;color:#dc2626;padding:.5rem;border-radius:var(--radius-sm);margin-bottom:1rem;text-align:center}.update-notification{color:var(--primary);background:var(--primary-light);padding:.2rem;border-radius:var(--radius-sm);margin-bottom:1rem;text-align:center;font-weight:600;max-height:0;overflow:hidden;transition:max-height .5s ease,opacity .5s ease,margin .5s ease;opacity:0;margin:0}.update-notification--show{max-height:100px;opacity:1;margin-bottom:1rem}.loading-spinner{display:inline-block;width:20px;height:20px;border:3px solid rgba(0,0,0,.1);border-radius:50%;border-top-color:var(--primary);animation:spin 1s ease-in-out infinite;margin-left:10px}.loading-container{display:flex;justify-content:center;align-items:center;gap:10px;padding:10px;background:var(--card-bg);border-radius:var(--radius-sm);margin-bottom:1rem}.no-results{grid-column:1/-1;text-align:center;padding:2rem;background:var(--card-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);margin-top:1rem}.no-results-icon{font-size:3rem;margin-bottom:1rem;opacity:.5}.no-results-text{font-size:1.1rem;color:var(--text);margin-bottom:.5rem}.no-results-hint{font-size:.9rem;color:var(--text);opacity:.7}.modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;justify-content:center;align-items:center;z-index:1001}.modal--active{display:flex}.modal__content{background:var(--card-bg);border-radius:var(--radius-md);padding:1.2rem;width:90%;max-width:350px;box-shadow:var(--shadow-sm)}.modal__title{margin-bottom:.8rem;color:var(--text);font-size:1.1rem;display:flex;align-items:center;gap:8px}.modal__actions{display:flex;justify-content:flex-end;gap:.6rem;margin-top:1rem}.modal__btn{padding:.5rem .8rem;border:none;border-radius:var(--radius-sm);cursor:pointer;font-weight:500;font-size:.9rem;transition:all .2s}.modal__btn--primary{background:var(--primary);color:#fff}.modal__btn--primary:hover{background:var(--primary-dark)}.settings-section{margin-bottom:1.2rem;padding-bottom:1rem;border-bottom:1px solid var(--border-color)}.settings-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}.settings-section__title{font-size:.9rem;color:var(--primary);margin-bottom:.8rem;display:flex;align-items:center;gap:8px}.settings-item{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;padding:.5rem;border-radius:var(--radius-sm);transition:background .2s}.settings-item:hover{background:var(--primary-light)}.settings-item__info{display:flex;align-items:center;gap:12px;flex:1}.settings-icon{font-size:1.2rem}.settings-label{font-size:.9rem;color:var(--text);font-weight:500;display:block}.settings-description{font-size:.75rem;color:var(--text);opacity:.7;display:block;margin-top:2px}.settings-switch{position:relative;display:inline-block;width:50px;height:24px}.settings-switch input{opacity:0;width:0;height:0}.settings-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.4s;border-radius:24px}.settings-slider:before{position:absolute;content:"";height:16px;width:16px;left:4px;bottom:4px;background-color:#fff;transition:.4s;border-radius:50%}input:checked+.settings-slider{background-color:var(--primary)}input:checked+.settings-slider:before{transform:translateX(26px)}.color-picker{display:flex;gap:6px}.color-option{width:24px;height:24px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform .2s}.color-option:hover{transform:scale(1.1)}.color-option.active{border-color:var(--text);transform:scale(1.1)}.header{display:none}.movistar{color:var(--movistar-blue)!important}.eurosport{color:var(--eurosport-blue)!important}.dazn{color:var(--dazn-black)!important}.f1{color:var(--f1-red)!important}.action{color:var(--action-red)!important}.cinema-red{color:var(--cinema-red)!important}.sports{color:var(--sports-green)!important}.vamos{color:var(--vamos-green)!important}.copadelrey{color:var(--copadelrey-green)!important}.champions{color:var(--champions-teal)!important}.liga{color:var(--liga-teal)!important}.hypermotion{color:var(--hypermotion-cyan)!important}.golf{color:var(--golf-teal)!important}.eurosport-number{color:var(--eurosport-number-red)!important}.smartbank{color:var(--smartbank-red)!important}.plus{color:var(--plus-blue)!important}.western{color:var(--western-red)!important}.documentary{color:var(--documentary-purple)!important}.originals{color:var(--originals-blue)!important}.ellas{color:var(--ellas-green)!important}.series{color:var(--series-orange)!important}.channel-meta{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--text);opacity:.7;position:absolute;bottom:5px;right:1rem;z-index:10}.channel-meta .quality-audio{white-space:nowrap}.source-badge{font-size:.6rem;font-weight:700;padding:.2rem .4rem;border-radius:3px;z-index:1}.gist-badge{background-color:var(--gist-source-color);color:#fff}.elcano-badge{background-color:var(--elcano-source-color);color:#fff}.era-badge{background-color:var(--era-source-color);color:#fff} /* AÑADIDO */.special-gist-badge{background-color:var(--special-gist-color);color:#fff}.events-badge{background-color:var(--events-source-color);color:#fff}.shickat-badge{background-color:var(--shickat-badge);color:#fff}.channel-number-badge-button{position:absolute;top:50%;transform:translateY(-50%);right:10px;padding:4px;border-radius:var(--radius-sm);box-shadow:0 1px 3px rgba(0,0,0,.1);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2;transition:background-color .3s ease;width:40px;height:40px;background:rgba(var(--primary-rgb),.9);color:#fff;border:none;cursor:pointer;z-index:20}.channel-number-badge-button.gist-badge{background-color:var(--gist-source-color)}.channel-number-badge-button.elcano-badge{background-color:var(--elcano-source-color)}.channel-number-badge-button.era-badge{background-color:var(--era-source-color)}.channel-number-badge-button.events-badge{background-color:var(--events-source-color)}.channel-number-badge-button.shickat-badge{background-color:var(--shickat-badge)}.channel-number-badge-button .channel-number{font-weight:600;white-space:nowrap;color:#fff;font-size:.8rem;margin-bottom:2px}.channel-number-badge-button .source-initials{font-size:.6rem;font-weight:700;color:#fff}.channel-number-badge-button:hover{transform:translateY(-50%) scale(1.1)}.retry-button{padding:.5rem 1rem;margin-top:10px;background-color:var(--warning);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer}.status-message{grid-column:1/-1;text-align:center;padding:.5rem;font-size:.85rem;background-color:rgba(76,201,240,.1);border-radius:var(--radius-sm);margin-bottom:.5rem;opacity:1;transition:all .5s ease-in-out,margin .5s ease-in-out}.status-message.hide{opacity:0;transform:translateY(-20px);pointer-events:none;margin-bottom:0}.status-message.success{color:var(--primary);background-color:var(--primary-light)}.status-message.info{color:var(--primary);background-color:var(--primary-light)}.status-message.error{color:var(--secondary);background-color:rgba(247,37,133,.1)}.status-message.warning{color:var(--warning);background-color:rgba(248,150,30,.1)}@keyframes spin{to{transform:rotate(360deg)}}@media (min-width:768px){.channel-name{font-size:1.1rem}.channel-card{min-width:300px;max-width:300px}}.degradado-comedia{background-image:linear-gradient(to right,#ff3c3c,orange);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700}.copy-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--card-bg);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1.5rem;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:2000;width:90%;max-width:320px;display:none;flex-direction:column;align-items:center;text-align:center;animation:fadeIn .3s ease-out}.copy-modal.active{display:flex}.copy-modal-icon{font-size:2.5rem;margin-bottom:.8rem}.copy-modal-text{font-size:.95rem;color:var(--text);margin-bottom:1rem}.copy-modal-button{padding:.6rem 1.2rem;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:.9rem;font-weight:600;transition:background .2s;margin-bottom:.5rem}.copy-modal-button:hover{background:var(--primary-dark)}.copy-modal-url{background-color:var(--bg-light);color:var(--text);padding:.5rem;margin-bottom:1rem;border-radius:var(--radius-sm);font-family:monospace;word-break:break-all;font-size:.85rem;display:block}body.dark-mode .copy-modal-url{background-color:var(--border-color)}@keyframes fadeIn{from{opacity:0;transform:translate(-50%,-60%)}to{opacity:1;transform:translate(-50%,-50%)}}.copy-message{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:.6rem 1.2rem;border-radius:var(--radius-sm);font-size:.9rem;z-index:2001;opacity:0;transition:opacity .4s ease-in-out}.copy-message.show{opacity:1}.rating-stars{position:absolute;bottom:5px;left:1rem;font-size:.9rem}.half-star{background:linear-gradient(to right,var(--primary) 50%,gray 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:inline-block}.channel-card__quality{font-size:.7rem;font-weight:600;color:var(--primary);background:var(--primary-light);padding:.2rem .5rem;border-radius:var(--radius-sm);position:absolute;top:5px;left:5px;z-index:10}.new-channel-indicator{position:absolute;top:8px;right:8px;width:8px;height:8px;background-color:var(--primary);border-radius:50%;animation:blink-soft 1.5s infinite ease-in-out;z-index:20}body.dark-mode .new-channel-indicator{background-color:var(--primary)}@keyframes blink-soft{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}.event-date{font-size:.75rem;color:var(--primary);background-color:var(--primary-light);padding:.2rem .5rem;border-radius:var(--radius-sm);margin-top:.3rem;display:inline-block}.group-title-emoji{font-size:1.2em;vertical-align:middle}.group-title-text{display:flex;flex-direction:column;align-items:flex-start}.marquee-container{width:100%;overflow:hidden;white-space:nowrap;box-sizing:border-box}.competition-text{display:inline-block;font-weight:700;color:var(--primary)}.competition-text.is-overflowing{padding-left:100%;animation:marquee 15s linear infinite}body.dark-mode .competition-text{color:var(--primary)}@keyframes marquee{0%{transform:translate(0,0)}100%{transform:translate(-100%,0)}}.event-date-header{font-size:1.2rem;font-weight:600;color:var(--text);margin-top:1rem;margin-bottom:.5rem;padding-left:.5rem;border-left:4px solid var(--primary);padding-left:10px}.hide-event-details .channel-group.event-group .channel-group__header{display:none!important}.hide-event-details .event-date-header{display:none!important}.floating-save-button{position:fixed;bottom:20px;right:20px;width:50px;height:50px;border-radius:50%;background-color:var(--primary);color:#fff;border:none;box-shadow:0 4px 8px rgba(0,0,0,.25);font-size:1.5rem;font-weight:700;cursor:pointer;display:flex;justify-content:center;align-items:center;z-index:1000;opacity:0;visibility:hidden;transform:scale(.8);transition:all .3s ease-in-out}.floating-save-button--active{opacity:1;visibility:visible;transform:scale(1)}.live-time-blink{color:var(--secondary)!important;animation:soft-blink 1.5s infinite ease-in-out;font-weight:700}@keyframes soft-blink{0%,100%{opacity:1}50%{opacity:.5}}.live-separator{border:none;border-top:3px solid var(--primary);border-radius:5px;margin:1.5rem 0;opacity:.7;box-shadow:0 1px 3px rgba(0,0,0,.1)}.subgroup-title{font-size:.9rem;font-weight:600;color:var(--text);padding:.5rem 1rem;background:var(--primary-light);border-bottom:1px solid var(--border-color);margin-top:.5rem}.subgroup-content{display:flex;gap:.8rem;padding:.8rem;overflow-x:auto;overflow-y:hidden;white-space:nowrap;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;padding-bottom:1rem}.subgroup-content::-webkit-scrollbar{height:6px}.subgroup-content::-webkit-scrollbar-thumb{background:rgba(var(--primary-rgb),.5);border-radius:3px}</style></head><body><div class="main-container"><div class="search-filters"><div class="search-box"><input id="searchInput" placeholder="Buscar canales, ID (ej: #123)" autofocus></div><div class="filter-buttons"><button class="filter-button filter-button--favorites" id="filterFavorites">★</button><button class="filter-button" id="filterDAZN">DAZN</button><button class="filter-button" id="filterMovistar">MOVISTAR+</button><button class="filter-button" id="filterEurosport">★EUROSPORT</button><button class="filter-button filter-button--clear filter-button--active" id="clearEmojiFilters">x</button></div><div class="filter-buttons" id="sportFiltersContainer" style="margin-top:.6rem"><button class="filter-button sport-filter-button" data-sport-key="futbol" id="filterFutbol">⚽</button><button class="filter-button sport-filter-button" data-sport-key="baloncesto" id="filterBaloncesto">🏀</button><button class="filter-button sport-filter-button" data-sport-key="tenis" id="filterTenis">🎾</button><button class="filter-button sport-filter-button" data-sport-key="boxeo" id="filterBoxeo">🥊</button><button class="filter-button sport-filter-button" data-sport-key="ciclismo" id="filterCiclismo">🚴</button><button class="filter-button sport-filter-button" data-sport-key="motorsport" id="filterMotorsport">🏁</button><button class="filter-button sport-filter-button" data-sport-key="f1" id="filterF1">🏎️</button></div></div><div id="updateNotification" class="update-notification"></div><div class="channels-grid" id="channelsGrid"></div></div><div class="modal" id="settingsModal"><div class="modal__content"><h3 class="modal__title">⚙️ Ajustes</h3><div class="settings-section"><h4 class="settings-section__title">🎨 Apariencia</h4><div class="settings-item"><div class="settings-item__info"><span class="settings-icon">🌓</span><div><span class="settings-label">Modo oscuro</span><span class="settings-description">Cambia entre tema claro y oscuro</span></div></div><label class="settings-switch"><input type="checkbox" id="darkModeCheckbox"><span class="settings-slider"></span></label></div><div class="settings-item"><div class="settings-item__info"><span class="settings-icon">🎨</span><div><span class="settings-label">Color principal</span><span class="settings-description">Elige un color para la interfaz</span></div></div><div class="color-picker"><button class="color-option" data-color="#2563eb" style="background:#2563eb"></button><button class="color-option" data-color="#dc2626" style="background:#dc2626"></button><button class="color-option" data-color="#16a34a" style="background:#16a34a"></button><button class="color-option" data-color="#9333ea" style="background:#9333ea"></button></div></div></div><div class="settings-section"><h4 class="settings-section__title">🔧 Datos</h4><div class="settings-item"><div class="settings-item__info"><span class="settings-icon">📅</span><div><span class="settings-label">Ocultar detalles de evento</span><span class="settings-description">Oculta fecha, hora y deporte de los grupos.</span></div></div><label class="settings-switch"><input type="checkbox" id="hideEventDetailsCheckbox"><span class="settings-slider"></span></label></div><div class="settings-item"><div class="settings-item__info"><span class="settings-icon">⭐</span><div><span class="settings-label">Restablecer puntuaciones</span><span class="settings-description">Borra la puntuación de estabilidad de todos los canales</span></div></div><button class="modal__btn" onclick="resetRatings()">Reiniciar</button></div></div><div class="modal__actions"><button class="modal__btn modal__btn--primary" id="closeSettingsBtn">Cerrar</button></div></div></div><div class="copy-modal" id="copyModal"><div class="copy-modal-icon">🔗</div><div class="copy-modal-text">Enlace AceStream a copiar:</div><p id="copyUrlDisplayAceStream" class="copy-modal-url"></p><button class="copy-modal-button" id="copyAceStreamBtn" data-format="acestream">Copiar AceStream</button><button class="modal__btn modal__btn--cancel" id="cancelCopyBtn">Cancelar</button></div><div class="copy-message" id="copyMessage">URL copiada con éxito!</div><button class="floating-save-button" id="saveFavoritesButton" onclick="disableFavoriteMode()">✓</button><script> const state = { allChannels: [], channelsData: [], currentFilter: localStorage.getItem('currentFilter') || 'all', searchTerm: localStorage.getItem('searchTerm') || '', favorites: JSON.parse(localStorage.getItem('favorites')) || [], channelHistory: JSON.parse(localStorage.getItem('channelHistory')) || {}, currentChannel: null, clearButtonClickCount: 0, lastClearButtonClickTime: 0, isOnline: navigator.onLine, elcanoRetries: 0, eventsRetries: 0, darkMode: localStorage.getItem('darkMode') !== 'false', primaryColor: localStorage.getItem('primaryColor') || '#2563eb', isFavoriteMode: false, channelRatings: JSON.parse(localStorage.getItem('channelRatings')) || {}, lastChannelPlay: JSON.parse(localStorage.getItem('lastChannelPlay')) || null, firstSeen: JSON.parse(localStorage.getItem('firstSeen')) || {}, sportFilter: localStorage.getItem('sportFilter') || 'all', hideEventDetails: localStorage.getItem('hideEventDetails') === 'true' }; 
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream TV UI</title>
+    <style>
+        /* 1. ESQUEMA DE COLOR PARA MODO TV (Dark Theme Fijo) */
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e50c7;
+            --bg-main: #1f1f1f; /* Fondo principal */
+            --text-main: #e0e0e0; /* Texto principal */
+            --card-bg: #2d2d2d; /* Fondo de tarjetas */
+            --border-color: #444444; /* Borde y separador */
+            --white: #ffffff;
+            --live-red: #ff3535; /* Elementos en vivo */
+            --radius-lg: 12px;
+            --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-card-hover: 0 8px 25px rgba(0, 0, 0, 0.6);
+            --primary-rgb: 37, 99, 235; /* Añadido para el badge de fuente */
+            /* Colores de Marca */
+            --movistar-blue: #0085C1;
+            --dazn-orange: #000000;
+            --eurosport-blue: #5e17eb;
+            --f1-red: #ff3535;
+        }
+
+        /* 2. TIPOGRAFÍA Y GENERALES */
+        body {
+            background: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+            transition: all .3s;
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 1.5rem auto;
+            padding: 0 2.5rem; /* Más padding para TV */
+        }
+
+        /* Ocultar elementos de búsqueda/filtro de PC */
+        .search-filters, #updateNotification, .floating-save-button {
+            display: none !important;
+        }
+
+        /* 3. LAYOUT Y ESTRUCTURA (Carruseles) */
+        .channels-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        .channel-group {
+            background: none;
+            border: none;
+            padding: 0;
+            margin-bottom: 0;
+            box-shadow: none;
+        }
+
+        .channel-group__header {
+            padding: 0 0 0.8rem 0;
+            border-bottom: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .channel-group__title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            border-left: 4px solid var(--primary); /* Borde de acento */
+            padding-left: 15px;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* AJUSTE PARA TÍTULOS DE GRUPO DE EVENTO */
+        .channel-group.event-group .channel-group__title {
+            font-size: 1.8rem; /* Título de grupo para eventos más grande */
+            color: var(--text-main); /* Mantener color principal */
+            align-items: flex-start; /* Alinear el texto superior */
+        }
+
+        .channel-group.event-group .channel-group__title > div {
+             /* Contenedor principal del título del evento */
+             display: flex;
+             flex-direction: column;
+             align-items: flex-start;
+             width: 100%;
+        }
+
+        .group-content-container {
+            padding: 0;
+        }
+
+        .subgroup-title {
+            display: none; /* Ocultar títulos de subgrupo para UI más limpia */
+        }
+
+        .subgroup-content {
+            display: flex;
+            gap: 1.5rem;
+            padding: 0.5rem 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x mandatory;
+        }
+
+        .subgroup-content::-webkit-scrollbar {
+            height: 0; /* Ocultar scrollbar */
+            display: none;
+        }
+        
+        /* 4. COMPONENTES DE TARJETAS */
+        .channel-card {
+            /* Dimensiones de Tarjeta Estándar (16:9) */
+            min-width: 320px;
+            max-width: 320px;
+            height: 180px;
+            border-radius: var(--radius-lg);
+            background: var(--card-bg);
+            border: 2px solid transparent;
+            box-shadow: var(--shadow-card);
+            transition: transform .3s ease-in-out, box-shadow .3s ease-in-out, border-color .3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Enfocar contenido abajo */
+            align-items: flex-start;
+            padding: 0;
+            scroll-snap-align: start;
+            cursor: pointer;
+            /* La imagen de fondo se manejará con estilo en línea en JS */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        /* Tarjeta de Evento en Vivo (Dimensiones mayores) */
+        .channel-card--live {
+            min-width: 350px;
+            max-width: 350px;
+            height: 200px;
+        }
+        
+        /* 5. EFECTO HOVER (Foco de TV) */
+        .channel-card:hover {
+            transform: scale(1.08); /* Escala */
+            box-shadow: var(--shadow-card-hover); /* Sombra pronunciada */
+            border-color: var(--primary); /* Borde de acento */
+            z-index: 10;
+        }
+
+        /* Superposición de rmación del Canal */
+        .channel-info-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            padding-top: 3rem;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0)); /* Degradado inferior */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* .channel-name (ELIMINADO por ser redundante con el placeholder) */
+        .channel-header {
+            width: 100%;
+            display: block;
+            margin-bottom: 0;
+        }
+
+        /* 6. INDICADORES DE CALIDAD */
+        .channel-card__quality {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--white);
+            background: var(--primary);
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            z-index: 1;
+            letter-spacing: 0.5px;
+        }
+
+        /* 7. BADGE DE NÚMERO/FUENTE (AceStream ID) */
+        .channel-number-badge-button {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(var(--primary-rgb), 0.5); /* Fondo semitransparente */
+            backdrop-filter: blur(5px); /* Efecto blur */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            transition: all .3s ease;
+            box-shadow: var(--shadow-card);
+            border: none;
+            z-index: 20;
+            cursor: pointer; /* Añadido cursor pointer */
+        }
+        
+        .channel-card--live .channel-number-badge-button {
+            right: 15px; /* Mantener la derecha */
+            left: auto; /* Desactivar la izquierda */
+            bottom: 15px; /* Bajar un poco */
+        }
+
+        .channel-number-badge-button .channel-number {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--white);
+            margin-bottom: 1px;
+        }
+
+        .channel-number-badge-button .source-initials {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--white);
+            opacity: 0.8;
+        }
+        
+        /* 8. SISTEMA DE RATING */
+        .rating-stars {
+            position: absolute;
+            bottom: 15px; 
+            left: 15px;
+            font-size: 1rem;
+            z-index: 10;
+        }
+
+        /* AJUSTE PARA RATING EN TARJETAS LIVE */
+        .channel-card--live .rating-stars {
+            bottom: 20px;
+            left: 20px;
+        }
+        
+        /* 9. ESTADOS ESPECIALES DE EVENTOS EN VIVO */
+        /* ELIMINAMOS EL ESTILO DEL TÍTULO ROJO AQUÍ Y LO TRATAMOS EN JS */
+        /* .channel-group.event-group .channel-group__title {
+            font-size: 1.8rem; 
+            color: var(--live-red);
+        } */
+
+        .channel-card--live .channel-info-overlay {
+             padding: 1.5rem;
+        }
+        
+        /* ESTILO DEL BADGE MOVIDO A LA CABECERA DEL GRUPO */
+        .live-indicator-badge {
+            display: inline-block;
+            background: var(--live-red);
+            color: var(--white);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-right: 15px; /* Separación con el texto */
+            animation: soft-blink 1.5s infinite ease-in-out;
+            text-transform: uppercase;
+        }
+
+        @keyframes soft-blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        .event-header-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .event-details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .event-time {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 4px;
+        }
+        
+        /* AJUSTE PARA HORA EN TÍTULO DE GRUPO */
+        .channel-group.event-group .event-time {
+            font-size: 1.5rem; /* Más grande en el título */
+            margin-bottom: 0;
+            margin-right: 15px;
+        }
+
+        .event-competition {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+        }
+
+        .event-match {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--white);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+        
+        .live-time-blink {
+            color: var(--live-red) !important;
+        }
+
+        /* 10. ESTILOS DE MARCA */
+        .movistar { color: var(--movistar-blue) !important; }
+        .dazn { color: var(--dazn-orange) !important; }
+        .eurosport { color: var(--eurosport-blue) !important; }
+        .f1 { color: var(--f1-red) !important; }
+        .liga, .hypermotion { color: #21ffb8 !important; }
+
+        /* 11. ADAPTACIONES MENORES */
+        .event-date-header {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            padding-left: 15px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .live-separator {
+            border: none;
+            border-top: 3px solid var(--border-color);
+            border-radius: 5px;
+            margin: 3rem 0;
+            opacity: 0.5;
+        }
+        
+        /* MODALES */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.modal--active {
+            display: flex;
+        }
+
+        .modal__content {
+            background-color: var(--bg-main);
+            margin: auto;
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            width: 80%;
+            max-width: 600px;
+            box-shadow: var(--shadow-card-hover);
+            transform: scale(0.95);
+            transition: transform 0.3s ease-out;
+        }
+
+        .modal.modal--active .modal__content {
+            transform: scale(1);
+        }
+        
+        .alternatives-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+        
+        .alternatives-list li {
+            background: var(--card-bg);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .alternatives-list li:hover {
+            background-color: var(--border-color);
+        }
+        
+        .alt-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .alt-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .alt-details {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            opacity: 0.7;
+        }
+        
+        .alt-action {
+            padding: 8px 15px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .alt-source-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            background-color: rgba(var(--primary-rgb), 0.7);
+            padding: 3px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            display: inline-block;
+        }
+        
+        .modal__title {
+            font-size: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .modal__btn {
+            background: var(--primary);
+            color: var(--white);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .modal__btn--cancel {
+            background: var(--border-color);
+            margin-left: 10px;
+        }
+        .modal__actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body class="tv-mode">
+<div class="main-container">
+
+    <div class="search-filters" style="display: none;">
+        <div class="search-box"><input id="searchInput" placeholder="Buscar canales, ID (ej: #123)" autofocus></div>
+        <div class="filter-buttons">
+            <button class="filter-button filter-button--favorites" id="filterFavorites">★</button>
+            <button class="filter-button" id="filterDAZN">DAZN</button>
+            <button class="filter-button" id="filterMovistar">MOVISTAR+</button>
+            <button class="filter-button" id="filterEurosport">★EUROSPORT</button>
+            <button class="filter-button filter-button--clear filter-button--active" id="clearEmojiFilters">x</button>
+        </div>
+        <div class="filter-buttons" id="sportFiltersContainer" style="margin-top:.6rem">
+            <button class="filter-button sport-filter-button" data-sport-key="futbol" id="filterFutbol">⚽</button>
+            <button class="filter-button sport-filter-button" data-sport-key="baloncesto" id="filterBaloncesto">🏀</button>
+            <button class="filter-button sport-filter-button" data-sport-key="tenis" id="filterTenis">🎾</button>
+            <button class="filter-button sport-filter-button" data-sport-key="boxeo" id="filterBoxeo">🥊</button>
+            <button class="filter-button sport-filter-button" data-sport-key="ciclismo" id="filterCiclismo">🚴</button>
+            <button class="filter-button sport-filter-button" data-sport-key="motorsport" id="filterMotorsport">🏁</button>
+            <button class="filter-button sport-filter-button" data-sport-key="f1" id="filterF1">🏎️</button>
+        </div>
+    </div>
+
+    <div id="updateNotification" class="update-notification"></div>
+    
+    <div class="channels-grid" id="channelsGrid">
+        </div>
+
+</div>
+
+<div class="modal" id="settingsModal" style="display: none;">
+    <div class="modal__content">
+        <h3 class="modal__title">⚙️ Ajustes</h3>
+        <div class="modal__actions">
+            <button class="modal__btn modal__btn--primary" id="closeSettingsBtn">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="alternativesModal">
+    <div class="modal__content">
+        <h3 class="modal__title">🔁 Alternativas para <span id="altChannelName"></span></h3>
+        <ul class="alternatives-list" id="altList">
+            </ul>
+        <div class="modal__actions">
+            <button class="modal__btn modal__btn--cancel" id="closeAlternativesBtn">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<button class="floating-save-button" id="saveFavoritesButton" onclick="disableFavoriteMode()">✓</button>
+
+<script>
+    // Se mantiene todo el código JavaScript original, pero se modifica la función createChannelCard
+    const state = { 
+        allChannels: [], 
+        channelsData: [], 
+        currentFilter: localStorage.getItem('currentFilter') || 'all', 
+        searchTerm: localStorage.getItem('searchTerm') || '', 
+        favorites: JSON.parse(localStorage.getItem('favorites')) || [], 
+        channelHistory: JSON.parse(localStorage.getItem('channelHistory')) || {}, 
+        currentChannel: null, 
+        clearButtonClickCount: 0, 
+        lastClearButtonClickTime: 0, 
+        isOnline: navigator.onLine, 
+        elcanoRetries: 0, 
+        eventsRetries: 0, 
+        darkMode: false, 
+        primaryColor: localStorage.getItem('primaryColor') || '#2563eb', 
+        isFavoriteMode: false, 
+        channelRatings: JSON.parse(localStorage.getItem('channelRatings')) || {}, 
+        lastChannelPlay: JSON.parse(localStorage.getItem('lastChannelPlay')) || null, 
+        firstSeen: JSON.parse(localStorage.getItem('firstSeen')) || {}, 
+        sportFilter: localStorage.getItem('sportFilter') || 'all', 
+        hideEventDetails: localStorage.getItem('hideEventDetails') === 'true',
+        // NUEVA ESTRUCTURA PARA GUARDAR ALTERNATIVAS
+        alternativeSources: {} 
+    }; 
+    
 // URL DE LA NUEVA FUENTE ERA
 const ERA_URL = "https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/data/listas/listaplana.txt";
 const PROXIES = [ 'https://api.allorigins.win/raw?url=', 'https://cors-anywhere.herokuapp.com/', 'https://api.codetabs.com/v1/proxy/?quest=', 'https://proxy-cors-simple.vercel.app/api?url=', 'https://yacdn.org/proxy/', 'https://cors-proxy.fringe.co.kr/?' ]; 
@@ -124,7 +686,8 @@ function applyFilter(filter) {
     if (filter === 'all') { 
         state.searchTerm = ''; 
         localStorage.setItem('searchTerm', ''); 
-        document.getElementById('searchInput').value = ''; 
+        const searchInput = document.getElementById('searchInput');
+        if(searchInput) searchInput.value = ''; 
         state.sportFilter = 'all'; 
         localStorage.setItem('sportFilter', 'all'); 
     } 
@@ -137,7 +700,8 @@ function applyFilter(filter) {
     else if (filter === 'favorites') targetId = 'filterFavorites'; 
     else if (filter === 'all') targetId = 'clearEmojiFilters'; 
     if (targetId) { 
-        document.getElementById(targetId).classList.add('filter-button--active'); 
+        const targetBtn = document.getElementById(targetId);
+        if(targetBtn) targetBtn.classList.add('filter-button--active'); 
     } 
     renderResults(); 
 } 
@@ -151,7 +715,8 @@ function applySportFilter(sportKey) {
     disableFavoriteMode(); 
     clearAllFilterVisuals(); 
     if (state.sportFilter !== 'all') { 
-        document.querySelector(`.sport-filter-button[data-sport-key="${sportKey}"]`).classList.add('filter-button--active'); 
+        const sportBtn = document.querySelector(`.sport-filter-button[data-sport-key="${sportKey}"]`);
+        if(sportBtn) sportBtn.classList.add('filter-button--active'); 
     } else { 
         restoreFilterUI(); 
     } 
@@ -163,7 +728,7 @@ function showStatusMessage(message, type = "info") {
         statusElement = document.createElement("div"); 
         statusElement.className = "status-message"; 
         const channelsGrid = document.getElementById("channelsGrid"); 
-        channelsGrid.prepend(statusElement); 
+        if (channelsGrid) channelsGrid.prepend(statusElement);
     } 
     statusElement.textContent = message; 
     statusElement.className = `status-message ${type}`; 
@@ -655,7 +1220,8 @@ function processChannelNames() {
 } 
 function filterChannels() { 
     let filteredChannels = state.channelsData; 
-    const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase(); 
+    const searchInput = document.getElementById('searchInput');
+    const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : ''; 
     if (searchTerm) { 
         filteredChannels = filteredChannels.filter(channel => { 
             const normalizedSearchTerm = normalizeText(searchTerm); 
@@ -793,14 +1359,10 @@ function isChannelLive(channel, allEventChannels) {
     const liveStartTime = event.startTime - (15 * 60 * 1000); 
     const liveEndTime = event.endTime; 
     const isTimeframeLive = now >= liveStartTime && now <= liveEndTime; 
-    if (!isTimeframeLive) { 
-        return false; 
+    if (isTimeframeLive) { 
+        return true; 
     } 
-    const isConflicted = findConflictingSiblings(channel, allEventChannels); 
-    if (isConflicted) { 
-        return false; 
-    } 
-    return true; 
+    return false; 
 } 
 function findConflictingSiblings(currentChannel, allEventChannels) { 
     const currentChannelName = normalizeText(currentChannel.name); 
@@ -853,6 +1415,49 @@ function determineBrandGroup(channel) {
     return 'Otros';
 }
 // MODIFICACIÓN DE determineBrandGroup TERMINA AQUÍ
+
+// **********************************************
+// **** INICIO DE MODIFICACIONES CLAVE **********
+// **********************************************
+
+/**
+ * Filtra la lista de canales para mostrar solo la mejor opción por nombre de canal,
+ * y guarda las alternativas en `state.alternativeSources`.
+ * @param {Array<Object>} sortedChannels - Canales ya ordenados.
+ * @returns {Array<Object>} La lista de canales principales (deduplicados).
+ */
+function deduplicateChannels(sortedChannels) {
+    const principalChannels = [];
+    const alternatives = {};
+    const seenChannelNames = new Set();
+
+    sortedChannels.forEach(channel => {
+        const principalName = channel.name.toUpperCase().trim();
+        
+        // El nombre de canal es la clave para la deduplicación
+        const normalizedKey = normalizeText(principalName); 
+
+        if (!seenChannelNames.has(normalizedKey)) {
+            // Este es el mejor canal para este nombre, ya que la lista está ordenada por calidad/fuente/rating.
+            principalChannels.push(channel);
+            seenChannelNames.add(normalizedKey);
+            alternatives[channel.id] = []; // Inicializar la lista de alternativas para el canal principal
+        } else {
+            // Es una alternativa, necesitamos encontrar su canal principal.
+            // Iteramos sobre los principales ya añadidos para encontrar el ID del principal
+            const principal = principalChannels.find(c => normalizeText(c.name) === normalizedKey);
+            
+            if (principal) {
+                // Guardar como alternativa al ID del principal.
+                alternatives[principal.id].push(channel);
+            }
+        }
+    });
+
+    state.alternativeSources = alternatives;
+    return principalChannels;
+}
+
 function renderResults() {
     const filteredChannels = filterChannels();
     const channelsGrid = document.getElementById('channelsGrid');
@@ -868,36 +1473,52 @@ function renderResults() {
         channelsGrid.innerHTML = ` <div class="no-results"><div class="no-results-icon">📡</div><div class="no-results-text">No se encontraron canales</div><div class="no-results-hint">Prueba con otros filtros o términos de búsqueda</div></div> `;
         return;
     }
+    
+    // 1. ORDENAR TODOS LOS CANALES POR PRIORIDAD
     const sortedChannels = [...filteredChannels].sort((a, b) => {
+        // Criterio de ordenación (repetido aquí para consistencia con el bloque de renderizado, 
+        // pero esencial para que la deduplicación funcione correctamente).
+        
+        // 1. Puntuación (rating) - de mayor a menor
+        const ratingA = state.channelRatings[a.id] !== undefined ? state.channelRatings[a.id] : 2.5;
+        const ratingB = state.channelRatings[b.id] !== undefined ? state.channelRatings[b.id] : 2.5;
+        if (ratingA !== ratingB) return ratingB - ratingA;
+        
+        // 2. Si está en vivo
         if (a.isLive && !b.isLive) return -1;
         if (!a.isLive && b.isLive) return 1;
-        const aIsOff = a.name.includes('(OFF)');
-        const bIsOff = b.name.includes('(OFF)');
-        if (aIsOff && !bIsOff) return 1;
-        if (!aIsOff && bIsOff) return -1;
-        const nameNumberA = getChannelNumberFromName(a.name);
-        const nameNumberB = getChannelNumberFromName(b.name);
-        if (nameNumberA !== nameNumberB) {
-            return nameNumberA - nameNumberB;
-        }
-        const qualityMap = { '4K': 5, 'FHD': 4, 'HD': 3, 'SD': 2, 'N/A': 1, 'UHD': 6 };
+        
+        // 3. Calidad del stream (UHD/4K > FHD > HD > SD)
+        const qualityMap = { 'UHD': 6, '4K': 5, 'FHD': 4, 'HD': 3, 'SD': 2, 'N/A': 1 };
         const qualityA = qualityMap[standardizeQuality(a.quality)] || 0;
         const qualityB = qualityMap[standardizeQuality(b.quality)] || 0;
-        if (qualityB !== qualityA) {
-            return qualityB - qualityA;
-        }
-        const sourcePriorityMap = { 'gist': 4, 'era': 3, 'events': 2, 'shickat': 1, 'elcano': 0, 'history': -1 }; // ERA Prioridad: 3
+        if (qualityB !== qualityA) return qualityB - qualityA;
+        
+        // 4. Fuente del stream (gist > era > events > shickat > elcano)
+        const sourcePriorityMap = { 'gist': 4, 'era': 3, 'events': 2, 'shickat': 1, 'elcano': 0, 'history': -1 }; 
         const sourceA = sourcePriorityMap[a.source] || 0;
         const sourceB = sourcePriorityMap[b.source] || 0;
-        if (sourceB !== sourceA) {
-            return sourceB - sourceA;
-        }
+        if (sourceB !== sourceA) return sourceB - sourceA;
+        
+        // 5. Si es favorito
+        const aIsFavorite = state.favorites.includes(a.id);
+        const bIsFavorite = state.favorites.includes(b.id);
+        if (aIsFavorite && !bIsFavorite) return -1;
+        if (!aIsFavorite && bIsFavorite) return 1;
+        
+        // Criterio de desempate final: Orden alfabético por nombre
         return a.name.localeCompare(b.name);
     });
+    
+    // 2. DEDUPLICAR: OBTENER SOLO LA MEJOR OPCIÓN Y GUARDAR ALTERNATIVAS
+    const principalChannels = deduplicateChannels(sortedChannels);
+
+    // 3. SEGUIR CON LA LÓGICA DE AGRUPACIÓN Y RENDERIZADO CON LOS CANALES PRINCIPALES
+    
     const groups = {};
     const eventGroupKeysByChannelName = new Map();
-    const eventChannels = sortedChannels.filter(c => c.source === 'events' && c.event);
-    const otherChannels = sortedChannels.filter(c => !(c.source === 'events' && c.event));
+    const eventChannels = principalChannels.filter(c => c.source === 'events' && c.event);
+    const otherChannels = principalChannels.filter(c => !(c.source === 'events' && c.event));
     
     eventChannels.forEach(channel => {
         let groupName;
@@ -905,17 +1526,32 @@ function renderResults() {
         if (state.hideEventDetails) {
             groupName = determineBrandGroup(channel);
         } else {
+            // Clave única para agrupar por evento
             const eventGroupKey = `${channel.event.date}###${channel.event.competition}###${channel.event.match}`;
             groupName = eventGroupKey;
             isEventGroup = true;
+            
+            // Mapeo inverso de nombre de canal a grupo de evento (para canales no-evento)
             const normalizedChannelName = normalizeText(channel.name);
             if (!eventGroupKeysByChannelName.has(normalizedChannelName)) {
                 eventGroupKeysByChannelName.set(normalizedChannelName, new Set());
             }
             eventGroupKeysByChannelName.get(normalizedChannelName).add(eventGroupKey);
         }
+        
         if (!groups[groupName]) {
-            groups[groupName] = { name: groupName, channels: [], isEvent: isEventGroup, time: isEventGroup ? channel.event.time : null, date: isEventGroup ? channel.event.date : null, sportEmoji: isEventGroup ? channel.event.sportEmoji : null, sportName: isEventGroup ? channel.event.sportName : null, competition: isEventGroup ? channel.event.competition : null, match: isEventGroup ? channel.event.match : null, hasLive: channel.isLive };
+            groups[groupName] = { 
+                name: groupName, 
+                channels: [], 
+                isEvent: isEventGroup, 
+                time: isEventGroup ? channel.event.time : null, 
+                date: isEventGroup ? channel.event.date : null, 
+                sportEmoji: isEventGroup ? channel.event.sportEmoji : null, 
+                sportName: isEventGroup ? channel.event.sportName : null, 
+                competition: isEventGroup ? channel.event.competition : null, 
+                match: isEventGroup ? channel.event.match : null, 
+                hasLive: channel.isLive 
+            };
         } else {
             if (channel.isLive) {
                 groups[groupName].hasLive = true;
@@ -923,9 +1559,12 @@ function renderResults() {
         }
         groups[groupName].channels.push(channel);
     });
+    
     otherChannels.forEach(channel => {
         let groupFound = false;
         const normalizedChannelName = normalizeText(channel.name);
+        
+        // Intenta agrupar el canal con un grupo de evento existente (por nombre)
         if (!state.hideEventDetails && eventGroupKeysByChannelName.has(normalizedChannelName)) {
             const eventGroupKeys = eventGroupKeysByChannelName.get(normalizedChannelName);
             for (const eventGroupKey of eventGroupKeys) {
@@ -936,6 +1575,8 @@ function renderResults() {
                 }
             }
         }
+        
+        // Si no se agrupó con un evento, usa el grupo de marca normal.
         if (!groupFound) {
             const groupName = determineBrandGroup(channel);
             if (!groups[groupName]) {
@@ -949,60 +1590,40 @@ function renderResults() {
         }
     });
 
-    // INICIO DE LA MODIFICACIÓN PARA AGRUPAR CANALES CON/SIN BAR Y APLICAR SUBGRUPOS PERSONALIZADOS
-    Object.values(groups).forEach(group => {
-        const subGroups = {};
-        group.channels.forEach(channel => {
-            let subGroupName = channel.name.trim();
-            
-            // LÓGICA AÑADIDA PARA SUBGRUPOS DE "OTROS"
-            if (group.name === 'Otros') {
-                const normalizedChannelName = normalizeText(channel.name);
-                let foundSubGroup = null;
+    // **********************************************
+    // **** INICIO DE LA MODIFICACIÓN: ELIMINAR SUBGRUPOS ****
+    // **********************************************
+    
+    // NOTA: Se ha eliminado el bucle 'Object.values(groups).forEach(group => { ... })'
+    // que creaba los subgrupos (group.subGroups).
+    // Ahora, los canales de cada grupo deben ordenarse para el carrusel principal.
 
-                // Iterar sobre la lista de subgrupos solicitados
-                for (const subGroupKey of OTHER_SUBGROUPS) {
-                    const normalizedSubGroupKey = normalizeText(subGroupKey);
-                    
-                    // Usamos una búsqueda más flexible para capturar coincidencias
-                    if (normalizedChannelName.includes(normalizedSubGroupKey)) {
-                        foundSubGroup = subGroupKey;
-                        break;
-                    }
-                }
+    // **********************************************
+    // **** FIN DE LA MODIFICACIÓN: ELIMINAR SUBGRUPOS ****
+    // **********************************************
 
-                // Si se encuentra un subgrupo, usa su clave, si no, usa el nombre del canal.
-                subGroupName = foundSubGroup || subGroupName;
-            }
-            
-            // Lógica para agrupar canales DAZN con/sin BAR
-            if (subGroupName.includes('DAZN') && subGroupName.includes('BAR')) {
-                subGroupName = subGroupName.replace(' BAR', '').trim();
-            }
-            
-            if (!subGroups[subGroupName]) {
-                subGroups[subGroupName] = [];
-            }
-            subGroups[subGroupName].push(channel);
-        });
-        group.subGroups = subGroups;
-    });
-    // FIN DE LA MODIFICACIÓN
 
     const sortedGroupKeys = Object.keys(groups).sort((a, b) => {
         const groupA = groups[a];
         const groupB = groups[b];
+        
+        // 1. Grupos con contenido "En Vivo" (canales Live) primero
         const aHasLive = groupA.channels.some(c => c.isLive);
         const bHasLive = groupB.channels.some(c => c.isLive);
         if (aHasLive && !bHasLive) return -1;
         if (!aHasLive && bHasLive) return 1;
+
+        // 2. Grupos de Evento primero (si están visibles)
         if (groupA.isEvent && groupB.isEvent) {
+            // Ordenar por fecha y luego hora de evento
             const dateCompare = compareEventDates(groupA, groupB);
             if (dateCompare !== 0) return dateCompare;
             return a.localeCompare(b);
         }
         if (groupA.isEvent && !groupB.isEvent) return -1;
         if (!groupA.isEvent && groupB.isEvent) return 1;
+
+        // 3. Orden predefinido de marcas (DAZN F1, DAZN, M+...)
         const indexA = groupOrder.indexOf(a);
         const indexB = groupOrder.indexOf(b);
         if (indexA === -1 && indexB === -1) {
@@ -1012,16 +1633,37 @@ function renderResults() {
         if (indexB === -1) return -1;
         return indexA - indexB;
     });
+
+    // Mover "Otros" al final del orden predefinido
     if (groups['Otros']) {
         sortedGroupKeys.push(sortedGroupKeys.splice(sortedGroupKeys.indexOf('Otros'), 1)[0]);
     }
+
     const fragment = document.createDocumentFragment();
     let lastDateRendered = null;
     let separatorAdded = false;
-    let hasLiveEvents = sortedGroupKeys.some(key => groups[key].isEvent && groups[key].channels.some(c => c.isLive));
-    let foundEndOfLiveGroups = false;
+
     sortedGroupKeys.forEach(groupKey => {
         const group = groups[groupKey];
+        
+        // Ordenar los canales dentro del grupo: Live > Calidad > Rating
+        group.channels.sort((a, b) => {
+            if (a.isLive && !b.isLive) return -1;
+            if (!a.isLive && b.isLive) return 1;
+            
+            const qualityMap = { 'UHD': 6, '4K': 5, 'FHD': 4, 'HD': 3, 'SD': 2, 'N/A': 1 };
+            const qualityA = qualityMap[standardizeQuality(a.quality)] || 0;
+            const qualityB = qualityMap[standardizeQuality(b.quality)] || 0;
+            if (qualityB !== qualityA) return qualityB - qualityA;
+            
+            const ratingA = state.channelRatings[a.id] !== undefined ? state.channelRatings[a.id] : 2.5;
+            const ratingB = state.channelRatings[b.id] !== undefined ? state.channelRatings[b.id] : 2.5;
+            if (ratingA !== ratingB) return ratingB - ratingA;
+            
+            return a.name.localeCompare(b.name);
+        });
+
+        // Título de fecha para grupos de eventos (solo si no están ocultos)
         if (group.isEvent && !state.hideEventDetails) {
             const formattedDate = formatEventDate(group.date);
             if (formattedDate !== lastDateRendered) {
@@ -1034,79 +1676,43 @@ function renderResults() {
         } else {
             lastDateRendered = null;
         }
+
         const groupElement = document.createElement('div');
         const isEventGroup = group.isEvent ? 'event-group' : '';
         groupElement.className = `channel-group ${isEventGroup}`;
+        
         const liveTimeClass = group.hasLive ? 'live-time-blink' : '';
+        const liveBadge = group.hasLive ? '<div class="live-indicator-badge">EN DIRECTO AHORA</div>' : '';
+
         let groupTitleContent;
         if (group.isEvent && !state.hideEventDetails) {
-            groupTitleContent = ` <div style="display: flex; flex-direction: column; width: 100%;"><div style="display: flex; justify-content: space-between; align-items: center; width: 100%;"><div class="${liveTimeClass}" style="margin-right: 10px;">${group.time}</div><div class="marquee-container" style="flex: 1;"><div class="competition-text">${group.competition}</div></div><div style="margin-left: 10px;"> ${group.match} <span class="group-title-emoji" style="margin-left: 10px;">${group.sportEmoji}</span></div></div></div> `;
+            // Estructura para título de evento en el diseño TV
+            groupTitleContent = `
+                <div>
+                    <div class="event-header-info">
+                        ${liveBadge}
+                        <span class="group-title-emoji" style="margin-right: 10px;">${group.sportEmoji}</span>
+                        <span class="${liveTimeClass} event-time">${group.time}</span> 
+                    </div>
+                    <div class="event-match">${group.competition} - ${group.match}</div> 
+                </div>`;
         } else {
             groupTitleContent = `<div>${group.name}</div>`;
         }
-        groupElement.innerHTML = ` <div class="channel-group__header"><div class="channel-group__title">${groupTitleContent}</div></div><div id="group-content-${groupKey}" class="group-content-container"></div> `;
+        
+        groupElement.innerHTML = ` 
+            <div class="channel-group__header">
+                <div class="channel-group__title">${groupTitleContent}</div>
+            </div>
+            <div id="group-content-${groupKey}" class="group-content-container">
+                <div class="subgroup-content"> 
+                    ${group.channels.map(channel => createChannelCard(channel)).join('')} 
+                </div>
+            </div> 
+        `;
         fragment.appendChild(groupElement);
-        const subGroupContentContainer = groupElement.querySelector('.group-content-container');
-        const sortedSubGroupNames = Object.keys(group.subGroups).sort((a, b) => {
-            const aHasLive = group.subGroups[a].some(c => c.isLive);
-            const bHasLive = group.subGroups[b].some(c => c.isLive);
-            if (aHasLive && !bHasLive) return -1;
-            if (!aHasLive && bHasLive) return 1;
-            return a.localeCompare(b);
-        });
-        sortedSubGroupNames.forEach(subGroupName => {
-            const subGroupChannels = group.subGroups[subGroupName];
-            
-            // INICIO DEL BLOQUE DE ORDENAMIENTO MODIFICADO
-            subGroupChannels.sort((a, b) => {
-                // 1. PRIMER criterio: Puntuación (rating) - de mayor a menor
-                // Rating por defecto es 2.5
-                const ratingA = state.channelRatings[a.id] !== undefined ? state.channelRatings[a.id] : 2.5;
-                const ratingB = state.channelRatings[b.id] !== undefined ? state.channelRatings[b.id] : 2.5;
-                if (ratingA !== ratingB) {
-                    return ratingB - ratingA; // Mayor rating primero
-                }
 
-                // 2. SEGUNDO criterio: Si está en vivo (canales en vivo primero)
-                if (a.isLive && !b.isLive) return -1;
-                if (!a.isLive && b.isLive) return 1;
-                
-                // 3. TERCER criterio: Calidad del stream (UHD/4K > FHD > HD > SD)
-                const qualityMap = { 'UHD': 6, '4K': 5, 'FHD': 4, 'HD': 3, 'SD': 2, 'N/A': 1 };
-                const qualityA = qualityMap[standardizeQuality(a.quality)] || 0;
-                const qualityB = qualityMap[standardizeQuality(b.quality)] || 0;
-                if (qualityB !== qualityA) {
-                    return qualityB - qualityA;
-                }
-                
-                // 4. CUARTO criterio: Fuente del stream (gist > era > events > shickat > elcano)
-                const sourcePriorityMap = { 'gist': 4, 'era': 3, 'events': 2, 'shickat': 1, 'elcano': 0, 'history': -1 }; // ERA Prioridad: 3
-                const sourceA = sourcePriorityMap[a.source] || 0;
-                const sourceB = sourcePriorityMap[b.source] || 0;
-                if (sourceB !== sourceA) {
-                    return sourceB - sourceA;
-                }
-
-                // 5. QUINTO criterio: Si es favorito (favoritos primero)
-                const aIsFavorite = state.favorites.includes(a.id);
-                const bIsFavorite = state.favorites.includes(b.id);
-                if (aIsFavorite && !bIsFavorite) return -1;
-                if (!aIsFavorite && bIsFavorite) return 1;
-                
-                // Criterio de desempate final: Orden alfabético por nombre
-                return a.name.localeCompare(b.name);
-            });
-            // FIN DEL BLOQUE DE ORDENAMIENTO MODIFICADO
-            
-            let subGroupTitleHTML = '';
-            // INICIO DE MODIFICACIÓN PARA CENTRAR UN ÚNICO ELEMENTO
-            const isSingleItem = subGroupChannels.length === 1;
-            const singleItemClass = isSingleItem ? 'subgroup-content--single-item' : '';
-            
-            const subGroupHTML = ` ${subGroupTitleHTML} <div class="subgroup-content ${singleItemClass}"> ${subGroupChannels.map(channel => createChannelCard(channel)).join('')} </div> `;
-            // FIN DE MODIFICACIÓN
-            subGroupContentContainer.innerHTML += subGroupHTML;
-        });
+        // Separador para dividir eventos de canales permanentes
         if (!separatorAdded && group.isEvent) {
             const nextGroupIndex = sortedGroupKeys.indexOf(groupKey) + 1;
             const nextGroupKey = sortedGroupKeys[nextGroupIndex];
@@ -1121,30 +1727,432 @@ function renderResults() {
         }
     });
     channelsGrid.appendChild(fragment);
-    document.querySelectorAll('.competition-text').forEach(textElement => {
-        const container = textElement.closest('.marquee-container');
-        setTimeout(() => {
-            if (container && textElement.scrollWidth > container.clientWidth) {
-                textElement.classList.add('is-overflowing');
-            } else {
-                textElement.classList.remove('is-overflowing');
-            }
-        }, 0);
+} 
+
+// Función para mostrar el modal de alternativas
+function showAlternativesModal(principalChannelId) {
+    const principalChannel = state.channelsData.find(c => c.id === principalChannelId);
+    if (!principalChannel) return;
+    
+    const alternatives = state.alternativeSources[principalChannelId] || [];
+    
+    const altChannelName = document.getElementById('altChannelName');
+    const altList = document.getElementById('altList');
+    const alternativesModal = document.getElementById('alternativesModal');
+
+    // Usar el displayableName que ya tiene el formato HTML
+    altChannelName.innerHTML = principalChannel.displayableName;
+    altList.innerHTML = ''; // Limpiar lista anterior
+
+    // Agregar la opción principal primero (que es la "mejor")
+    altList.innerHTML += `
+        <li data-acestream-id="${principalChannel.id}" data-channel-name="${principalChannel.name}" class="principal-source">
+            <div class="alt-info">
+                <span class="alt-name">Opción Principal (Mejor calidad/rating)</span>
+                <span class="alt-details">${standardizeQuality(principalChannel.quality)} | Fuente: ${getSourceText(principalChannel.source)} | Rating: ${getStarRating(state.channelRatings[principalChannel.id] || 2.5)}</span>
+            </div>
+            <button class="alt-action" onclick="handleAlternativePlay('${principalChannel.id}')">Ver Ahora</button>
+        </li>
+    `;
+
+    // Agregar las alternativas
+    alternatives.forEach((alt, index) => {
+        altList.innerHTML += `
+            <li data-acestream-id="${alt.id}" data-channel-name="${alt.name}" class="alternative-source">
+                <div class="alt-info">
+                    <span class="alt-name">Alternativa ${index + 1}</span>
+                    <span class="alt-details">${standardizeQuality(alt.quality)} | Fuente: ${getSourceText(alt.source)} | Rating: ${getStarRating(state.channelRatings[alt.id] || 2.5)}</span>
+                </div>
+                <button class="alt-action" onclick="handleAlternativePlay('${alt.id}')">Probar</button>
+            </li>
+        `;
     });
-} function createChannelCard(channel) { const isFavorite = state.favorites.includes(channel.id); const isLive = channel.isLive; let cardClass = `channel-card ${isFavorite ? 'channel-card--favorite' : ''} ${state.isFavoriteMode ? 'channel-card--favorite-mode' : ''}`; if (isLive) { cardClass += ' channel-card--live'; } const rating = state.channelRatings[channel.id] !== undefined ? state.channelRatings[channel.id] : 2.5; let sourceBadgeClass = ''; let sourceBadgeText = ''; switch (channel.source) { case 'gist': sourceBadgeClass = 'gist-badge'; sourceBadgeText = 'NE'; break; 
-    case 'era': // CASO ERA AÑADIDO
-        sourceBadgeClass = 'era-badge';
-        sourceBadgeText = 'ER'; 
-        break;
-    case 'elcano': 
-        sourceBadgeClass = 'elcano-badge'; 
-        sourceBadgeText = 'EC'; 
-        break; 
-    case 'events': 
-        sourceBadgeClass = 'events-badge'; 
-        sourceBadgeText = 'EV'; 
-        break; 
-    case 'shickat': 
-        sourceBadgeClass = 'shickat-badge'; 
-        sourceBadgeText = 'SH'; 
-        break; } const isNew = isChannelNew(channel.id); const newIndicator = isNew ? '<div class="new-channel-indicator"></div>' : ''; const displayQuality = standardizeQuality(channel.quality); const sourceButton = ` <button class="channel-number-badge-button ${sourceBadgeClass}" data-id="${channel.id}" title="Copiar enlace (AceStream ID: ${channel.id})"><span class="channel-number">${channel.number}</span><span class="source-initials">${sourceBadgeText}</span></button> `; const liveIndicator = ''; return ` <div class="${cardClass}" data-id="${channel.id}" data-number="${channel.number}"> ${newIndicator} <div class="channel-card__quality"> ${displayQuality} ${channel.multiAudio ? '🎧' : ''} </div><div class="channel-header"><div class="channel-name">${channel.displayableName} ${liveIndicator}</div></div> ${sourceButton} <div class="rating-stars">${getStarRating(rating)}</div></div> `; } function playChannel(acestreamId) { const acestreamUrl = `acestream://${acestreamId}`; const newWindow = window.open(acestreamUrl, '_blank'); setTimeout(() => { if (newWindow && newWindow.closed) { } else { } }, 500); } function handleChannelPlay(channel) { const now = new Date().getTime(); if (state.lastChannelPlay) { const previousChannelId = state.lastChannelPlay.channelId; const previousChannelData = state.channelsData.find(c => c.id === previousChannelId); const duration = (now - state.lastChannelPlay.timestamp) / 1000; let rating = state.channelRatings[previousChannelId] !== undefined ? state.channelRatings[previousChannelId] : 2.5; let newRating = rating; if (previousChannelId !== channel.id && previousChannelData) { const previousName = previousChannelData.name.toLowerCase().trim(); const currentName = channel.name.toLowerCase().trim(); if (previousName === currentName) { if (duration >= (30 * 60)) { newRating += 1.5; } else if (duration >= (15 * 60)) { newRating += 0.5; } else if (duration >= (5 * 60)) { newRating -= 1; } else if (duration >= 10) { newRating -= 1.5; } else { newRating -= 2; } } else { if (duration >= (30 * 60)) { newRating += 1.5; } else { newRating = rating; } } } else if (previousChannelId === channel.id) { newRating = rating; } state.channelRatings[previousChannelId] = Math.max(1, Math.min(5, newRating)); saveRatings(); renderResults(); } state.lastChannelPlay = { channelId: channel.id, timestamp: now }; localStorage.setItem('lastChannelPlay', JSON.stringify(state.lastChannelPlay)); playChannel(channel.id); } function showCopyModal(acestreamId) { const acestreamUrl = `acestream://${acestreamId}`; const copyModal = document.getElementById('copyModal'); const copyAceStreamBtn = document.getElementById('copyAceStreamBtn'); const urlDisplayAceStream = document.getElementById('copyUrlDisplayAceStream'); urlDisplayAceStream.textContent = acestreamUrl; copyAceStreamBtn.onclick = () => copyUrlToClipboard(acestreamUrl, 'AceStream'); copyModal.classList.add('active'); } async function copyAcestreamDirectly(acestreamId) { const acestreamUrl = `acestream://${acestreamId}`; try { await navigator.clipboard.writeText(acestreamUrl); showCopySuccessMessage('AceStream'); } catch (err) { console.error('Error al copiar el texto: ', err); alert('No se pudo copiar la URL. Por favor, hazlo manualmente.'); } } function hideCopyModal() { document.getElementById('copyModal').classList.remove('active'); } function showCopySuccessMessage(format = 'AceStream') { const messageElement = document.getElementById('copyMessage'); messageElement.textContent = `${format} URL copiada con éxito!`; messageElement.classList.add('show'); setTimeout(() => { messageElement.classList.remove('show'); }, 2000); } async function copyUrlToClipboard(urlToCopy, format) { try { await navigator.clipboard.writeText(urlToCopy); hideCopyModal(); showCopySuccessMessage(format); } catch (err) { console.error('Error al copiar el texto: ', err); alert('No se pudo copiar la URL. Por favor, hazlo manualmente.'); } } function handleSearchInput() { state.searchTerm = document.getElementById('searchInput').value.trim(); localStorage.setItem('searchTerm', state.searchTerm); disableFavoriteMode(); if (state.searchTerm) { if (state.currentFilter === 'all' && state.sportFilter === 'all') { document.getElementById('clearEmojiFilters').classList.remove('filter-button--active'); } } else { restoreFilterUI(); } renderResults(); } function changePrimaryColor(color) { state.primaryColor = color; const rgb = hexToRgb(color); document.documentElement.style.setProperty('--primary-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`); document.documentElement.style.setProperty('--primary', color); document.documentElement.style.setProperty('--primary-dark', color === '#2563eb' ? '#1e50c7' : color); updatePrimaryLightColor(); document.querySelectorAll('.color-option').forEach(btn => { btn.classList.remove('active'); }); document.querySelector(`.color-option[data-color="${color}"]`).classList.add('active'); localStorage.setItem('primaryColor', color); renderResults(); } function hexToRgb(hex) { const r = parseInt(hex.slice(1, 3), 16); const g = parseInt(hex.slice(3, 5), 16); const b = parseInt(hex.slice(5, 7), 16); return { r, g, b }; } function updatePrimaryLightColor() { const rgb = hexToRgb(state.primaryColor); const isDarkMode = document.body.classList.contains('dark-mode'); document.documentElement.style.setProperty('--primary-light', isDarkMode ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)` : `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`); } function cleanObsoleteRatings() { const activeChannelIds = new Set(state.channelsData.map(c => c.id)); const ratingsToKeep = {}; for (const channelId in state.channelRatings) { if (activeChannelIds.has(channelId)) { ratingsToKeep[channelId] = state.channelRatings[channelId]; } } state.channelRatings = ratingsToKeep; saveRatings(); console.log("Puntuaciones de canales obsoletas limpiadas."); } function saveRatings() { localStorage.setItem('channelRatings', JSON.stringify(state.channelRatings)); } function resetRatings() { if (confirm('¿Estás seguro de que quieres restablecer todas las puntuaciones de los canales?')) { localStorage.removeItem('channelRatings'); state.channelRatings = {}; renderResults(); showStatusMessage("Puntuaciones de canales restablecidas.", "success"); document.getElementById('settingsModal').classList.remove('modal--active'); } } function getStarRating(score) { const fullStars = Math.floor(score); const hasHalfStar = score % 1 >= 0.5; let stars = '★'.repeat(fullStars); if (hasHalfStar) { stars += '<span class="half-star">★</span>'; } const emptyStars = '☆'.repeat(5 - fullStars - (hasHalfStar ? 1 : 0)); return `<span style="color: var(--primary);">${stars}</span><span style="color: gray;">${emptyStars}</span>`; } function restoreFilterUI() { document.getElementById('searchInput').value = state.searchTerm; clearAllFilterVisuals(); let targetId; if (state.searchTerm && state.currentFilter === 'all' && state.sportFilter === 'all') { return; } if (state.sportFilter !== 'all') { const sportBtn = document.querySelector(`.sport-filter-button[data-sport-key="${state.sportFilter}"]`); if (sportBtn) { sportBtn.classList.add('filter-button--active'); return; } } if (state.currentFilter === 'dazn') targetId = 'filterDAZN'; else if (state.currentFilter === 'm+') targetId = 'filterMovistar'; else if (state.currentFilter === 'eurosport') targetId = 'filterEurosport'; else if (state.currentFilter === 'favorites') targetId = 'filterFavorites'; else if (state.currentFilter === 'all') targetId = 'clearEmojiFilters'; if (targetId) { document.getElementById(targetId).classList.add('filter-button--active'); } } document.addEventListener('DOMContentLoaded', () => { document.body.classList.toggle('dark-mode', state.darkMode); document.getElementById('darkModeCheckbox').checked = state.darkMode; document.getElementById('hideEventDetailsCheckbox').checked = state.hideEventDetails; document.body.classList.toggle('hide-event-details', state.hideEventDetails); const favoriteButton = document.getElementById('filterFavorites'); const LONG_PRESS_THRESHOLD = 500; const clearButton = document.getElementById('clearEmojiFilters'); const copyModal = document.getElementById('copyModal'); const cancelCopyBtn = document.getElementById('cancelCopyBtn'); cleanupOldFirstSeenRecords(); const setupLongPress = (btn, onLongPress, onClick) => { let pressTimer = null; let isLongPress = false; const startPress = () => { isLongPress = false; pressTimer = setTimeout(() => { isLongPress = true; onLongPress(); }, LONG_PRESS_THRESHOLD); }; const endPress = () => { clearTimeout(pressTimer); if (pressTimer && !isLongPress) { onClick(); } pressTimer = null; }; btn.addEventListener('mousedown', (e) => { if (e.button === 0) startPress(); }); btn.addEventListener('mouseup', endPress); btn.addEventListener('touchstart', startPress, {passive: true}); btn.addEventListener('touchend', endPress); btn.addEventListener('touchmove', () => clearTimeout(pressTimer)); }; setupLongPress( favoriteButton, () => { state.isFavoriteMode = !state.isFavoriteMode; updateFavoriteModeVisuals(); if (state.isFavoriteMode) { showStatusMessage("Modo de selección de favoritos activado. Pulsa un canal para marcarlo/desmarcarlo."); } else { showStatusMessage("Modo de selección de favoritos desactivado.", "success"); } }, () => applyFilter('favorites') ); setupLongPress( clearButton, () => { document.getElementById('settingsModal').classList.add('modal--active'); }, () => applyFilter('all') ); if(cancelCopyBtn) { cancelCopyBtn.addEventListener('click', hideCopyModal); } window.addEventListener('click', (event) => { if (event.target === copyModal) { hideCopyModal(); } if (state.isFavoriteMode && !event.target.closest('.channel-card') && !event.target.closest('.floating-save-button') && !event.target.closest('.search-filters')) { disableFavoriteMode(); } }); document.getElementById('filterDAZN').addEventListener('click', () => applyFilter('dazn')); document.getElementById('filterMovistar').addEventListener('click', () => applyFilter('m+')); document.getElementById('filterEurosport').addEventListener('click', () => applyFilter('eurosport')); document.querySelectorAll('.sport-filter-button').forEach(button => { button.addEventListener('click', () => { applySportFilter(button.dataset.sportKey); }); }); document.getElementById('searchInput').addEventListener('input', handleSearchInput); document.getElementById('darkModeCheckbox').addEventListener('change', toggleDarkMode); document.getElementById('hideEventDetailsCheckbox').addEventListener('change', toggleHideEventDetails); document.getElementById('closeSettingsBtn').addEventListener('click', () => document.getElementById('settingsModal').classList.remove('modal--active')); document.querySelectorAll('.color-option').forEach(btn => { btn.addEventListener('click', () => changePrimaryColor(btn.dataset.color)); }); changePrimaryColor(state.primaryColor); document.addEventListener('click', (e) => { if (e.target.closest('.channel-number-badge-button')) { const button = e.target.closest('.channel-number-badge-button'); e.stopPropagation(); const channelId = button.dataset.id; copyAcestreamDirectly(channelId); } }); document.addEventListener('click', (e) => { const card = e.target.closest('.channel-card'); const numberButton = e.target.closest('.channel-number-badge-button'); if (card && !numberButton) { const channelId = card.dataset.id; const channelData = state.channelsData.find(c => c.id === channelId); if (state.isFavoriteMode) { e.stopPropagation(); toggleFavorite(channelId); } else if (channelData) { handleChannelPlay(channelData); } } }); restoreFilterUI(); loadInitialChannels(); setInterval(renderResults, 60000); });</script></body></html>
+
+    alternativesModal.classList.add('modal--active');
+}
+
+function hideAlternativesModal() {
+    document.getElementById('alternativesModal').classList.remove('modal--active');
+}
+
+// Función que maneja la reproducción desde el modal de alternativas
+function handleAlternativePlay(acestreamId) {
+    const channelData = state.channelsData.find(c => c.id === acestreamId);
+    if (channelData) {
+        handleChannelPlay(channelData); // Reutilizar la lógica de reproducción y rating
+    }
+    hideAlternativesModal(); // Cerrar el modal después de intentar la reproducción
+}
+
+function getSourceText(source) {
+    switch (source) {
+        case 'gist': return 'New Era';
+        case 'era': return 'ERA';
+        case 'elcano': return 'Elcano';
+        case 'events': return 'Eventos';
+        case 'shickat': return 'Shickat';
+        default: return 'Desconocido';
+    }
+}
+
+// **********************************************
+// **** FIN DE MODIFICACIONES CLAVE *************
+// **********************************************
+
+
+// REEMPLAZA esta función completa:
+function getPlaceholderInfo(channelName) {
+    const name = channelName.toUpperCase().replace(/<[^>]*>/g, '').trim(); // Eliminar spans HTML
+    let color = '444444'; // Gris oscuro por defecto
+    
+    // Usar el nombre completo del canal para el texto
+    let text = name;
+    
+    // Asignación de colores basada en el nombre del canal
+    if (name.includes('DAZN F1')) {
+        color = '350000'; // Rojo F1
+    } else if (name.includes('DAZN')) {
+        color = '000000'; // Negro DAZN
+    } else if (name.includes('M+ LIGA DE CAMPEONES')) {
+        color = '0085C1'; // Azul Movistar
+    } else if (name.includes('M+ LA LIGA')) {
+        color = '0085C1'; 
+    } else if (name.includes('M+ VAMOS')) {
+        color = '0085C1'; 
+    } else if (name.includes('M+ DEPORTES')) {
+        color = '0085C1'; 
+    } else if (name.includes('M+ PLUS')) {
+        color = '0085C1'; 
+    } else if (name.includes('★EUROSPORT')) {
+        color = '5e17eb'; // Púrpura Eurosport
+    } else if (name.includes('LA LIGA HYPERMOTION')) {
+        color = '21ffb8'; // Verde/Cian Hypermotion
+    } else if (name.includes('F1')) {
+        color = 'ff3535';
+    } else if (name.includes('CINE') || name.includes('ESTRENOS') || name.includes('HITS') || name.includes('DRAMA')) {
+        color = 'a06cf5'; // Lila
+    } else if (name.includes('SERIES')) {
+        color = '6c75f5'; // Azul claro
+    } else if (name.includes('DOCUMENTALES') || name.includes('DISCOVERY')) {
+        color = '556270'; // Azul oscuro
+    } else if (name.includes('INFANTIL')) {
+        color = '17e0eb'; // Cian
+    } else if (name.includes('M+')) {
+        color = '0085C1';
+    }
+    
+    // Codificar el texto manteniendo los espacios como %20 en lugar de +
+    text = encodeURIComponent(text).replace(/%20/g, ' ');
+    
+    const url = `https://placehold.co/600x338/${color}/white?text=${text}`;
+    return { url, color };
+}
+function createChannelCard(channel) { 
+    const isFavorite = state.favorites.includes(channel.id); 
+    const isLive = channel.isLive; 
+    let cardClass = `channel-card ${isFavorite ? 'channel-card--favorite' : ''} ${state.isFavoriteMode ? 'channel-card--favorite-mode' : ''}`; 
+    if (isLive) { 
+        cardClass += ' channel-card--live'; 
+    } 
+    const rating = state.channelRatings[channel.id] !== undefined ? state.channelRatings[channel.id] : 2.5; 
+    let sourceBadgeClass = ''; 
+    let sourceBadgeText = ''; 
+    switch (channel.source) { 
+        case 'gist': sourceBadgeClass = 'gist-badge'; sourceBadgeText = 'NE'; break; 
+        case 'era': sourceBadgeClass = 'era-badge'; sourceBadgeText = 'ER'; break; // Etiqueta para ERA
+        case 'elcano': sourceBadgeClass = 'elcano-badge'; sourceBadgeText = 'EC'; break; 
+        case 'events': sourceBadgeClass = 'events-badge'; sourceBadgeText = 'EV'; break; 
+        case 'shickat': sourceBadgeClass = 'shickat-badge'; sourceBadgeText = 'SH'; break; 
+    } 
+    const isNew = isChannelNew(channel.id); 
+    const newIndicator = isNew ? '<div class="new-channel-indicator"></div>' : ''; 
+    const displayQuality = standardizeQuality(channel.quality); 
+    
+    // Generar la URL del placeholder dinámicamente
+    const { url: bgImageUrl } = getPlaceholderInfo(channel.displayableName);
+    
+    // Aplicar la imagen de fondo con un degradado/oscurecimiento
+    const cardStyle = `background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${bgImageUrl}')`;
+    
+    // Contar alternativas: El canal principal tiene una lista de alternativas en state.alternativeSources[channel.id].
+    // Si la lista tiene elementos, significa que hay alternativas además de la principal.
+    const numAlternatives = state.alternativeSources[channel.id] ? state.alternativeSources[channel.id].length : 0;
+    const alternativesIndicator = numAlternatives > 0 ? `<div class="alternatives-count" style="font-size: 0.75rem; color: var(--white); opacity: 0.8;">+${numAlternatives} Alt.</div>` : '';
+
+    // Botón de fuente (AceStream ID) - Clic ahora abre el modal de alternativas
+    const sourceButton = ` 
+        <button class="channel-number-badge-button ${sourceBadgeClass}" data-id="${channel.id}" title="${numAlternatives > 0 ? 'Ver Alternativas' : 'Copiar enlace (AceStream ID: ' + channel.id + ')'}">
+            <span class="channel-number">${channel.number}</span>
+            <span class="source-initials">${sourceBadgeText}</span>
+            ${alternativesIndicator}
+        </button> 
+    `; 
+    
+    let infoOverlayHTML;
+
+    // Lógica Modificada: Se elimina el nombre del canal de la superposición.
+    infoOverlayHTML = `
+        <div class="channel-info-overlay">
+            <div class="rating-stars">${getStarRating(rating)}</div>
+            ${sourceButton} 
+        </div>
+    `;
+
+    // **NOTA:** El data-id sigue siendo el ID del stream, pero ahora, en `renderResults`, solo se usa el ID del canal principal.
+
+    return ` 
+        <div class="${cardClass}" data-id="${channel.id}" data-number="${channel.number}" data-has-alternatives="${numAlternatives > 0}" style="${cardStyle}">
+            ${newIndicator} 
+            <div class="channel-card__quality">${displayQuality} ${channel.multiAudio ? '🎧' : ''}</div>
+            ${infoOverlayHTML}
+        </div> 
+    `; 
+}
+function playChannel(acestreamId) { const acestreamUrl = `acestream://${acestreamId}`; const newWindow = window.open(acestreamUrl, '_blank'); setTimeout(() => { if (newWindow && newWindow.closed) { } else { } }, 500); } function handleChannelPlay(channel) { const now = new Date().getTime(); if (state.lastChannelPlay) { const previousChannelId = state.lastChannelPlay.channelId; const previousChannelData = state.channelsData.find(c => c.id === previousChannelId); const duration = (now - state.lastChannelPlay.timestamp) / 1000; let rating = state.channelRatings[previousChannelId] !== undefined ? state.channelRatings[previousChannelId] : 2.5; let newRating = rating; if (previousChannelId !== channel.id && previousChannelData) { const previousName = previousChannelData.name.toLowerCase().trim(); const currentName = channel.name.toLowerCase().trim(); if (previousName === currentName) { if (duration >= (30 * 60)) { newRating += 1.5; } else if (duration >= (15 * 60)) { newRating += 0.5; } else if (duration >= (5 * 60)) { newRating -= 1; } else if (duration >= 10) { newRating -= 1.5; } else { newRating -= 2; } } else { if (duration >= (30 * 60)) { newRating += 1.5; } else { newRating = rating; } } } else if (previousChannelId === channel.id) { newRating = rating; } state.channelRatings[previousChannelId] = Math.max(1, Math.min(5, newRating)); saveRatings(); renderResults(); } state.lastChannelPlay = { channelId: channel.id, timestamp: now }; localStorage.setItem('lastChannelPlay', JSON.stringify(state.lastChannelPlay)); playChannel(channel.id); } function showCopyModal(acestreamId) { const acestreamUrl = `acestream://${acestreamId}`; const copyModal = document.getElementById('copyModal'); const copyAceStreamBtn = document.getElementById('copyAceStreamBtn'); const urlDisplayAceStream = document.getElementById('copyUrlDisplayAceStream'); urlDisplayAceStream.textContent = acestreamUrl; copyAceStreamBtn.onclick = () => copyUrlToClipboard(acestreamUrl, 'AceStream'); copyModal.classList.add('active'); } async function copyAcestreamDirectly(acestreamId) { const acestreamUrl = `acestream://${acestreamId}`; try { await navigator.clipboard.writeText(acestreamUrl); showCopySuccessMessage('AceStream'); } catch (err) { console.error('Error al copiar el texto: ', err); alert('No se pudo copiar la URL. Por favor, hazlo manualmente.'); } } function hideCopyModal() { document.getElementById('copyModal').classList.remove('active'); } function showCopySuccessMessage(format = 'AceStream') { const messageElement = document.getElementById('copyMessage'); messageElement.textContent = `${format} URL copiada con éxito!`; messageElement.classList.add('show'); setTimeout(() => { messageElement.classList.remove('show'); }, 2000); } async function copyUrlToClipboard(urlToCopy, format) { try { await navigator.clipboard.writeText(urlToCopy); hideCopyModal(); showCopySuccessMessage(format); } catch (err) { console.error('Error al copiar el texto: ', err); alert('No se pudo copiar la URL. Por favor, hazlo manualmente.'); } } function handleSearchInput() { const searchInput = document.getElementById('searchInput');
+    if(searchInput) {
+        state.searchTerm = searchInput.value.trim(); 
+        localStorage.setItem('searchTerm', state.searchTerm); 
+        disableFavoriteMode(); 
+        if (state.searchTerm) { 
+            const clearBtn = document.getElementById('clearEmojiFilters');
+            if (clearBtn && state.currentFilter === 'all' && state.sportFilter === 'all') { clearBtn.classList.remove('filter-button--active'); }
+        } else { 
+            restoreFilterUI(); 
+        } 
+        renderResults(); 
+    }
+} 
+function changePrimaryColor(color) { 
+    state.primaryColor = color; 
+    const rgb = hexToRgb(color); 
+    document.documentElement.style.setProperty('--primary-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`); 
+    document.documentElement.style.setProperty('--primary', color); 
+    document.documentElement.style.setProperty('--primary-dark', color === '#2563eb' ? '#1e50c7' : color); 
+    updatePrimaryLightColor(); 
+    document.querySelectorAll('.color-option').forEach(btn => { btn.classList.remove('active'); }); 
+    const colorOption = document.querySelector(`.color-option[data-color="${color}"]`);
+    if(colorOption) colorOption.classList.add('active'); 
+    localStorage.setItem('primaryColor', color); 
+    renderResults(); 
+} 
+function hexToRgb(hex) { 
+    const r = parseInt(hex.slice(1, 3), 16); 
+    const g = parseInt(hex.slice(3, 5), 16); 
+    const b = parseInt(hex.slice(5, 7), 16); 
+    return { r, g, b }; 
+} 
+function updatePrimaryLightColor() { 
+    const rgb = hexToRgb(state.primaryColor); 
+    const isDarkMode = document.body.classList.contains('dark-mode'); 
+    document.documentElement.style.setProperty('--primary-light', isDarkMode ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)` : `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`); 
+} 
+function cleanObsoleteRatings() { 
+    const activeChannelIds = new Set(state.channelsData.map(c => c.id)); 
+    const ratingsToKeep = {}; 
+    for (const channelId in state.channelRatings) { 
+        if (activeChannelIds.has(channelId)) { 
+            ratingsToKeep[channelId] = state.channelRatings[channelId]; 
+        } 
+    } 
+    state.channelRatings = ratingsToKeep; 
+    saveRatings(); 
+    console.log("Puntuaciones de canales obsoletas limpiadas."); 
+} 
+function saveRatings() { 
+    localStorage.setItem('channelRatings', JSON.stringify(state.channelRatings)); 
+} 
+function resetRatings() { 
+    if (confirm('¿Estás seguro de que quieres restablecer todas las puntuaciones de los canales?')) { 
+        localStorage.removeItem('channelRatings'); 
+        state.channelRatings = {}; 
+        renderResults(); 
+        showStatusMessage("Puntuaciones de canales restablecidas.", "success"); 
+        document.getElementById('settingsModal').classList.remove('modal--active'); 
+    } 
+} 
+function getStarRating(score) { 
+    const fullStars = Math.floor(score); 
+    const hasHalfStar = score % 1 >= 0.5; 
+    let stars = '★'.repeat(fullStars); 
+    if (hasHalfStar) { 
+        stars += '<span class="half-star">★</span>'; 
+    } 
+    const emptyStars = '☆'.repeat(5 - fullStars - (hasHalfStar ? 1 : 0)); 
+    return `<span style="color: var(--primary);">${stars}</span><span style="color: gray;">${emptyStars}</span>`; 
+} 
+function restoreFilterUI() { 
+    const searchInput = document.getElementById('searchInput');
+    if(searchInput) searchInput.value = state.searchTerm; 
+    clearAllFilterVisuals(); 
+    let targetId; 
+    if (state.searchTerm && state.currentFilter === 'all' && state.sportFilter === 'all') { 
+        return; 
+    } 
+    if (state.sportFilter !== 'all') { 
+        const sportBtn = document.querySelector(`.sport-filter-button[data-sport-key="${state.sportFilter}"]`); 
+        if (sportBtn) { 
+            sportBtn.classList.add('filter-button--active'); 
+            return; 
+        } 
+    } 
+    if (state.currentFilter === 'dazn') targetId = 'filterDAZN'; 
+    else if (state.currentFilter === 'm+') targetId = 'filterMovistar'; 
+    else if (state.currentFilter === 'eurosport') targetId = 'filterEurosport'; 
+    else if (state.currentFilter === 'favorites') targetId = 'filterFavorites'; 
+    else if (state.currentFilter === 'all') targetId = 'clearEmojiFilters'; 
+    if (targetId) { 
+        const targetBtn = document.getElementById(targetId);
+        if(targetBtn) targetBtn.classList.add('filter-button--active'); 
+    } 
+} 
+document.addEventListener('DOMContentLoaded', () => { 
+    // Forzar modo oscuro y color primario
+    document.body.classList.add('dark-mode'); 
+    document.body.classList.add('tv-mode'); 
+    changePrimaryColor(state.primaryColor); 
+
+    const favoriteButton = document.getElementById('filterFavorites'); 
+    const LONG_PRESS_THRESHOLD = 500; 
+    const clearButton = document.getElementById('clearEmojiFilters'); 
+    const copyModal = document.getElementById('copyModal'); 
+    const cancelCopyBtn = document.getElementById('cancelCopyBtn'); 
+    const alternativesModal = document.getElementById('alternativesModal'); // Añadir referencia al modal
+    const closeAlternativesBtn = document.getElementById('closeAlternativesBtn'); // Añadir referencia al botón de cerrar
+    
+    cleanupOldFirstSeenRecords(); 
+
+    const setupLongPress = (btn, onLongPress, onClick) => { 
+        if(!btn) return;
+        let pressTimer = null; 
+        let isLongPress = false; 
+        const startPress = () => { 
+            isLongPress = false; 
+            pressTimer = setTimeout(() => { 
+                isLongPress = true; 
+                onLongPress(); 
+            }, LONG_PRESS_THRESHOLD); 
+        }; 
+        const endPress = () => { 
+            clearTimeout(pressTimer); 
+            if (pressTimer && !isLongPress) { 
+                onClick(); 
+            } 
+            pressTimer = null; 
+        }; 
+        btn.addEventListener('mousedown', (e) => { 
+            if (e.button === 0) startPress(); 
+        }); 
+        btn.addEventListener('mouseup', endPress); 
+        btn.addEventListener('touchstart', startPress, {passive: true}); 
+        btn.addEventListener('touchend', endPress); 
+        btn.addEventListener('touchmove', () => clearTimeout(pressTimer)); 
+    }; 
+    
+    // Simular el setup de botones de filtro, aunque estén ocultos, por si acaso
+    if(favoriteButton) setupLongPress( 
+        favoriteButton, 
+        () => { 
+            state.isFavoriteMode = !state.isFavoriteMode; 
+            updateFavoriteModeVisuals(); 
+            if (state.isFavoriteMode) { 
+                showStatusMessage("Modo de selección de favoritos activado. Pulsa un canal para marcarlo/desmarcarlo."); 
+            } else { 
+                showStatusMessage("Modo de selección de favoritos desactivado.", "success"); 
+            } 
+        }, 
+        () => applyFilter('favorites') 
+    ); 
+
+    if(clearButton) setupLongPress( 
+        clearButton, 
+        () => { 
+            const settingsModal = document.getElementById('settingsModal');
+            if(settingsModal) settingsModal.classList.add('modal--active'); 
+        }, 
+        () => applyFilter('all') 
+    ); 
+
+    if(cancelCopyBtn) { cancelCopyBtn.addEventListener('click', hideCopyModal); } 
+    if(closeAlternativesBtn) { closeAlternativesBtn.addEventListener('click', hideAlternativesModal); } // Botón para cerrar modal de alternativas
+    
+    window.addEventListener('click', (event) => { 
+        if (event.target === copyModal) { hideCopyModal(); } 
+        if (event.target === alternativesModal) { hideAlternativesModal(); } // Cerrar modal de alternativas al hacer clic fuera
+        if (state.isFavoriteMode && !event.target.closest('.channel-card') && !event.target.closest('.floating-save-button') && !event.target.closest('.search-filters')) { 
+            disableFavoriteMode(); 
+        } 
+    }); 
+    
+    const filterDazn = document.getElementById('filterDAZN');
+    if(filterDazn) filterDazn.addEventListener('click', () => applyFilter('dazn')); 
+    const filterMovistar = document.getElementById('filterMovistar');
+    if(filterMovistar) filterMovistar.addEventListener('click', () => applyFilter('m+')); 
+    const filterEurosport = document.getElementById('filterEurosport');
+    if(filterEurosport) filterEurosport.addEventListener('click', () => applyFilter('eurosport')); 
+    
+    document.querySelectorAll('.sport-filter-button').forEach(button => { 
+        button.addEventListener('click', () => { 
+            applySportFilter(button.dataset.sportKey); 
+        }); 
+    }); 
+    
+    const searchInput = document.getElementById('searchInput');
+    if(searchInput) searchInput.addEventListener('input', handleSearchInput); 
+    
+    const darkModeCheckbox = document.getElementById('darkModeCheckbox');
+    if(darkModeCheckbox) darkModeCheckbox.addEventListener('change', toggleDarkMode); 
+    
+    const hideEventDetailsCheckbox = document.getElementById('hideEventDetailsCheckbox');
+    if(hideEventDetailsCheckbox) hideEventDetailsCheckbox.addEventListener('change', toggleHideEventDetails); 
+    
+    const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+    if(closeSettingsBtn) closeSettingsBtn.addEventListener('click', () => {
+        const settingsModal = document.getElementById('settingsModal');
+        if(settingsModal) settingsModal.classList.remove('modal--active');
+    }); 
+    
+    document.querySelectorAll('.color-option').forEach(btn => { 
+        btn.addEventListener('click', () => changePrimaryColor(btn.dataset.color)); 
+    }); 
+    
+    changePrimaryColor(state.primaryColor); 
+
+    document.addEventListener('click', (e) => { 
+        if (e.target.closest('.channel-number-badge-button')) { 
+            const button = e.target.closest('.channel-number-badge-button'); 
+            e.stopPropagation(); 
+            const channelId = button.dataset.id; 
+            
+            // Lógica para abrir modal de alternativas si las hay, sino copia directa
+            const hasAlternatives = button.closest('.channel-card').dataset.hasAlternatives === 'true';
+            if (hasAlternatives) {
+                 showAlternativesModal(channelId);
+            } else {
+                 copyAcestreamDirectly(channelId); 
+            }
+        } 
+    }); 
+
+    document.addEventListener('click', (e) => { 
+        const card = e.target.closest('.channel-card'); 
+        const numberButton = e.target.closest('.channel-number-badge-button'); 
+        if (card && !numberButton) { 
+            const channelId = card.dataset.id; 
+            const channelData = state.channelsData.find(c => c.id === channelId); 
+            if (state.isFavoriteMode) { 
+                e.stopPropagation(); 
+                toggleFavorite(channelId); 
+            } else if (channelData) { 
+                // Al hacer clic en la tarjeta (no el badge), se intenta reproducir el stream principal (el que se muestra)
+                handleChannelPlay(channelData); 
+            } 
+        } 
+    }); 
+
+    restoreFilterUI(); 
+    loadInitialChannels(); 
+    setInterval(renderResults, 60000); 
+});
+</script>
+</body>
+</html>
