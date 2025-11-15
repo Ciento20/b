@@ -1786,45 +1786,60 @@
         }
     }
 
+    // Función Proxy de Imágenes para solucionar el problema de CORS/Hotlinking en GitHub.
+    function proxyImage(url) {
+        // Usamos un proxy de imágenes confiable para evitar problemas de CORS/hotlinking
+        const imageProxy = 'https://images.weserv.nl/?url='; 
+        const encodedUrl = encodeURIComponent(url);
+        return imageProxy + encodedUrl;
+    }
+
+
     function getPlaceholderInfo(channelName) {
         const name = channelName.toUpperCase().replace(/<[^>]*>/g, '').trim();
         let color = '444444';
+        
+        // Se han eliminado los "https://" iniciales ya que se añade en la llamada a proxyImage
         const championsLeagueImages = {
-            'M+ LIGA DE CAMPEONES': 'https://static.wikia.nocookie.net/logopedia/images/0/05/Liga_de_Campeones_por_Movistar_Plus%2B.svg/revision/latest?cb=20220128151054',
-            'M+ LIGA DE CAMPEONES 2': 'https://static.wikia.nocookie.net/logopedia/images/3/33/Liga_de_Campeones_2_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171922',
-            'M+ LIGA DE CAMPEONES 3': 'https://static.wikia.nocookie.net/logopedia/images/f/f8/Liga_de_Campeones_3_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171923',
-            'M+ LIGA DE CAMPEONES 4': 'https://static.wikia.nocookie.net/logopedia/images/0/0a/Liga_de_Campeones_4_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171811',
-            'M+ LIGA DE CAMPEONES 5': 'https://static.wikia.nocookie.net/logopedia/images/b/b3/Liga_de_Campeones_5_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171812',
-            'M+ LIGA DE CAMPEONES 6': 'https://static.wikia.nocookie.net/logopedia/images/d/d8/Liga_de_Campeones_6_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171813',
-            'M+ LIGA DE CAMPEONES 7': 'https://static.wikia.nocookie.net/logopedia/images/b/bf/Liga_de_Campeones_7_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171814',
-            'M+ LIGA DE CAMPEONES 8': 'https://static.wikia.nocookie.net/logopedia/images/f/f8/Liga_de_Campeones_3_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171923',
-            'M+ DEPORTES': 'https://static.wikia.nocookie.net/logopedia/images/d/d7/Deportes_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230721194319',
-'M+ DEPORTES 6': 'https://static.wikia.nocookie.net/logopedia/images/d/d1/Deportes_6_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201004','M+ LA LIGA': 'https://static.wikia.nocookie.net/logopedia/images/c/cd/LaLigaTV_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230704125929',
-'M+ LA LIGA 2': 'https://static.wikia.nocookie.net/logopedia/images/4/4c/LaLigaTV_2_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175335',
-'M+ LA LIGA 3': 'https://static.wikia.nocookie.net/logopedia/images/0/0e/LaLigaTV_3_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175336',
-'M+ LA LIGA 4': 'https://static.wikia.nocookie.net/logopedia/images/b/b0/Movistar_LaLiga_4.png/revision/latest?cb=20210308192125','★EUROSPORT 1': 'https://static.wikia.nocookie.net/logopedia/images/c/c8/Eurosport_1.svg/revision/latest?cb=20210911124742',
-'★EUROSPORT 2': 'https://static.wikia.nocookie.net/logopedia/images/0/0d/Eurosport_2_%282015%29.svg/revision/latest?cb=20171209134527',
-'M+ VAMOS': 'https://static.wikia.nocookie.net/logopedia/images/b/be/Vamos_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230728170813',
-'LA LIGA HYPERMOTION': 'https://static.wikia.nocookie.net/logopedia/images/b/b5/LaLiga_TV_Hypermotion.svg/revision/latest?cb=20230704141115',
-'LA LIGA HYPERMOTION 2': 'https://static.wikia.nocookie.net/logopedia/images/6/6f/La_Liga_Hypermotion_2.svg/revision/latest/scale-to-width-down/250?cb=20240921151926',
-'M+ GOLF': 'https://static.wikia.nocookie.net/logopedia/images/2/21/Golf_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230721202544',
-'M+ GOLF 2': 'https://static.wikia.nocookie.net/logopedia/images/5/57/Golf_2_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721202546',
-'DAZN F1': 'https://static.wikia.nocookie.net/logopedia/images/c/cc/DAZN_F1.svg/revision/latest?cb=20221210225344',
-'DAZN LA LIGA': 'https://static.wikia.nocookie.net/logopedia/images/1/18/DAZN_LALIGA_2024.svg/revision/latest?cb=20240910115205',
-'DAZN LA LIGA 2': 'https://static.wikia.nocookie.net/logopedia/images/f/fa/DAZN_LaLiga_2_2024.svg/revision/latest/scale-to-width-down/250?cb=20240910121150',
-'DAZN 1': 'https://static.wikia.nocookie.net/logopedia/images/1/18/DAZN_1_2024.svg/revision/latest?cb=20240713213358',
-'DAZN 2': 'https://static.wikia.nocookie.net/logopedia/images/8/82/DAZN_2_2024.svg/revision/latest?cb=20240713212845',
-'DAZN 3': 'https://static.wikia.nocookie.net/logopedia/images/0/0f/DAZN_3_2024.svg/revision/latest?cb=20240713212252',
-'DAZN 4': 'https://static.wikia.nocookie.net/logopedia/images/f/f7/DAZN_4_2024.svg/revision/latest?cb=20240713211915',
-'M+ LA LIGA 5': 'https://static.wikia.nocookie.net/logopedia/images/a/a2/LaLigaTV_4_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175337',
-            'M+ DEPORTES 2': 'https://static.wikia.nocookie.net/logopedia/images/7/7c/Deportes_2_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201028',
-            'M+ DEPORTES 3': 'https://static.wikia.nocookie.net/logopedia/images/4/40/Deportes_3_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201007',
-            'M+ DEPORTES 4': 'https://static.wikia.nocookie.net/logopedia/images/e/eb/Deportes_4_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201006',
-            'M+ DEPORTES 5': 'https://static.wikia.nocookie.net/logopedia/images/8/88/Deportes_5_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201005',
+            'M+ LIGA DE CAMPEONES': 'static.wikia.nocookie.net/logopedia/images/0/05/Liga_de_Campeones_por_Movistar_Plus%2B.svg/revision/latest?cb=20220128151054',
+            'M+ LIGA DE CAMPEONES 2': 'static.wikia.nocookie.net/logopedia/images/3/33/Liga_de_Campeones_2_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171922',
+            'M+ LIGA DE CAMPEONES 3': 'static.wikia.nocookie.net/logopedia/images/f/f8/Liga_de_Campeones_3_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171923',
+            'M+ LIGA DE CAMPEONES 4': 'static.wikia.nocookie.net/logopedia/images/0/0a/Liga_de_Campeones_4_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171811',
+            'M+ LIGA DE CAMPEONES 5': 'static.wikia.nocookie.net/logopedia/images/b/b3/Liga_de_Campeones_5_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171812',
+            'M+ LIGA DE CAMPEONES 6': 'static.wikia.nocookie.net/logopedia/images/d/d8/Liga_de_Campeones_6_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171813',
+            'M+ LIGA DE CAMPEONES 7': 'static.wikia.nocookie.net/logopedia/images/b/bf/Liga_de_Campeones_7_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171814',
+            'M+ LIGA DE CAMPEONES 8': 'static.wikia.nocookie.net/logopedia/images/f/f8/Liga_de_Campeones_3_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171923',
+            'M+ DEPORTES': 'static.wikia.nocookie.net/logopedia/images/d/d7/Deportes_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230721194319',
+            'M+ DEPORTES 6': 'static.wikia.nocookie.net/logopedia/images/d/d1/Deportes_6_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201004',
+            'M+ LA LIGA': 'static.wikia.nocookie.net/logopedia/images/c/cd/LaLigaTV_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230704125929',
+            'M+ LA LIGA 2': 'static.wikia.nocookie.net/logopedia/images/4/4c/LaLigaTV_2_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175335',
+            'M+ LA LIGA 3': 'static.wikia.nocookie.net/logopedia/images/0/0e/LaLigaTV_3_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175336',
+            'M+ LA LIGA 4': 'static.wikia.nocookie.net/logopedia/images/b/b0/Movistar_LaLiga_4.png/revision/latest?cb=20210308192125',
+            '★EUROSPORT 1': 'static.wikia.nocookie.net/logopedia/images/c/c8/Eurosport_1.svg/revision/latest?cb=20210911124742',
+            '★EUROSPORT 2': 'static.wikia.nocookie.net/logopedia/images/0/0d/Eurosport_2_%282015%29.svg/revision/latest?cb=20171209134527',
+            'M+ VAMOS': 'static.wikia.nocookie.net/logopedia/images/b/be/Vamos_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230728170813',
+            'LA LIGA HYPERMOTION': 'static.wikia.nocookie.net/logopedia/images/b/b5/LaLiga_TV_Hypermotion.svg/revision/latest?cb=20230704141115',
+            'LA LIGA HYPERMOTION 2': 'static.wikia.nocookie.net/logopedia/images/6/6f/La_Liga_Hypermotion_2.svg/revision/latest/scale-to-width-down/250?cb=20240921151926',
+            'M+ GOLF': 'static.wikia.nocookie.net/logopedia/images/2/21/Golf_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230721202544',
+            'M+ GOLF 2': 'static.wikia.nocookie.net/logopedia/images/5/57/Golf_2_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721202546',
+            'DAZN F1': 'static.wikia.nocookie.net/logopedia/images/c/cc/DAZN_F1.svg/revision/latest?cb=20221210225344',
+            'DAZN LA LIGA': 'static.wikia.nocookie.net/logopedia/images/1/18/DAZN_LALIGA_2024.svg/revision/latest?cb=20240910115205',
+            'DAZN LA LIGA 2': 'static.wikia.nocookie.net/logopedia/images/f/fa/DAZN_LaLiga_2_2024.svg/revision/latest/scale-to-width-down/250?cb=20240910121150',
+            'DAZN 1': 'static.wikia.nocookie.net/logopedia/images/1/18/DAZN_1_2024.svg/revision/latest?cb=20240713213358',
+            'DAZN 2': 'static.wikia.nocookie.net/logopedia/images/8/82/DAZN_2_2024.svg/revision/latest?cb=20240713212845',
+            'DAZN 3': 'static.wikia.nocookie.net/logopedia/images/0/0f/DAZN_3_2024.svg/revision/latest?cb=20240713212252',
+            'DAZN 4': 'static.wikia.nocookie.net/logopedia/images/f/f7/DAZN_4_2024.svg/revision/latest?cb=20240713211915',
+            'M+ LA LIGA 5': 'static.wikia.nocookie.net/logopedia/images/a/a2/LaLigaTV_4_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175337',
+            'M+ DEPORTES 2': 'static.wikia.nocookie.net/logopedia/images/7/7c/Deportes_2_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201028',
+            'M+ DEPORTES 3': 'static.wikia.nocookie.net/logopedia/images/4/40/Deportes_3_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201007',
+            'M+ DEPORTES 4': 'static.wikia.nocookie.net/logopedia/images/e/eb/Deportes_4_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201006',
+            'M+ DEPORTES 5': 'static.wikia.nocookie.net/logopedia/images/8/88/Deportes_5_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201005',
         };
 
         if (championsLeagueImages[name]) {
-            return {url: championsLeagueImages[name], color: '0085C1', isImage: true};
+            // Se aplica el proxy para la imagen
+            const proxiedUrl = proxyImage('https://' + championsLeagueImages[name]);
+            return {url: proxiedUrl, color: '0085C1', isImage: true};
         }
 
         let text = name;
