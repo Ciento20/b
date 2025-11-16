@@ -818,7 +818,9 @@
                     this.currentGroupIndex = indices.groupIndex;
                     this.currentChannelIndex = indices.channelIndex;
                     // Asegurar que el elemento esté visible (scroll)
-                    newElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    // Scroll del contenedor principal (vertical) y del subgrupo (horizontal)
+                    newElement.scrollIntoView({ behavior: 'smooth', block: 'nearest'}); 
+                    newElement.closest('.subgroup-content').scrollLeft = newElement.offsetLeft - newElement.closest('.subgroup-content').offsetWidth / 2 + newElement.offsetWidth / 2;
                 }
             } else if (newElement.closest('#sidebar')) {
                 // Asegurar que el elemento de la sidebar esté visible
@@ -862,6 +864,7 @@
         },
 
         // Maneja la navegación en el Contenido Principal
+        // 💡 CÓDIGO MODIFICADO PARA SOLUCIONAR EL SCROLL HORIZONTAL
         _moveInMainContent: function(direction) {
             // En el contenido principal, navegamos por grupos (vertical) y canales (horizontal)
             const currentGroup = this.groups[this.currentGroupIndex];
@@ -900,7 +903,11 @@
                     newChannelIndex = Math.min(this.currentChannelIndex, targetCards.length - 1);
                     newCard = targetCards[newChannelIndex];
                 } else {
-                    // Si no hay más grupos arriba, moverse al sidebar (si es deseado)
+                    // Si no hay más grupos arriba, moverse al sidebar
+                     if (this.sidebarItems.length > 0) {
+                        this.setFocus(this.sidebarItems[this.sidebarItems.length - 1]); // Mover al último elemento del sidebar
+                        return;
+                    }
                     newCard = this.currentFocus; // Mantener el foco
                 }
             } else if (direction === 'ArrowDown') {
@@ -920,6 +927,7 @@
                 this.setFocus(newCard);
             }
         },
+        // 💡 FIN CÓDIGO MODIFICADO
 
         // Agrega el manejador de eventos del teclado
         addEventListeners: function() {
@@ -2291,14 +2299,11 @@
         tvFocusManager.updateFocusableItems();
         
         // Si no hay un foco actual, forzar el foco al primer elemento de la lista principal
-        if (!tvFocusManager.currentFocus && tvFocusManager.mainItems.length > 0) {
-            tvFocusManager.setFocus(tvFocusManager.mainItems[0]);
-        } else if (tvFocusManager.currentFocus && !tvFocusManager.currentFocus.closest('body')) {
-            // Si el elemento enfocado ya no existe (p. ej., por un filtro), restablecer el foco
+        if (!tvFocusManager.currentFocus || !tvFocusManager.currentFocus.closest('body')) {
             if (tvFocusManager.mainItems.length > 0) {
                 tvFocusManager.setFocus(tvFocusManager.mainItems[0]);
             } else if (tvFocusManager.sidebarItems.length > 0) {
-                tvFocusManager.setFocus(tvFocusManager.sidebarItems[0]);
+                 tvFocusManager.setFocus(tvFocusManager.sidebarItems[0]);
             }
         }
         // Fin CÓDIGO MODIFICADO
