@@ -627,6 +627,48 @@
                 display: none; /* Ocultar para simplificar el menú móvil */
             }
         }
+        
+        /* 💡 NUEVO: Estilo para el elemento enfocado (selección de TV) */
+        .focused {
+            outline: 4px solid var(--white) !important; /* Borde blanco brillante */
+            outline-offset: 4px; /* Espacio entre el borde y el elemento */
+            border-color: var(--primary) !important; /* Se mantiene el borde primario */
+            box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.7); /* Sombra para el efecto 'brillo' */
+            transform: scale(1.08);
+            z-index: 20; /* Asegura que esté por encima de otros elementos */
+        }
+
+        /* Ajustes para los enlaces del Sidebar */
+        .sidebar__nav-link.focused {
+            transform: scale(1.05); /* Menos zoom para los elementos de la sidebar */
+            outline-offset: 2px;
+        }
+        
+        /* Ajustes para el campo de búsqueda */
+        #channelSearch:focus {
+            outline: 4px solid var(--primary);
+            border-color: var(--primary);
+        }
+        
+        /* Desactivar el hover en modo TV cuando se usa el foco */
+        .tv-mode .channel-card:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: transparent;
+        }
+        .tv-mode .channel-card.focused:hover {
+            transform: scale(1.08); /* Restaurar solo si tiene el foco */
+        }
+        
+        /* Ajustes para la navegación en el modal */
+        #alternativesModal li:focus {
+            outline: none;
+            background-color: var(--border-color);
+        }
+        #alternativesModal .modal__btn:focus {
+            outline: 3px solid var(--white);
+            background-color: var(--primary-dark);
+        }
 
     </style>
 </head>
@@ -636,24 +678,24 @@
     <div class="sidebar__logo">StreamTV</div>
     
     <div class="search-input-container">
-        <input type="text" id="channelSearch" placeholder="Buscar canal..." />
+        <input type="text" id="channelSearch" placeholder="Buscar canal..." tabindex="0"/>
     </div>
 
     <nav class="sidebar__nav">
         <h4 class="sidebar__section-title">Navegación</h4>
         <ul class="sidebar__nav-list">
             <li class="sidebar__nav-item">
-                <a href="#" class="sidebar__nav-link active" data-filter="all">
+                <a href="#" class="sidebar__nav-link active" data-filter="all" tabindex="0">
                     <span class="sidebar__icon">📺</span> Todos los Canales
                 </a>
             </li>
             <li class="sidebar__nav-item">
-                <a href="#" class="sidebar__nav-link" data-filter="live">
+                <a href="#" class="sidebar__nav-link" data-filter="live" tabindex="0">
                     <span class="sidebar__icon">🔴</span> En Vivo Ahora
                 </a>
             </li>
             <li class="sidebar__nav-item">
-                <a href="#" class="sidebar__nav-link" data-filter="favorites">
+                <a href="#" class="sidebar__nav-link" data-filter="favorites" tabindex="0">
                     <span class="sidebar__icon">⭐</span> Mis Favoritos
                 </a>
             </li>
@@ -662,12 +704,12 @@
         <h4 class="sidebar__section-title">Modos</h4>
         <ul class="sidebar__nav-list">
             <li class="sidebar__nav-item">
-                <a href="#" class="sidebar__nav-link" data-action="dark-mode">
+                <a href="#" class="sidebar__nav-link" data-action="dark-mode" tabindex="0">
                     <span class="sidebar__icon">🌙</span> Modo Oscuro (Activo)
                 </a>
             </li>
             <li class="sidebar__nav-item">
-                <a href="#" class="sidebar__nav-link" data-action="compact-mode">
+                <a href="#" class="sidebar__nav-link" data-action="compact-mode" tabindex="0">
                     <span class="sidebar__icon">⚙️</span> Configuración
                 </a>
             </li>
@@ -684,7 +726,7 @@
         <h3 class="modal__title">🔁 Alternativas para <span id="altChannelName"></span></h3>
         <ul class="alternatives-list" id="altList"></ul>
         <div class="modal__actions">
-            <button class="modal__btn modal__btn--cancel" id="closeAlternativesBtn">Cerrar</button>
+            <button class="modal__btn modal__btn--cancel" id="closeAlternativesBtn" tabindex="0">Cerrar</button>
         </div>
     </div>
 </div>
@@ -699,6 +741,290 @@
         currentFilter: 'all', // 💡 NUEVO: Estado para el filtro actual
         searchTerm: ''        // 💡 NUEVO: Estado para el término de búsqueda
     };
+
+    // CÓDIGO NUEVO: Gestión de Foco para el Modo TV
+    const tvFocusManager = {
+        currentFocus: null,
+        // La lista de elementos que son enfocables en el Sidebar
+        sidebarItems: [], 
+        // La lista de elementos que son enfocables en el Main Content
+        mainItems: [],     
+        // El índice del grupo de canales actual (para la navegación vertical)
+        currentGroupIndex: 0,
+        // El índice de la tarjeta dentro del grupo actual (para la navegación horizontal)
+        currentChannelIndex: 0,
+        // Bandera para saber si el foco está en el sidebar o en el contenido principal
+        isInSidebar: true,
+
+        // Inicializa la lista de elementos enfocables
+        init: function() {
+            this.updateFocusableItems();
+            // Inicializa el foco en el primer enlace de la sidebar
+            if (this.sidebarItems.length > 0) {
+                this.setFocus(this.sidebarItems[0]);
+            }
+            this.addEventListeners();
+        },
+
+        // Actualiza las listas de elementos enfocables tras un nuevo renderizado
+        updateFocusableItems: function() {
+            this.sidebarItems = Array.from(document.querySelectorAll('#sidebar .sidebar__nav-link, #channelSearch'));
+            this.mainItems = Array.from(document.querySelectorAll('.channel-card'));
+            this.updateGroupIndices();
+        },
+
+        // Rastrea los grupos de canales y las tarjetas dentro de ellos
+        updateGroupIndices: function() {
+            this.groups = Array.from(document.querySelectorAll('.channel-group'));
+            this.groupMap = new Map();
+            
+            this.groups.forEach((groupElement, groupIndex) => {
+                const cards = Array.from(groupElement.querySelectorAll('.channel-card'));
+                cards.forEach((card, channelIndex) => {
+                    this.groupMap.set(card, { groupIndex, channelIndex });
+                });
+            });
+        },
+
+        // Mueve el foco a un nuevo elemento y actualiza las clases
+        setFocus: function(newElement) {
+            if (!newElement) return;
+
+            // Limpiar foco anterior
+            if (this.currentFocus) {
+                this.currentFocus.classList.remove('focused');
+                this.currentFocus.blur(); // Quitar el foco nativo
+            }
+
+            // Establecer nuevo foco
+            this.currentFocus = newElement;
+            this.currentFocus.classList.add('focused');
+            
+            // Determinar si el foco está en la sidebar o en el contenido principal
+            const isSidebar = newElement.closest('#sidebar') !== null;
+            this.isInSidebar = isSidebar;
+            
+            // Forzar el foco nativo solo si es un campo de texto
+            if (newElement.id === 'channelSearch') {
+                newElement.focus();
+            } else {
+                newElement.focus({preventScroll: true}); // Evitar scroll innecesario
+            }
+
+            // Si el foco está en una tarjeta, actualizar los índices de grupo/canal
+            if (newElement.classList.contains('channel-card')) {
+                const indices = this.groupMap.get(newElement);
+                if (indices) {
+                    this.currentGroupIndex = indices.groupIndex;
+                    this.currentChannelIndex = indices.channelIndex;
+                    // Asegurar que el elemento esté visible (scroll)
+                    newElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+            } else if (newElement.closest('#sidebar')) {
+                // Asegurar que el elemento de la sidebar esté visible
+                newElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+            }
+        },
+
+        // Lógica para mover el foco
+        moveFocus: function(direction) {
+            if (!this.currentFocus) return;
+
+            if (this.isInSidebar) {
+                this._moveInSidebar(direction);
+            } else {
+                this._moveInMainContent(direction);
+            }
+        },
+
+        // Maneja la navegación en el Sidebar
+        _moveInSidebar: function(direction) {
+            const currentIndex = this.sidebarItems.indexOf(this.currentFocus);
+            if (currentIndex === -1) return;
+
+            let newIndex = currentIndex;
+            
+            // El movimiento Derecha sale del Sidebar
+            if (direction === 'ArrowRight' && this.mainItems.length > 0) {
+                this.setFocus(this.mainItems[0]); // Mover al primer canal del Main
+                return;
+            }
+
+            if (direction === 'ArrowUp') {
+                newIndex = Math.max(0, currentIndex - 1);
+            } else if (direction === 'ArrowDown') {
+                newIndex = Math.min(this.sidebarItems.length - 1, currentIndex + 1);
+            }
+
+            if (newIndex !== currentIndex) {
+                this.setFocus(this.sidebarItems[newIndex]);
+            }
+        },
+
+        // Maneja la navegación en el Contenido Principal
+        _moveInMainContent: function(direction) {
+            // En el contenido principal, navegamos por grupos (vertical) y canales (horizontal)
+            const currentGroup = this.groups[this.currentGroupIndex];
+            if (!currentGroup) return;
+
+            const currentCards = Array.from(currentGroup.querySelectorAll('.channel-card'));
+            
+            let newGroupIndex = this.currentGroupIndex;
+            let newChannelIndex = this.currentChannelIndex;
+            let newCard = null;
+
+            if (direction === 'ArrowLeft') {
+                // Intenta moverse a la izquierda
+                newChannelIndex = Math.max(0, this.currentChannelIndex - 1);
+                if (newChannelIndex !== this.currentChannelIndex) {
+                    newCard = currentCards[newChannelIndex];
+                } else {
+                    // Si ya está en el primer canal, intenta moverse al sidebar
+                    if (this.sidebarItems.length > 0) {
+                        this.setFocus(this.sidebarItems[this.sidebarItems.length - 1]); // Mover al último elemento del sidebar
+                        return;
+                    }
+                }
+            } else if (direction === 'ArrowRight') {
+                // Intenta moverse a la derecha
+                newChannelIndex = Math.min(currentCards.length - 1, this.currentChannelIndex + 1);
+                if (newChannelIndex !== this.currentChannelIndex) {
+                    newCard = currentCards[newChannelIndex];
+                }
+            } else if (direction === 'ArrowUp') {
+                // Intenta moverse hacia arriba
+                if (this.currentGroupIndex > 0) {
+                    newGroupIndex = this.currentGroupIndex - 1;
+                    // Mover al canal más cercano al índice horizontal anterior
+                    const targetCards = Array.from(this.groups[newGroupIndex].querySelectorAll('.channel-card'));
+                    newChannelIndex = Math.min(this.currentChannelIndex, targetCards.length - 1);
+                    newCard = targetCards[newChannelIndex];
+                } else {
+                    // Si no hay más grupos arriba, moverse al sidebar (si es deseado)
+                    newCard = this.currentFocus; // Mantener el foco
+                }
+            } else if (direction === 'ArrowDown') {
+                // Intenta moverse hacia abajo
+                if (this.currentGroupIndex < this.groups.length - 1) {
+                    newGroupIndex = this.currentGroupIndex + 1;
+                    // Mover al canal más cercano al índice horizontal anterior
+                    const targetCards = Array.from(this.groups[newGroupIndex].querySelectorAll('.channel-card'));
+                    newChannelIndex = Math.min(this.currentChannelIndex, targetCards.length - 1);
+                    newCard = targetCards[newChannelIndex];
+                } else {
+                    newCard = this.currentFocus; // Mantener el foco si ya estamos en el último grupo
+                }
+            }
+
+            if (newCard) {
+                this.setFocus(newCard);
+            }
+        },
+
+        // Agrega el manejador de eventos del teclado
+        addEventListeners: function() {
+            document.addEventListener('keydown', (e) => {
+                const isModalOpen = document.getElementById('alternativesModal').classList.contains('modal--active');
+
+                // Manejo de teclas cuando el modal está abierto
+                if (isModalOpen) {
+                    this._handleModalKeys(e);
+                    return;
+                }
+
+                switch (e.key) {
+                    case 'ArrowUp':
+                    case 'ArrowDown':
+                    case 'ArrowLeft':
+                    case 'ArrowRight':
+                        e.preventDefault(); // Evita el scroll nativo de la ventana
+                        this.moveFocus(e.key);
+                        break;
+                    case 'Enter': 
+                    case ' ': // Espacio o Enter para seleccionar
+                    case 'Select':
+                        e.preventDefault();
+                        this._selectFocusedElement();
+                        break;
+                    case 'Backspace': 
+                    case 'Escape': // Escape o Backspace para volver (si aplica)
+                        e.preventDefault();
+                        // Lógica para volver (p. ej., si estamos en el contenido, volver al sidebar)
+                        if (!this.isInSidebar && this.sidebarItems.length > 0) {
+                            this.setFocus(this.sidebarItems[0]); // Volver al primer elemento del sidebar
+                        }
+                        break;
+                }
+            });
+        },
+
+        // Lógica para seleccionar el elemento enfocado
+        _selectFocusedElement: function() {
+            if (!this.currentFocus) return;
+
+            if (this.currentFocus.classList.contains('sidebar__nav-link')) {
+                // Simular el clic en el enlace de la sidebar para aplicar el filtro
+                this.currentFocus.click(); 
+            } else if (this.currentFocus.id === 'channelSearch') {
+                // Enfocar el input para que el usuario pueda escribir (no hay una acción directa de "seleccionar")
+                this.currentFocus.focus();
+            } else if (this.currentFocus.classList.contains('channel-card')) {
+                const channelId = this.currentFocus.dataset.id;
+                const hasAlternatives = this.currentFocus.dataset.hasAlternatives === 'true';
+
+                if (hasAlternatives) {
+                    showAlternativesModal(channelId);
+                } else {
+                    const channelData = state.channelsData.find(c => c.id === channelId);
+                    if (channelData) {
+                        handleChannelPlay(channelData); // Reproducir directamente
+                    }
+                }
+            }
+        },
+        
+        // Manejo de la navegación dentro del modal
+        _handleModalKeys: function(e) {
+            e.preventDefault();
+            const altList = document.getElementById('altList');
+            // Usamos .alt-action para los botones de las alternativas, y los botones del modal
+            const focusableModalItems = Array.from(altList.querySelectorAll('.alt-action')).concat(
+                Array.from(document.querySelectorAll('#alternativesModal .modal__btn'))
+            );
+            
+            let currentModalFocus = document.activeElement;
+            
+            // Si el foco no está en un elemento enfocable del modal, enfocar el primero
+            if (!focusableModalItems.includes(currentModalFocus)) {
+                 currentModalFocus = focusableModalItems[0];
+                 if(currentModalFocus) currentModalFocus.focus();
+                 return;
+            }
+
+            const currentIndex = focusableModalItems.indexOf(currentModalFocus);
+            let newIndex = currentIndex;
+
+            if (e.key === 'ArrowUp') {
+                newIndex = Math.max(0, currentIndex - 1);
+            } else if (e.key === 'ArrowDown') {
+                newIndex = Math.min(focusableModalItems.length - 1, currentIndex + 1);
+            } else if (e.key === 'Enter' || e.key === 'Select') {
+                 // Simular clic en el elemento enfocado
+                 currentModalFocus.click(); 
+                 return;
+            } else if (e.key === 'Escape' || e.key === 'Backspace') {
+                hideAlternativesModal();
+                return;
+            }
+
+
+            if (newIndex !== currentIndex) {
+                focusableModalItems[newIndex].focus();
+            }
+        }
+    };
+    // Fin CÓDIGO NUEVO
+    
     const ERA_URL = "https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/data/listas/listaplana.txt";
     const PROXIES = [
         'https://api.allorigins.win/raw?url=',
@@ -1739,6 +2065,8 @@
             channelsGrid.innerHTML = `
                 <div class="no-results"><div class="no-results-icon">📡</div><div class="no-results-text">No se encontraron canales</div><div class="no-results-hint">Ajusta el filtro o la búsqueda.</div></div>
             `;
+            // 💡 CÓDIGO MODIFICADO: Actualizar foco incluso si no hay resultados
+            tvFocusManager.updateFocusableItems();
             return;
         }
 
@@ -1958,6 +2286,22 @@
         });
 
         channelsGrid.appendChild(fragment);
+        
+        // 💡 CÓDIGO MODIFICADO: Actualizar elementos enfocables para navegación con mando
+        tvFocusManager.updateFocusableItems();
+        
+        // Si no hay un foco actual, forzar el foco al primer elemento de la lista principal
+        if (!tvFocusManager.currentFocus && tvFocusManager.mainItems.length > 0) {
+            tvFocusManager.setFocus(tvFocusManager.mainItems[0]);
+        } else if (tvFocusManager.currentFocus && !tvFocusManager.currentFocus.closest('body')) {
+            // Si el elemento enfocado ya no existe (p. ej., por un filtro), restablecer el foco
+            if (tvFocusManager.mainItems.length > 0) {
+                tvFocusManager.setFocus(tvFocusManager.mainItems[0]);
+            } else if (tvFocusManager.sidebarItems.length > 0) {
+                tvFocusManager.setFocus(tvFocusManager.sidebarItems[0]);
+            }
+        }
+        // Fin CÓDIGO MODIFICADO
     }
 
     function showAlternativesModal(principalChannelId) {
@@ -1973,32 +2317,46 @@
         altList.innerHTML = '';
 
         altList.innerHTML += `
-            <li data-acestream-id="${principalChannel.id}" data-channel-name="${principalChannel.name}" class="principal-source">
+            <li data-acestream-id="${principalChannel.id}" data-channel-name="${principalChannel.name}" class="principal-source" tabindex="0">
                 <div class="alt-info">
                     <span class="alt-name">Opción Principal (Mejor calidad/rating)</span>
                     <span class="alt-details">${standardizeQuality(principalChannel.quality)} | Fuente: ${getSourceText(principalChannel.source)} </span>
                 </div>
-                <button class="alt-action" onclick="handleAlternativePlay('${principalChannel.id}')">Ver Ahora</button>
+                <button class="alt-action" onclick="handleAlternativePlay('${principalChannel.id}')" tabindex="-1">Ver Ahora</button>
             </li>
         `;
 
         alternatives.forEach((alt, index) => {
             altList.innerHTML += `
-                <li data-acestream-id="${alt.id}" data-channel-name="${alt.name}" class="alternative-source">
+                <li data-acestream-id="${alt.id}" data-channel-name="${alt.name}" class="alternative-source" tabindex="0">
                     <div class="alt-info">
                         <span class="alt-name">Alternativa ${index + 1}</span>
                         <span class="alt-details">${standardizeQuality(alt.quality)} | Fuente: ${getSourceText(alt.source)} </span>
                     </div>
-                    <button class="alt-action" onclick="handleAlternativePlay('${alt.id}')">Probar</button>
+                    <button class="alt-action" onclick="handleAlternativePlay('${alt.id}')" tabindex="-1">Probar</button>
                 </li>
             `;
         });
 
         alternativesModal.classList.add('modal--active');
+        
+        // 💡 CÓDIGO MODIFICADO: Forzar el foco inicial en el primer botón del modal para la navegación
+        const firstActionableItem = document.querySelector('#altList .alt-action');
+        if (firstActionableItem) {
+            firstActionableItem.focus();
+        } else {
+             // Si no hay alternativas, enfocar el botón de cerrar
+             document.getElementById('closeAlternativesBtn').focus();
+        }
+        // Fin CÓDIGO MODIFICADO
     }
 
     function hideAlternativesModal() {
         document.getElementById('alternativesModal').classList.remove('modal--active');
+        // Devolver el foco al elemento que lo tenía antes de abrir el modal
+        if (tvFocusManager.currentFocus) {
+            tvFocusManager.setFocus(tvFocusManager.currentFocus);
+        }
     }
 
     function handleAlternativePlay(acestreamId) {
@@ -2191,7 +2549,7 @@
         // FIN CÓDIGO MODIFICADO
 
         const sourceButton = `
-            <button class="channel-number-badge-button ${sourceBadgeClass}" data-id="${channel.id}" title="${buttonTitle}">
+            <button class="channel-number-badge-button ${sourceBadgeClass}" data-id="${channel.id}" title="${buttonTitle}" tabindex="-1">
                 ${buttonContent}
             </button>
         `;
@@ -2205,7 +2563,7 @@
         `;
 
         return `
-            <div class="${cardClass}" data-id="${channel.id}" data-number="${channel.number}" data-has-alternatives="${numAlternatives > 0}" style="${cardStyle}">
+            <div class="${cardClass}" data-id="${channel.id}" data-number="${channel.number}" data-has-alternatives="${numAlternatives > 0}" style="${cardStyle}" tabindex="-1">
                 ${newIndicator}
                 <div class="channel-card__quality">${displayQuality} ${channel.multiAudio ? '🎧' : ''}</div>
                 ${infoOverlayHTML}
@@ -2341,6 +2699,10 @@
             channelSearchInput.addEventListener('input', (e) => {
                 setSearchTerm(e.target.value);
             });
+            // 💡 CÓDIGO NUEVO: Asegurar que al salir del input, se pierda el foco 'focused'
+            channelSearchInput.addEventListener('blur', () => {
+                channelSearchInput.classList.remove('focused');
+            });
         }
         
         // Manejar el cambio de filtro al hacer clic en los enlaces de navegación
@@ -2456,6 +2818,18 @@
                 isLongPress = false; 
             }
         });
+
+        // Deshabilitar la gestión de foco nativa en las tarjetas
+        document.querySelectorAll('.channel-card').forEach(card => {
+            card.setAttribute('tabindex', '-1');
+        });
+        // Asegurar que los botones del modal puedan recibir el foco (necesario para la navegación del modal)
+        document.querySelectorAll('#alternativesModal button, #altList li .alt-action').forEach(el => {
+            el.setAttribute('tabindex', '0');
+        });
+
+        // 💡 CÓDIGO NUEVO: Inicializar la gestión de foco del TV
+        tvFocusManager.init();
 
         loadInitialChannels();
         setInterval(renderResults, 60000);
