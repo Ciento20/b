@@ -8,20 +8,25 @@
         :root {
             --primary: #2563eb;
             --primary-dark: #1e50c7;
-            --bg-main: #1f1f1f;
+            --bg-main: #151515;
             --text-main: #e0e0e0;
             --card-bg: #2d2d2d;
             --border-color: #444444;
             --white: #ffffff;
             --live-red: #ff3535;
             --radius-lg: 12px;
-            --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.4);
-            --shadow-card-hover: 0 8px 25px rgba(0, 0, 0, 0.6);
+            --shadow-card: none; 
+            --shadow-card-hover: none;
             --primary-rgb: 37, 99, 235;
             --movistar-blue: #0085C1;
             --dazn-orange: #000000;
             --eurosport-blue: #5e17eb;
             --f1-red: #ff3535;
+            /* 💡 NUEVO: Variables para el Sidebar */
+            --sidebar-width: 250px;
+            --sidebar-bg: #111111;
+            --sidebar-text: var(--text-main);
+            --sidebar-hover-bg: #2d2d2d;
         }
 
         body {
@@ -33,18 +38,113 @@
             padding: 0;
             transition: all .3s;
             overflow-x: hidden;
+            /* CÓDIGO MODIFICADO: Layout Principal con Grid */
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            min-height: 100vh;
+        }
+        
+        /* CÓDIGO NUEVO: Estilos de la Barra Lateral */
+        #sidebar {
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            padding: 1.5rem 1rem;
+            position: sticky;
+            top: 0;
+            height: 100vh; /* Ocupa toda la altura visible */
+            overflow-y: auto;
+            border-right: 1px solid var(--border-color);
+            box-sizing: border-box;
         }
 
+        .sidebar__logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 2rem;
+            padding-left: 10px;
+            letter-spacing: 1px;
+        }
+
+        .sidebar__nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar__nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar__nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .sidebar__nav-link:hover {
+            background-color: var(--sidebar-hover-bg);
+        }
+        
+        .sidebar__nav-link.active {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .sidebar__icon {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .sidebar__section-title {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            opacity: 0.7;
+            padding: 10px 10px 5px;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .search-input-container {
+            margin-bottom: 1rem;
+            padding: 0 10px;
+        }
+
+        #channelSearch {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-main);
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        /* 💡 NUEVO: Estilo para el contenido principal */
+        .main-content {
+            overflow-y: auto;
+        }
+
+        /* CÓDIGO MODIFICADO: Ajustes al contenedor principal de canales */
         .main-container {
-            max-width: 1400px;
-            margin: 1.5rem auto;
-            padding: 0 2.5rem;
+            /* Eliminación de max-width y margin: auto */
+            width: 100%;
+            margin: 0; 
+            padding: 1.5rem 2.5rem;
+            box-sizing: border-box;
         }
 
+        /* CÓDIGO ORIGINAL: Mantenido para el resto */
         .search-filters, #updateNotification, .floating-save-button {
             display: none;
         }
-
+        
         .channels-grid {
             display: flex;
             flex-direction: column;
@@ -121,7 +221,7 @@
             border-radius: var(--radius-lg);
             background: var(--card-bg);
             border: 2px solid transparent;
-            box-shadow: var(--shadow-card);
+            box-shadow: none; 
             transition: transform .3s ease-in-out, box-shadow .3s ease-in-out, border-color .3s ease-in-out;
             position: relative;
             overflow: hidden;
@@ -132,12 +232,22 @@
             padding: 0;
             scroll-snap-align: start;
             cursor: pointer;
-            /* CÓDIGO MODIFICADO: Cambiado de 'cover' a 'contain' para mostrar la imagen completa */
             background-size: contain; 
             background-position: center;
             background-repeat: no-repeat;
+            background-clip: content-box; 
+            background-origin: content-box; 
         }
 
+        .channel-card--logo-img {
+            padding: 15px 20px 15px 20px; 
+            background-clip: content-box; 
+            background-origin: content-box;
+            background-size: contain; 
+            background-color: var(--bg-main);
+            border: 2px solid black;
+        }
+        
         .channel-card--live {
             min-width: 350px;
             max-width: 350px;
@@ -146,7 +256,7 @@
 
         .channel-card:hover {
             transform: scale(1.08);
-            box-shadow: var(--shadow-card-hover);
+            box-shadow: none;
             border-color: var(--primary);
             z-index: 10;
         }
@@ -157,8 +267,8 @@
             left: 0;
             right: 0;
             padding: 1rem;
-            padding-top: 3rem;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0));
+            padding-top: 1rem; 
+            background: transparent;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
@@ -201,7 +311,7 @@
             justify-content: center;
             line-height: 1;
             transition: all .3s ease;
-            box-shadow: var(--shadow-card);
+            box-shadow: none;
             border: none;
             z-index: 20;
             cursor: pointer;
@@ -224,8 +334,6 @@
             margin-bottom: 1px;
         }
         
-        /* CÓDIGO ELIMINADO: Se ha quitado el CSS para el indicador '...' */
-
         .channel-number-badge-button .source-initials {
             font-size: 0.65rem;
             font-weight: 700;
@@ -239,7 +347,6 @@
             left: 15px;
             font-size: 1rem;
             z-index: 10;
-            /* MODIFICACIÓN AÑADIDA PARA OCULTAR EL RATING */
             display: none; 
         }
 
@@ -388,7 +495,7 @@
             border: 1px solid var(--border-color);
             width: 80%;
             max-width: 600px;
-            box-shadow: var(--shadow-card-hover);
+            box-shadow: none;
             transform: scale(0.95);
             transition: transform 0.3s ease-out;
         }
@@ -489,12 +596,89 @@
         .channel-number-badge-button {
             display: none !important;
         }
+        
+        /* 💡 NUEVO: Estilos para el Modo TV (Responsive - Opcional) */
+        @media (max-width: 1024px) {
+            body {
+                grid-template-columns: 1fr; /* Una sola columna en pantallas pequeñas */
+            }
+            #sidebar {
+                position: relative; /* Ya no es fijo, se desplaza con el contenido */
+                height: auto;
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 1rem;
+            }
+            .sidebar__logo {
+                text-align: center;
+                margin-bottom: 1rem;
+            }
+            .sidebar__nav {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-around;
+            }
+            .sidebar__nav-item {
+                flex: 1 1 45%; /* Dos elementos por fila */
+                margin: 5px;
+            }
+            .sidebar__section-title, .search-input-container {
+                display: none; /* Ocultar para simplificar el menú móvil */
+            }
+        }
+
     </style>
 </head>
 <body class="tv-mode dark-mode">
-<div class="main-container">
-    <div class="channels-grid" id="channelsGrid"></div>
-</div>
+
+<aside id="sidebar">
+    <div class="sidebar__logo">StreamTV</div>
+    
+    <div class="search-input-container">
+        <input type="text" id="channelSearch" placeholder="Buscar canal..." />
+    </div>
+
+    <nav class="sidebar__nav">
+        <h4 class="sidebar__section-title">Navegación</h4>
+        <ul class="sidebar__nav-list">
+            <li class="sidebar__nav-item">
+                <a href="#" class="sidebar__nav-link active" data-filter="all">
+                    <span class="sidebar__icon">📺</span> Todos los Canales
+                </a>
+            </li>
+            <li class="sidebar__nav-item">
+                <a href="#" class="sidebar__nav-link" data-filter="live">
+                    <span class="sidebar__icon">🔴</span> En Vivo Ahora
+                </a>
+            </li>
+            <li class="sidebar__nav-item">
+                <a href="#" class="sidebar__nav-link" data-filter="favorites">
+                    <span class="sidebar__icon">⭐</span> Mis Favoritos
+                </a>
+            </li>
+        </ul>
+
+        <h4 class="sidebar__section-title">Modos</h4>
+        <ul class="sidebar__nav-list">
+            <li class="sidebar__nav-item">
+                <a href="#" class="sidebar__nav-link" data-action="dark-mode">
+                    <span class="sidebar__icon">🌙</span> Modo Oscuro (Activo)
+                </a>
+            </li>
+            <li class="sidebar__nav-item">
+                <a href="#" class="sidebar__nav-link" data-action="compact-mode">
+                    <span class="sidebar__icon">⚙️</span> Configuración
+                </a>
+            </li>
+        </ul>
+    </nav>
+</aside>
+<main class="main-content">
+    <div class="main-container">
+        <div class="channels-grid" id="channelsGrid"></div>
+    </div>
+</main>
 <div class="modal" id="alternativesModal">
     <div class="modal__content">
         <h3 class="modal__title">🔁 Alternativas para <span id="altChannelName"></span></h3>
@@ -511,7 +695,9 @@
         channelRatings: JSON.parse(localStorage.getItem('channelRatings')) || {},
         lastChannelPlay: JSON.parse(localStorage.getItem('lastChannelPlay')) || null,
         firstSeen: JSON.parse(localStorage.getItem('firstSeen')) || {},
-        alternativeSources: {}
+        alternativeSources: {},
+        currentFilter: 'all', // 💡 NUEVO: Estado para el filtro actual
+        searchTerm: ''        // 💡 NUEVO: Estado para el término de búsqueda
     };
     const ERA_URL = "https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/data/listas/listaplana.txt";
     const PROXIES = [
@@ -526,7 +712,6 @@
     const ELCANO_URL = 'https://ipfs.io/ipns/elcano.top';
     const EVENTS_URL = 'https://eventos-eight-dun.vercel.app/';
     const SHICKAT_URL = 'https://shickat.me/';
-    // AÑADIDO: Constante para la URL base de Logopedia
     const LOGOPEDIA_BASE_URL = 'static.wikia.nocookie.net/logopedia/images/';
     const BACKUP_KEYS = {
         gist: 'gist_channels_backup',
@@ -715,7 +900,8 @@
             const newChannels = mergeChannels(allChannels);
             state.channelsData = newChannels;
             processChannelNames();
-            renderResults();
+            // 💡 CÓDIGO MODIFICADO: Llamada a renderResults sin argumentos, usa el estado
+            renderResults(); 
 
             if (hasOnlineSuccess) {
                 if (statusElement) statusElement.remove();
@@ -1500,9 +1686,47 @@
         state.alternativeSources = alternatives;
         return principalChannels;
     }
+    
+    // 💡 NUEVO CÓDIGO: Función para filtrar canales según el estado
+    function filterChannels(channels) {
+        let filtered = channels;
+        const normalizedSearchTerm = normalizeText(state.searchTerm);
+
+        // 1. Filtrado por término de búsqueda (Search Term)
+        if (normalizedSearchTerm) {
+            filtered = filtered.filter(channel => 
+                normalizeText(channel.name).includes(normalizedSearchTerm) ||
+                (channel.event && (
+                    normalizeText(channel.event.competition).includes(normalizedSearchTerm) ||
+                    normalizeText(channel.event.match).includes(normalizedSearchTerm)
+                ))
+            );
+        }
+
+        // 2. Filtrado por tipo (Filter Type: all, live, favorites)
+        switch (state.currentFilter) {
+            case 'live':
+                // Nota: La propiedad isLive se calcula en loadInitialChannels y se mantiene en state.channelsData
+                filtered = filtered.filter(channel => channel.isLive);
+                break;
+            case 'favorites':
+                filtered = filtered.filter(channel => state.favorites.includes(channel.id));
+                break;
+            case 'all':
+            default:
+                // No hay filtro adicional, se usa el resultado del filtro por búsqueda.
+                break;
+        }
+
+        return filtered;
+    }
+    // 💡 FIN NUEVO CÓDIGO
 
     function renderResults() {
-        const filteredChannels = state.channelsData;
+        // 💡 CÓDIGO MODIFICADO: Aplicar filtro antes de ordenar y agrupar
+        const filteredChannels = filterChannels(state.channelsData);
+        // 💡 FIN CÓDIGO MODIFICADO
+        
         const channelsGrid = document.getElementById('channelsGrid');
         channelsGrid.innerHTML = '';
 
@@ -1513,7 +1737,7 @@
 
         if (filteredChannels.length === 0) {
             channelsGrid.innerHTML = `
-                <div class="no-results"><div class="no-results-icon">📡</div><div class="no-results-text">No se encontraron canales</div><div class="no-results-hint">Intenta recargar la página.</div></div>
+                <div class="no-results"><div class="no-results-icon">📡</div><div class="no-results-text">No se encontraron canales</div><div class="no-results-hint">Ajusta el filtro o la búsqueda.</div></div>
             `;
             return;
         }
@@ -1943,9 +2167,12 @@
         let cardStyle;
 
         if (isImage) {
-            cardStyle = `background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.4)), url('${bgImageUrl}')`;
+            // CÓDIGO MODIFICADO: Añadir la clase para imágenes reales y eliminar el degradado
+            cardClass += ' channel-card--logo-img';
+            cardStyle = `background-image: url('${bgImageUrl}')`;
         } else {
-            cardStyle = `background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${bgImageUrl}')`;
+            // CÓDIGO MODIFICADO: Eliminar el degradado del placeholder
+            cardStyle = `background-image: url('${bgImageUrl}')`;
         }
 
         const numAlternatives = state.alternativeSources[channel.id] ? state.alternativeSources[channel.id].length : 0;
@@ -2067,6 +2294,26 @@
         const emptyStars = '☆'.repeat(5 - fullStars - (hasHalfStar ? 1 : 0));
         return `<span style="color: var(--primary);">${stars}</span><span style="color: gray;">${emptyStars}</span>`;
     }
+    
+    // 💡 NUEVO CÓDIGO: Funciones para manejar el Sidebar y la Búsqueda
+    function setFilter(filterType) {
+        state.currentFilter = filterType;
+        document.querySelectorAll('.sidebar__nav-link').forEach(link => {
+            if (link.dataset.filter === filterType) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+        renderResults();
+    }
+
+    function setSearchTerm(term) {
+        state.searchTerm = term.trim();
+        renderResults();
+    }
+    // 💡 FIN NUEVO CÓDIGO
+
 
     document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('dark-mode');
@@ -2084,6 +2331,37 @@
                 hideAlternativesModal();
             }
         });
+        
+        // 💡 NUEVO CÓDIGO: Event listeners para la barra lateral y la búsqueda
+        const channelSearchInput = document.getElementById('channelSearch');
+        const sidebarNav = document.querySelector('.sidebar__nav');
+
+        // Manejar la búsqueda en tiempo real
+        if (channelSearchInput) {
+            channelSearchInput.addEventListener('input', (e) => {
+                setSearchTerm(e.target.value);
+            });
+        }
+        
+        // Manejar el cambio de filtro al hacer clic en los enlaces de navegación
+        if (sidebarNav) {
+            sidebarNav.addEventListener('click', (e) => {
+                const link = e.target.closest('.sidebar__nav-link');
+                if (link && link.dataset.filter) {
+                    e.preventDefault();
+                    setFilter(link.dataset.filter);
+                } else if (link && link.dataset.action === 'dark-mode') {
+                    e.preventDefault();
+                    // Implementación de cambio de modo si se añade un modo claro
+                    showStatusMessage('Modo oscuro activo.', 'info');
+                } else if (link && link.dataset.action === 'compact-mode') {
+                    e.preventDefault();
+                    // Implementación de configuración
+                    showStatusMessage('Configuración no implementada.', 'info');
+                }
+            });
+        }
+        // 💡 FIN NUEVO CÓDIGO
 
         // Variable para almacenar el ID del temporizador de pulsación prolongada
         let longPressTimer;
