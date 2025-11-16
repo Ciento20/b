@@ -213,12 +213,18 @@
             bottom: 15px;
         }
 
+        .channel-card:hover .channel-number-badge-button {
+            background: rgba(var(--primary-rgb), 0.9);
+        }
+
         .channel-number-badge-button .channel-number {
             font-weight: 700;
             font-size: 0.85rem;
             color: var(--white);
             margin-bottom: 1px;
         }
+        
+        /* CÓDIGO ELIMINADO: Se ha quitado el CSS para el indicador '...' */
 
         .channel-number-badge-button .source-initials {
             font-size: 0.65rem;
@@ -233,6 +239,8 @@
             left: 15px;
             font-size: 1rem;
             z-index: 10;
+            /* MODIFICACIÓN AÑADIDA PARA OCULTAR EL RATING */
+            display: none; 
         }
 
         .channel-card--live .rating-stars {
@@ -475,6 +483,12 @@
             justify-content: flex-end;
             margin-top: 20px;
         }
+
+        /* ELIMINACIÓN DE INDICADORES DE TARJETA */
+        .channel-card__quality,
+        .channel-number-badge-button {
+            display: none !important;
+        }
     </style>
 </head>
 <body class="tv-mode dark-mode">
@@ -512,6 +526,8 @@
     const ELCANO_URL = 'https://ipfs.io/ipns/elcano.top';
     const EVENTS_URL = 'https://eventos-eight-dun.vercel.app/';
     const SHICKAT_URL = 'https://shickat.me/';
+    // AÑADIDO: Constante para la URL base de Logopedia
+    const LOGOPEDIA_BASE_URL = 'static.wikia.nocookie.net/logopedia/images/';
     const BACKUP_KEYS = {
         gist: 'gist_channels_backup',
         elcano: 'elcano_channels_backup',
@@ -578,7 +594,7 @@
             const backupData = localStorage.getItem(key);
             if (backupData) {
                 const {timestamp, data} = JSON.parse(backupData);
-                const backupAgeHours = (new Date().getTime() - timestamp) / (1000 * 60 * 60);
+                const backupAgeHours = (new Date().getTime() - timestamp) / (1.0 * 60 * 60 * 1000);
                 if (backupAgeHours > BACKUP_EXPIRY_HOURS) {
                     localStorage.removeItem(key);
                     return null;
@@ -1736,7 +1752,7 @@
             <li data-acestream-id="${principalChannel.id}" data-channel-name="${principalChannel.name}" class="principal-source">
                 <div class="alt-info">
                     <span class="alt-name">Opción Principal (Mejor calidad/rating)</span>
-                    <span class="alt-details">${standardizeQuality(principalChannel.quality)} | Fuente: ${getSourceText(principalChannel.source)} | Rating: ${getStarRating(state.channelRatings[principalChannel.id] || 2.5)}</span>
+                    <span class="alt-details">${standardizeQuality(principalChannel.quality)} | Fuente: ${getSourceText(principalChannel.source)} </span>
                 </div>
                 <button class="alt-action" onclick="handleAlternativePlay('${principalChannel.id}')">Ver Ahora</button>
             </li>
@@ -1747,7 +1763,7 @@
                 <li data-acestream-id="${alt.id}" data-channel-name="${alt.name}" class="alternative-source">
                     <div class="alt-info">
                         <span class="alt-name">Alternativa ${index + 1}</span>
-                        <span class="alt-details">${standardizeQuality(alt.quality)} | Fuente: ${getSourceText(alt.source)} | Rating: ${getStarRating(state.channelRatings[alt.id] || 2.5)}</span>
+                        <span class="alt-details">${standardizeQuality(alt.quality)} | Fuente: ${getSourceText(alt.source)} </span>
                     </div>
                     <button class="alt-action" onclick="handleAlternativePlay('${alt.id}')">Probar</button>
                 </li>
@@ -1799,46 +1815,48 @@
         const name = channelName.toUpperCase().replace(/<[^>]*>/g, '').trim();
         let color = '444444';
         
-        // Se han eliminado los "https://" iniciales ya que se añade en la llamada a proxyImage
+        // CÓDIGO MODIFICADO: Solo se guarda la ruta relativa, usando LOGOPEDIA_BASE_URL.
         const championsLeagueImages = {
-            'M+ LIGA DE CAMPEONES': 'static.wikia.nocookie.net/logopedia/images/0/05/Liga_de_Campeones_por_Movistar_Plus%2B.svg/revision/latest?cb=20220128151054',
-            'M+ LIGA DE CAMPEONES 2': 'static.wikia.nocookie.net/logopedia/images/3/33/Liga_de_Campeones_2_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171922',
-            'M+ LIGA DE CAMPEONES 3': 'static.wikia.nocookie.net/logopedia/images/f/f8/Liga_de_Campeones_3_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171923',
-            'M+ LIGA DE CAMPEONES 4': 'static.wikia.nocookie.net/logopedia/images/0/0a/Liga_de_Campeones_4_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171811',
-            'M+ LIGA DE CAMPEONES 5': 'static.wikia.nocookie.net/logopedia/images/b/b3/Liga_de_Campeones_5_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171812',
-            'M+ LIGA DE CAMPEONES 6': 'static.wikia.nocookie.net/logopedia/images/d/d8/Liga_de_Campeones_6_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171813',
-            'M+ LIGA DE CAMPEONES 7': 'static.wikia.nocookie.net/logopedia/images/b/bf/Liga_de_Campeones_7_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171814',
-            'M+ LIGA DE CAMPEONES 8': 'static.wikia.nocookie.net/logopedia/images/f/f8/Liga_de_Campeones_3_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171923',
-            'M+ DEPORTES': 'static.wikia.nocookie.net/logopedia/images/d/d7/Deportes_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230721194319',
-            'M+ DEPORTES 6': 'static.wikia.nocookie.net/logopedia/images/d/d1/Deportes_6_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201004',
-            'M+ LA LIGA': 'static.wikia.nocookie.net/logopedia/images/c/cd/LaLigaTV_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230704125929',
-            'M+ LA LIGA 2': 'static.wikia.nocookie.net/logopedia/images/4/4c/LaLigaTV_2_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175335',
-            'M+ LA LIGA 3': 'static.wikia.nocookie.net/logopedia/images/0/0e/LaLigaTV_3_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175336',
-            'M+ LA LIGA 4': 'static.wikia.nocookie.net/logopedia/images/b/b0/Movistar_LaLiga_4.png/revision/latest?cb=20210308192125',
-            '★EUROSPORT 1': 'static.wikia.nocookie.net/logopedia/images/c/c8/Eurosport_1.svg/revision/latest?cb=20210911124742',
-            '★EUROSPORT 2': 'static.wikia.nocookie.net/logopedia/images/0/0d/Eurosport_2_%282015%29.svg/revision/latest?cb=20171209134527',
-            'M+ VAMOS': 'static.wikia.nocookie.net/logopedia/images/b/be/Vamos_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230728170813',
-            'LA LIGA HYPERMOTION': 'static.wikia.nocookie.net/logopedia/images/b/b5/LaLiga_TV_Hypermotion.svg/revision/latest?cb=20230704141115',
-            'LA LIGA HYPERMOTION 2': 'static.wikia.nocookie.net/logopedia/images/6/6f/La_Liga_Hypermotion_2.svg/revision/latest/scale-to-width-down/250?cb=20240921151926',
-            'M+ GOLF': 'static.wikia.nocookie.net/logopedia/images/2/21/Golf_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230721202544',
-            'M+ GOLF 2': 'static.wikia.nocookie.net/logopedia/images/5/57/Golf_2_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721202546',
-            'DAZN F1': 'static.wikia.nocookie.net/logopedia/images/c/cc/DAZN_F1.svg/revision/latest?cb=20221210225344',
-            'DAZN LA LIGA': 'static.wikia.nocookie.net/logopedia/images/1/18/DAZN_LALIGA_2024.svg/revision/latest?cb=20240910115205',
-            'DAZN LA LIGA 2': 'static.wikia.nocookie.net/logopedia/images/f/fa/DAZN_LaLiga_2_2024.svg/revision/latest/scale-to-width-down/250?cb=20240910121150',
-            'DAZN 1': 'static.wikia.nocookie.net/logopedia/images/1/18/DAZN_1_2024.svg/revision/latest?cb=20240713213358',
-            'DAZN 2': 'static.wikia.nocookie.net/logopedia/images/8/82/DAZN_2_2024.svg/revision/latest?cb=20240713212845',
-            'DAZN 3': 'static.wikia.nocookie.net/logopedia/images/0/0f/DAZN_3_2024.svg/revision/latest?cb=20240713212252',
-            'DAZN 4': 'static.wikia.nocookie.net/logopedia/images/f/f7/DAZN_4_2024.svg/revision/latest?cb=20240713211915',
-            'M+ LA LIGA 5': 'static.wikia.nocookie.net/logopedia/images/a/a2/LaLigaTV_4_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175337',
-            'M+ DEPORTES 2': 'static.wikia.nocookie.net/logopedia/images/7/7c/Deportes_2_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201028',
-            'M+ DEPORTES 3': 'static.wikia.nocookie.net/logopedia/images/4/40/Deportes_3_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201007',
-            'M+ DEPORTES 4': 'static.wikia.nocookie.net/logopedia/images/e/eb/Deportes_4_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201006',
-            'M+ DEPORTES 5': 'static.wikia.nocookie.net/logopedia/images/8/88/Deportes_5_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201005',
+            'M+ LIGA DE CAMPEONES': '0/05/Liga_de_Campeones_por_Movistar_Plus%2B.svg/revision/latest?cb=20220128151054',
+            'M+ LIGA DE CAMPEONES 2': '3/33/Liga_de_Campeones_2_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171922',
+            'M+ LIGA DE CAMPEONES 3': 'f/f8/Liga_de_Campeones_3_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171923',
+            'M+ LIGA DE CAMPEONES 4': '0/0a/Liga_de_Campeones_4_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171811',
+            'M+ LIGA DE CAMPEONES 5': 'b/b3/Liga_de_Campeones_5_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171812',
+            'M+ LIGA DE CAMPEONES 6': 'd/d8/Liga_de_Campeones_6_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171813',
+            'M+ LIGA DE CAMPEONES 7': 'b/bf/Liga_de_Campeones_7_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171814',
+            'M+ LIGA DE CAMPEONES 8': 'f/f8/Liga_de_Campeones_3_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171923',
+            'M+ DEPORTES': 'd/d7/Deportes_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230721194319',
+            'M+ DEPORTES 6': 'd/d1/Deportes_6_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201004',
+            'M+ LA LIGA': 'c/cd/LaLigaTV_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230704125929',
+            'M+ LA LIGA 2': '4/4c/LaLigaTV_2_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175335',
+            'M+ LA LIGA 3': '0/0e/LaLigaTV_3_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175336',
+            'M+ LA LIGA 4': 'a/a2/LaLigaTV_4_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175337',
+            '★EUROSPORT 1': 'c/c8/Eurosport_1.svg/revision/latest?cb=20210911124742',
+            '★EUROSPORT 2': '0/0d/Eurosport_2_%282015%29.svg/revision/latest?cb=20171209134527',
+            'M+ VAMOS': 'b/be/Vamos_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230728170813',
+            'LA LIGA HYPERMOTION': 'b/b5/LaLiga_TV_Hypermotion.svg/revision/latest?cb=20230704141115',
+            'LA LIGA HYPERMOTION 2': '6/6f/La_Liga_Hypermotion_2.svg/revision/latest/scale-to-width-down/250?cb=20240921151926',
+            'M+ GOLF': '2/21/Golf_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230721202544',
+            'M+ GOLF 2': '5/57/Golf_2_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721202546',
+            'DAZN F1': 'c/cc/DAZN_F1.svg/revision/latest?cb=20221210225344',
+            'DAZN LA LIGA': '1/18/DAZN_LALIGA_2024.svg/revision/latest?cb=20240910115205',
+            'DAZN LA LIGA 2': 'f/fa/DAZN_LaLiga_2_2024.svg/revision/latest/scale-to-width-down/250?cb=20240910121150',
+            'DAZN 1': '1/18/DAZN_1_2024.svg/revision/latest?cb=20240713213358',
+            'DAZN 2': '8/82/DAZN_2_2024.svg/revision/latest?cb=20240713212845',
+            'DAZN 3': '0/0f/DAZN_3_2024.svg/revision/latest?cb=20240713212252',
+            'DAZN 4': 'f/f7/DAZN_4_2024.svg/revision/latest?cb=20240713211915',
+            'M+ LA LIGA 5': 'b/ba/LaLigaTV_5_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175338',
+            'M+ DEPORTES 2': '7/7c/Deportes_2_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201028',
+            'M+ DEPORTES 3': '4/40/Deportes_3_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201007',
+            'M+ DEPORTES 4': 'e/eb/Deportes_4_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201006',
+            'M+ DEPORTES 5': '8/88/Deportes_5_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201005',
         };
 
         if (championsLeagueImages[name]) {
+            // CÓDIGO MODIFICADO: Se construye la URL completa con la nueva constante
+            const fullUrl = 'https://' + LOGOPEDIA_BASE_URL + championsLeagueImages[name];
             // Se aplica el proxy para la imagen
-            const proxiedUrl = proxyImage('https://' + championsLeagueImages[name]);
+            const proxiedUrl = proxyImage(fullUrl);
             return {url: proxiedUrl, color: '0085C1', isImage: true};
         }
 
@@ -1933,13 +1951,24 @@
         const numAlternatives = state.alternativeSources[channel.id] ? state.alternativeSources[channel.id].length : 0;
         const alternativesIndicator = numAlternatives > 0 ? `<div class="alternatives-count" style="font-size: 0.75rem; color: var(--white); opacity: 0.8;">+${numAlternatives} Alt.</div>` : '';
 
+        // CÓDIGO MODIFICADO: Siempre mostrar el número/fuente
+        let buttonContent;
+        let buttonTitle;
+
+        // Se ha simplificado la lógica: siempre mostrar el número y la fuente.
+        buttonContent = `
+            <span class="channel-number">${channel.number}</span>
+            <span class="source-initials">${sourceBadgeText}</span>
+        `;
+        buttonTitle = 'Copiar enlace (AceStream ID: ' + channel.id + ')';
+        // FIN CÓDIGO MODIFICADO
+
         const sourceButton = `
-            <button class="channel-number-badge-button ${sourceBadgeClass}" data-id="${channel.id}" title="${numAlternatives > 0 ? 'Ver Alternativas' : 'Copiar enlace (AceStream ID: ' + channel.id + ')'}">
-                <span class="channel-number">${channel.number}</span>
-                <span class="source-initials">${sourceBadgeText}</span>
-                ${alternativesIndicator}
+            <button class="channel-number-badge-button ${sourceBadgeClass}" data-id="${channel.id}" title="${buttonTitle}">
+                ${buttonContent}
             </button>
         `;
+        // FIN CÓDIGO MODIFICADO
 
         const infoOverlayHTML = `
             <div class="channel-info-overlay">
@@ -2056,30 +2085,97 @@
             }
         });
 
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.channel-number-badge-button')) {
-                const button = e.target.closest('.channel-number-badge-button');
-                e.stopPropagation();
-                const channelId = button.dataset.id;
-                const hasAlternatives = button.closest('.channel-card').dataset.hasAlternatives === 'true';
+        // Variable para almacenar el ID del temporizador de pulsación prolongada
+        let longPressTimer;
+        // Bandera para evitar la reproducción del canal después de una pulsación prolongada
+        let isLongPress = false;
+        // Duración de la pulsación prolongada en milisegundos
+        const LONG_PRESS_DURATION = 500; 
 
+        // Función que maneja la lógica de la pulsación prolongada
+        function handleLongPress(e) {
+            const card = e.target.closest('.channel-card');
+            const numberButton = e.target.closest('.channel-number-badge-button');
+
+            // Si se pulsa el botón de opciones, no aplicar la lógica de long press a la tarjeta
+            if (!card || numberButton) return; 
+
+            // Limpiar cualquier temporizador anterior
+            clearTimeout(longPressTimer);
+            isLongPress = false; 
+
+            longPressTimer = setTimeout(() => {
+                const channelId = card.dataset.id;
+                const hasAlternatives = card.dataset.hasAlternatives === 'true';
+
+                // Comprobar si hay alternativas para abrir el modal
                 if (hasAlternatives) {
                     showAlternativesModal(channelId);
+                    isLongPress = true; // Establecer la bandera
                 } else {
-                    copyAcestreamDirectly(channelId);
+                    // Si no hay alternativas, el long press en la tarjeta no tiene un comportamiento especial
+                    isLongPress = false; 
                 }
+                
+                clearTimeout(longPressTimer); // Terminar el temporizador
+            }, LONG_PRESS_DURATION);
+        }
+
+        // Función que maneja el fin de la pulsación
+        function handleEndPress() {
+            clearTimeout(longPressTimer);
+            // Si no fue una pulsación prolongada, se permite que se ejecute el evento 'click'
+        }
+
+        // Evento de inicio de pulsación (mousedown/touchstart) en la tarjeta
+        document.addEventListener('mousedown', (e) => {
+            if (e.button === 0) { // Solo para el botón izquierdo del ratón
+                handleLongPress(e);
             }
         });
 
+        // Para dispositivos táctiles
+        document.addEventListener('touchstart', handleLongPress);
+
+        // Evento de fin de pulsación (mouseup/touchend) en cualquier lugar
+        document.addEventListener('mouseup', handleEndPress);
+        document.addEventListener('touchend', handleEndPress);
+
+
+        // 1. Manejo del Clic en el BOTÓN DE COPIAR (anteriormente opciones)
+        document.addEventListener('click', (e) => {
+            const button = e.target.closest('.channel-number-badge-button');
+            if (button) {
+                e.preventDefault(); // Evitar cualquier acción por defecto
+                e.stopPropagation(); // Evitar que se propague a la tarjeta
+
+                const channelId = button.dataset.id;
+                // CÓDIGO MODIFICADO: Siempre copiar al hacer clic en el botón
+                copyAcestreamDirectly(channelId);
+            }
+        });
+
+
+        // 2. Manejo del Clic en la TARJETA COMPLETA (para reproducir)
         document.addEventListener('click', (e) => {
             const card = e.target.closest('.channel-card');
             const numberButton = e.target.closest('.channel-number-badge-button');
-            if (card && !numberButton) {
+            
+            // Ejecutar reproducción si:
+            // - Se hizo clic en la tarjeta (y no en el botón de opciones)
+            // - NO fue una pulsación prolongada (longPress) la que ya abrió el modal
+            if (card && !numberButton && !isLongPress) {
                 const channelId = card.dataset.id;
                 const channelData = state.channelsData.find(c => c.id === channelId);
                 if (channelData) {
                     handleChannelPlay(channelData);
                 }
+            }
+
+            // Restablecer la bandera de pulsación prolongada al final de la interacción,
+            // pero solo si el evento no fue consumido por el botón de opciones
+            if (!numberButton) {
+                isLongPress = false; 
             }
         });
 
