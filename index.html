@@ -555,12 +555,9 @@ const createTVChannelCard = (channel, allOptionsJson = '[]') => {
     const rating = state.channelRatings[channel.id] !== undefined ? state.channelRatings[channel.id] : 2.5;
     const ratingStars = getStarRating(rating);
 
-    // Botón para abrir las opciones de canal (ELIMINADO - Ahora por pulsación larga)
-    // const optionsButton = `<button class="tv-options-button" data-channel-id="${channel.id}" title="Opciones de canal">···</button>`;
-    
-    // Botón para abrir directamente (ELIMINADO - Ahora por pulsación corta)
-    // const directLinkButton = `<button class="tv-link-button" data-channel-id="${channel.id}" title="Abrir enlace directamente">🔗</button>`;
-    
+    // ELIMINACIÓN DEL CAMBIO: Ya no mostramos la hora del evento en la tarjeta
+    const eventDetails = channel.event ? `<div style="font-size: 0.7rem; color: #ccc; margin-top: 2px;">${channel.event.match}</div>` : ''; 
+
     return ` 
         <div 
             class="tv-card ${isLiveClass}" 
@@ -576,7 +573,7 @@ const createTVChannelCard = (channel, allOptionsJson = '[]') => {
                 <div style="font-size: 0.7rem; color: #ccc; margin-top: 5px;">
                     ${ratingStars} | ${standardizeQuality(channel.quality)}${channel.multiAudio ? ' 🎧' : ''} - ${channel.source.toUpperCase()}
                 </div> 
-                ${channel.event ? `<div style="font-size: 0.7rem; color: #ccc; margin-top: 2px;">${channel.event.match} - ${channel.event.time}</div>` : ''} 
+                ${eventDetails} 
             </div>
         </div> 
     `;
@@ -613,8 +610,11 @@ function createTVChannelsHTML(groups, sortedGroupKeys) {
         }); 
 
         let groupTitle = group.name; 
+        
+        // APLICACIÓN DEL CAMBIO: Mostrar la hora en el encabezado del evento
         if (group.isEvent) { 
-            groupTitle = `${group.sportEmoji} ${group.competition} - ${group.match}`; 
+            const liveTimeClass = group.hasLive ? 'live-time-blink' : '';
+            groupTitle = `<span class="${liveTimeClass}" style="margin-right: 15px;">${group.time}</span> ${group.sportEmoji} ${group.competition} - ${group.match}`; 
         } 
         
         // --- Contenedor del Grupo Principal ---
