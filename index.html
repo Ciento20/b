@@ -2082,7 +2082,7 @@
                             multiAudio = true;
                             namePart = namePart.replace('MULTI', '').trim();
                         }
-                        namePart = namePart.replace(/\(ES\)|\(Es\)/g, '').trim();
+                        namePart = namePart.replace(/\(ES\)|\(Es\)/g, '', ).trim();
                         let simplifiedName = namePart;
                         for (const key in channelMappings) {
                             if (simplifiedName.includes(key)) {
@@ -3436,8 +3436,8 @@
             const isLiveClass = channel.isLive ? 'tv-card--live' : '';
             const liveIndicator = channel.isLive ? '<span class="tv-live-indicator">🔴 EN VIVO</span>' : '';
             let bgColor = 'var(--card-bg)';
-            if (channel.name.includes('DAZN') && !channel.name.includes('F1')) bgColor = '#000000';
-            else if (channel.name.includes('DAZN F1')) bgColor = '#ff3535';
+            if (channel.name.includes('DAZN') && !channel.name.includes('F1')) bgColor = '#353535';
+            else if (channel.name.includes('DAZN F1')) bgColor = '#353535';
             else if (channel.name.includes('M+')) bgColor = '#0085C1';
             else if (channel.name.includes('EUROSPORT')) bgColor = '#5e17eb';
             const cardBgStyle = `background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%), ${bgColor};`;
@@ -3474,7 +3474,8 @@
                 });
                 let groupTitle = group.name;
                 if (group.isEvent) {
-                    groupTitle = `${group.sportEmoji} ${group.competition} - ${group.match}`;
+                    // MODIFICACIÓN: Añadir la hora del evento al encabezado en modo TV
+                    groupTitle = `<span class="${group.hasLive ? 'live-time-blink' : ''}" style="margin-right: 15px;">${group.time}</span> ${group.sportEmoji} ${group.competition} - ${group.match}`;
                 }
                 html += ` <div class="tv-group"><header class="tv-group-header"><h2 class="tv-group-title">${groupTitle}</h2></header> `;
                 let subGroupContent = '';
