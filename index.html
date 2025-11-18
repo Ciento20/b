@@ -1305,6 +1305,13 @@
             transform: scale(1.08);
             z-index: 20;
         }
+        
+        /* Nuevo estilo para tarjetas con logo */
+        .channel-card--logo-img {
+            background-size: 80% !important; /* Ajusta el tamaño del logo */
+            background-position: center !important; /* Centra el logo */
+            background-color: #222222 !important; /* Fondo negro para el logo */
+        }
 
         .tv-channels-grid {
             display: flex;
@@ -1587,7 +1594,59 @@
             tvFocusManager: null,
             playerActive: false
         };
+        const LOGOPEDIA_BASE_URL = "https://static.wikia.nocookie.net/logopedia/images/";
+        const IMAGE_PROXY_URL = "https://images.weserv.nl/?url=";
         const ERA_URL = "https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/data/listas/listaplana.txt";
+        const championsLeagueImages = {
+            'M+ LIGA DE CAMPEONES': '0/05/Liga_de_Campeones_por_Movistar_Plus%2B.svg/revision/latest?cb=20220128151054',
+            'M+ LIGA DE CAMPEONES 2': '3/33/Liga_de_Campeones_2_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171922',
+            'M+ LIGA DE CAMPEONES 3': 'f/f8/Liga_de_Campeones_3_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171923',
+            'M+ LIGA DE CAMPEONES 4': '0/0a/Liga_de_Campeones_4_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171811',
+            'M+ LIGA DE CAMPEONES 5': 'b/b3/Liga_de_Campeones_5_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171812',
+            'M+ LIGA DE CAMPEONES 6': 'd/d8/Liga_de_Campeones_6_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171813',
+            'M+ LIGA DE CAMPEONES 7': 'b/bf/Liga_de_Campeones_7_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171814',
+            'M+ LIGA DE CAMPEONES 8': 'f/f8/Liga_de_Campeones_3_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171923',
+            'M+ DEPORTES': 'd/d7/Deportes_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230721194319',
+            'M+ DEPORTES 2': '7/7c/Deportes_2_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201028',
+            'M+ DEPORTES 3': '4/40/Deportes_3_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201007',
+            'M+ DEPORTES 4': 'e/eb/Deportes_4_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201006',
+            'M+ DEPORTES 5': '8/88/Deportes_5_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201005',
+            'M+ DEPORTES 6': 'd/d1/Deportes_6_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201004',
+            'M+ LA LIGA': 'c/cd/LaLigaTV_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230704125929',
+            'M+ LA LIGA 2': '4/4c/LaLigaTV_2_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175335',
+            'M+ LA LIGA 3': '0/0e/LaLigaTV_3_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175336',
+            'M+ LA LIGA 4': 'a/a2/LaLigaTV_4_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175337',
+            'M+ LA LIGA 5': 'b/ba/LaLigaTV_5_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175338',
+            '★EUROSPORT 1': 'c/c8/Eurosport_1.svg/revision/latest?cb=20210911124742',
+            '★EUROSPORT 2': '0/0d/Eurosport_2_%282015%29.svg/revision/latest?cb=20171209134527',
+            'M+ VAMOS': 'b/be/Vamos_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230728170813',
+            'LA LIGA HYPERMOTION': 'b/b5/LaLiga_TV_Hypermotion.svg/revision/latest?cb=20230704141115',
+            'LA LIGA HYPERMOTION 2': '6/6f/La_Liga_Hypermotion_2.svg/revision/latest/scale-to-width-down/250?cb=20240921151926',
+            'M+ GOLF': '2/21/Golf_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230721202544',
+            'M+ GOLF 2': '5/57/Golf_2_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721202546',
+            'DAZN F1': 'c/cc/DAZN_F1.svg/revision/latest?cb=20221210225344',
+            'DAZN LA LIGA': '1/18/DAZN_LALIGA_2024.svg/revision/latest?cb=20240910115205',
+            'DAZN LA LIGA 2': 'f/fa/DAZN_LaLiga_2_2024.svg/revision/latest/scale-to-width-down/250?cb=20240910121150',
+            'DAZN 1': '1/18/DAZN_1_2024.svg/revision/latest?cb=20240713213358',
+            'DAZN 2': '8/82/DAZN_2_2024.svg/revision/latest?cb=20240713212845',
+            'DAZN 3': '0/0f/DAZN_3_2024.svg/revision/latest?cb=20240713212252',
+            'DAZN 4': 'f/f7/DAZN_4_2024.svg/revision/latest?cb=20240713211915',
+        };
+
+        function getPlaceholderInfo(channelName) {
+            const name = channelName.toUpperCase().trim();
+            if (championsLeagueImages[name]) {
+                return {
+                    url: championsLeagueImages[name],
+                    class: 'channel-card--logo-img'
+                };
+            }
+            return null;
+        }
+
+        function proxyImage(url) {
+            return IMAGE_PROXY_URL + encodeURIComponent(url);
+        }
         const PROXIES = [
             'https://api.allorigins.win/raw?url=',
             'https://cors-anywhere.herokuapp.com/',
@@ -3433,18 +3492,38 @@
             renderResults();
         }
         const createTVChannelCard = (channel, allOptionsJson = '[]') => {
+            const logoInfo = getPlaceholderInfo(channel.name);
             const isLiveClass = channel.isLive ? 'tv-card--live' : '';
             const liveIndicator = channel.isLive ? '<span class="tv-live-indicator">🔴 EN VIVO</span>' : '';
             let bgColor = 'var(--card-bg)';
-            if (channel.name.includes('DAZN') && !channel.name.includes('F1')) bgColor = '#353535';
-            else if (channel.name.includes('DAZN F1')) bgColor = '#353535';
-            else if (channel.name.includes('M+')) bgColor = '#0085C1';
-            else if (channel.name.includes('EUROSPORT')) bgColor = '#5e17eb';
-            const cardBgStyle = `background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%), ${bgColor};`;
+            let backgroundImageStyle = '';
+            let logoClass = '';
+            let nameStyle = 'white';
+
+            let channelNameHTML = `<h3 style="font-size: 1.2rem; font-weight: 700; color: ${nameStyle}; white-space: normal; text-align: center;">${channel.displayableName}</h3>`;
+
+            if (logoInfo) {
+                const fullUrl = LOGOPEDIA_BASE_URL + logoInfo.url;
+                const proxiedUrl = proxyImage(fullUrl);
+                // Aplica el logo como background-image de la tarjeta
+                backgroundImageStyle = `background-image: url('${proxiedUrl}');`;
+                logoClass = logoInfo.class;
+                // MODIFICACIÓN: Si hay logo, ocultamos el nombre del canal
+                channelNameHTML = `<h3 style="font-size: 1.2rem; font-weight: 700; color: ${nameStyle}; white-space: normal; text-align: center;">${liveIndicator}</h3>`;
+            } else {
+                // Lógica de color de fondo existente si no hay logo
+                if (channel.name.includes('DAZN') && !channel.name.includes('F1')) bgColor = '#353535';
+                else if (channel.name.includes('DAZN F1')) bgColor = '#353535';
+                else if (channel.name.includes('M+')) bgColor = '#0085C1';
+                else if (channel.name.includes('EUROSPORT')) bgColor = '#5e17eb';
+                backgroundImageStyle = `background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%), ${bgColor};`;
+            }
+
             const rating = state.channelRatings[channel.id] !== undefined ? state.channelRatings[channel.id] : 2.5;
             const ratingStars = getStarRating(rating);
             const optionsButton = `<button class="tv-link-button" data-channel-id="${channel.id}" title="Ver opciones alternativas">🔍</button>`;
-            return ` <div class="tv-card ${isLiveClass}" data-channel-id="${channel.id}" data-all-options='${allOptionsJson}' style="${cardBgStyle}" tabindex="0" role="button" aria-label="Ver canal ${channel.name}"> ${optionsButton} <div style="width: 100%; padding: 10px; border-radius: 0 0 12px 12px; text-align: left;"><h3 style="font-size: 1rem; margin: 0; color: white; white-space: normal;">${channel.displayableName}</h3> ${liveIndicator} <div style="font-size: 0.7rem; color: #ccc; margin-top: 5px;"> ${ratingStars} | ${standardizeQuality(channel.quality)}${channel.multiAudio ? ' 🎧' : ''} - ${channel.source.toUpperCase()} </div> ${channel.event ? `<div style="font-size: 0.7rem; color: #ccc; margin-top: 2px;">${channel.event.match} - ${channel.event.time}</div>` : ''} </div></div> `;
+
+            return ` <div class="tv-card ${isLiveClass} ${logoClass}" data-channel-id="${channel.id}" data-all-options='${allOptionsJson}' style="${backgroundImageStyle}" tabindex="0" role="button" aria-label="Ver canal ${channel.name}"> ${optionsButton} <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 0;">${channelNameHTML}</div></div> `;
         };
 
         function createTVChannelsHTML(groups, sortedGroupKeys) {
@@ -3456,6 +3535,7 @@
             for (const groupKey of sortedGroupKeys) {
                 const group = groups[groupKey];
                 const subGroups = group.subGroups;
+
                 if (group.isEvent) {
                     const formattedDate = formatEventDate(group.date);
                     if (formattedDate !== lastDateRendered) {
@@ -3465,6 +3545,17 @@
                 } else {
                     lastDateRendered = null;
                 }
+
+                let groupTitle = group.name;
+                if (group.isEvent) {
+                    groupTitle = `<span class="${group.hasLive ? 'live-time-blink' : ''}" style="margin-right: 15px;">${group.time}</span> ${group.sportEmoji} ${group.competition} - ${group.match}`;
+                }
+
+                // 1. Iniciar el contenedor del grupo
+                html += ` <div class="tv-group"><header class="tv-group-header"><h2 class="tv-group-title">${groupTitle}</h2></header> `;
+
+                // 2. Recopilar el HTML de todas las tarjetas
+                let cardsHTML = '';
                 const sortedSubGroupNames = Object.keys(subGroups).sort((a, b) => {
                     const aHasLive = subGroups[a].some(c => c.isLive);
                     const bHasLive = subGroups[b].some(c => c.isLive);
@@ -3472,17 +3563,13 @@
                     if (!aHasLive && bHasLive) return 1;
                     return a.localeCompare(b);
                 });
-                let groupTitle = group.name;
-                if (group.isEvent) {
-                    // MODIFICACIÓN: Añadir la hora del evento al encabezado en modo TV
-                    groupTitle = `<span class="${group.hasLive ? 'live-time-blink' : ''}" style="margin-right: 15px;">${group.time}</span> ${group.sportEmoji} ${group.competition} - ${group.match}`;
-                }
-                html += ` <div class="tv-group"><header class="tv-group-header"><h2 class="tv-group-title">${groupTitle}</h2></header> `;
-                let subGroupContent = '';
+
                 sortedSubGroupNames.forEach(subGroupName => {
                     const channels = subGroups[subGroupName];
                     const bestChannel = getBestChannelInSubgroup(channels);
                     if (!bestChannel) return;
+
+                    // El modal de opciones usa todos los canales del subgrupo
                     const allOptions = channels.map(c => ({
                         id: c.id,
                         name: c.displayableName,
@@ -3492,18 +3579,17 @@
                         rating: state.channelRatings[c.id] !== undefined ? state.channelRatings[c.id] : 2.5
                     }));
                     const allOptionsJson = JSON.stringify(allOptions);
-                    let subGroupHeader = '';
-                    if (groupKey === 'Otros' && sortedSubGroupNames.length > 1) {
-                        subGroupHeader = `<h3 class="tv-group-title" style="font-size: 1.2rem; border-left: 2px solid var(--primary); margin-top: 1rem; margin-bottom: 0.5rem;">${subGroupName}</h3>`;
-                    } else if (groupKey === 'Otros' && sortedSubGroupNames.length === 1 && subGroupName !== 'Otros') {
-                        groupTitle = subGroupName;
-                        subGroupHeader = '';
-                    } else if (group.isEvent) {
-                        subGroupHeader = '';
-                    }
-                    subGroupContent += ` ${subGroupHeader} <div class="tv-subgroup-content"> ${createTVChannelCard(bestChannel, allOptionsJson)} </div> `;
+
+                    // Acumulamos el HTML de la tarjeta, pero NO el contenedor tv-subgroup-content
+                    cardsHTML += createTVChannelCard(bestChannel, allOptionsJson);
                 });
-                html += `${subGroupContent}</div>`;
+
+                // 3. Insertar todas las tarjetas en un ÚNICO div.tv-subgroup-content
+                if (cardsHTML) {
+                    html += `<div class="tv-subgroup-content">${cardsHTML}</div>`;
+                }
+
+                html += `</div>`; // Cierra tv-group
             }
             return html;
         }
@@ -3921,6 +4007,12 @@
                     renderResults();
                 }
             }, 60000);
+        });
+    </script>
+</body>
+
+</html>
+           }, 60000);
         });
     </script>
 </body>
