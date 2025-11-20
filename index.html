@@ -6,6 +6,7 @@
     <meta name="viewport"
         content="width=device-width,initial-scale=0.584maximum-scale=0.8,user-scalable=no">
     <title>📺</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.8em%22 font-size=%2285%22>📺</text></svg>">
     <style>
         :root {
             --primary: #2563eb;
@@ -1181,7 +1182,8 @@
         #tvSidebar {
             background: #111111;
             color: #e0e0e0;
-            padding: 1.5rem 0.5rem;
+            /* CAMBIO: Aumento del padding inferior en la sidebar */
+            padding: 1.5rem 0.5rem 3rem 0.5rem;
             position: fixed;
             left: 0;
             top: 0;
@@ -1191,6 +1193,10 @@
             overflow-y: auto;
             border-right: 1px solid #383838;
             z-index: 100;
+            display: flex;
+            flex-direction: column;
+            /* MODIFICACIÓN: Alinear verticalmente al centro */
+            justify-content: center;
         }
 
         #tvSidebar .sidebar-logo {
@@ -1239,8 +1245,6 @@
             padding: 5px 0;
             margin: 5px auto;
             justify-content: center;
-            /* AÑADIDO: Mismo fondo que las tarjetas TV (#2d2d2d) */
-            background-color: #2d2d2d; 
         }
 
         #tvSidebar .tv-nav-link.brand-filter img {
@@ -1303,12 +1307,43 @@
             background: #151515;
         }
 
-        #tvSidebar button#normalModeBtn {
-            /* Ajuste del botón salir */
-            width: 100%;
-            padding: 8px 5px;
-            font-size: 0.75rem;
+        /* ESTILO DEL BOTÓN DE AJUSTES (MODIFICADO A CIRCULAR) */
+        #tvSidebar button#settingsModeBtn {
+            /* **CAMBIO PRINCIPAL: Hacerlo circular** */
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            /* **FIN CAMBIO PRINCIPAL** */
+            
+            margin: 1rem auto 0.5rem auto; /* Centrado y con margen arriba */
+            padding: 0;
+            font-size: 1.2rem; /* Aumentar tamaño de fuente para el icono */
+            background-color: #383838;
+            color: #e0e0e0;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            
+            /* **Añadir flexbox para centrar el icono** */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+
+        #tvSidebar button#settingsModeBtn:hover,
+        #tvSidebar button#settingsModeBtn.tv-sidebar-link-focused {
+            background-color: var(--primary) !important;
+            border: 2px solid white;
+            outline-offset: 2px;
+            transform: scale(1.02);
+        }
+
+        /* Contenedor para la parte inferior (Ajustes) - ELIMINADO */
+        /* #tvBottomNav {
+            padding: 0 5px;
+            margin-top: 2rem;
+            margin-bottom: 3rem;
+        } */
 
         /* FIN DE LOS CAMBIOS */
 
@@ -1501,7 +1536,7 @@
     </div>
     <div class="modal" id="settingsModal">
         <div class="modal__content">
-            <h3 class="modal__title">⚙️ Ajustes</h3>
+            <h3 class="modal__title">⚙️ AJUSTES</h3>
             <div class="settings-section">
                 <h4 class="settings-section__title">📺 Modo TV</h4>
                 <div class="settings-item">
@@ -1573,40 +1608,39 @@
     </div>
     <div id="tvInterface" style="display: none;">
         <aside id="tvSidebar">
-            <div class="sidebar-logo"></div>
-            <div style="margin-bottom: 1rem; padding: 0 5px;">
-                <input type="text" id="tvSearch" placeholder="Buscar canal..." tabindex="0">
+            <div>
+                <div style="margin-bottom: 1rem; padding: 0 5px;">
+                    <input type="text" id="tvSearch" placeholder="Buscar canal..." tabindex="0">
+                </div>
+                <nav>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 0.5rem;"><a href="#" class="tv-nav-link focused-link" data-filter="all" tabindex="0">
+                                <span>📺</span> Todos </a></li>
+                        <li style="margin-bottom: 0.5rem;"><a href="#" class="tv-nav-link" data-filter="live" tabindex="0">
+                                <span>🔴</span> DIRECTO </a></li>
+                        <li style="margin-bottom: 0.5rem;"><a href="#" class="tv-nav-link" data-filter="favorites"
+                                tabindex="0"> <span>⭐</span>Favoritos </a></li>
+
+                        <li style="margin-top: 1rem;"><a href="#" class="tv-nav-link brand-filter" data-filter="dazn" tabindex="0">
+                            <img src="https://images.weserv.nl/?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Flogopedia%2Fimages%2F7%2F7c%2FDAZN.svg%2Frevision%2Flatest%3Fcb%3D20210824163814" alt="DAZN Logo"> </a></li>
+                            <li><a href="#" class="tv-nav-link brand-filter" data-filter="m+" tabindex="0">
+                            <img src="https://images.weserv.nl/?url=https://static.wikia.nocookie.net/logopedia/images/a/af/Movistar_2025.svg/revision/latest?cb=20251005163444" alt="Movistar+ Logo"> </a></li>
+                        <li><a href="#" class="tv-nav-link brand-filter" data-filter="eurosport" tabindex="0">
+                            <img src="https://images.weserv.nl/?url=https://static.wikia.nocookie.net/logopedia/images/d/d1/Eurosport_%282015%29_%28Monogram%29.svg/revision/latest/scale-to-width-down/250?cb=20171222150235" alt="Eurosport Logo"> </a></li>
+
+                        <div id="tvSportFilters">
+                            <a href="#" class="tv-nav-link sport-filter" data-sport-key="futbol" tabindex="0" title="Fútbol">⚽</a>
+                            <a href="#" class="tv-nav-link sport-filter" data-sport-key="baloncesto" tabindex="0" title="Baloncesto">🏀</a>
+                            <a href="#" class="tv-nav-link sport-filter" data-sport-key="tenis" tabindex="0" title="Tenis">🎾</a>
+                            <a href="#" class="tv-nav-link sport-filter" data-sport-key="motorsport" tabindex="0" title="Motorsport">🏁</a>
+                            <a href="#" class="tv-nav-link sport-filter" data-sport-key="f1" tabindex="0" title="F1">🏎️</a>
+                            </div>
+
+                        <button id="settingsModeBtn" tabindex="0"> ⚙️ </button>
+                    </ul>
+                </nav>
             </div>
-            <nav>
-                <ul style="list-style: none; padding: 0; margin: 0;">
-                    <li style="margin-bottom: 0.5rem;"><a href="#" class="tv-nav-link focused-link" data-filter="all" tabindex="0">
-                            <span>📺</span> Todos </a></li>
-                    <li style="margin-bottom: 0.5rem;"><a href="#" class="tv-nav-link" data-filter="live" tabindex="0">
-                            <span>🔴</span> DIRECTO </a></li>
-                    <li style="margin-bottom: 0.5rem;"><a href="#" class="tv-nav-link" data-filter="favorites"
-                            tabindex="0"> <span>⭐</span>Favoritos </a></li>
-
-                    <li style="margin-top: 1rem;"><a href="#" class="tv-nav-link brand-filter" data-filter="dazn" tabindex="0">
-                        <img src="https://static.wikia.nocookie.net/logopedia/images/8/83/DAZN_2019_logo.svg/revision/latest?cb=20210824002335" alt="DAZN Logo"> </a></li>
-                    <li><a href="#" class="tv-nav-link brand-filter" data-filter="m+" tabindex="0">
-                        <img src="https://static.wikia.nocookie.net/logopedia/images/0/07/Movistar_Plus%2B.svg/revision/latest?cb=20240116071854" alt="Movistar+ Logo"> </a></li>
-                    <li><a href="#" class="tv-nav-link brand-filter" data-filter="eurosport" tabindex="0">
-                        <img src="https://static.wikia.nocookie.net/logopedia/images/0/0a/Eurosport_%282015%29.svg/revision/latest?cb=20210911120727" alt="Eurosport Logo"> </a></li>
-
-                    <div id="tvSportFilters">
-                        <a href="#" class="tv-nav-link sport-filter" data-sport-key="futbol" tabindex="0" title="Fútbol">⚽</a>
-                        <a href="#" class="tv-nav-link sport-filter" data-sport-key="baloncesto" tabindex="0" title="Baloncesto">🏀</a>
-                        <a href="#" class="tv-nav-link sport-filter" data-sport-key="tenis" tabindex="0" title="Tenis">🎾</a>
-                        <a href="#" class="tv-nav-link sport-filter" data-sport-key="boxeo" tabindex="0" title="Boxeo">🥊</a>
-                        <a href="#" class="tv-nav-link sport-filter" data-sport-key="ciclismo" tabindex="0" title="Ciclismo">🚴</a>
-                        <a href="#" class="tv-nav-link sport-filter" data-sport-key="motorsport" tabindex="0" title="Motor">🏁</a>
-                        <a href="#" class="tv-nav-link sport-filter" data-sport-key="f1" tabindex="0" title="F1">🏎️</a>
-                    </div>
-
-                    <li style="margin-top: 1rem;"><button id="normalModeBtn" tabindex="0"> Salir </button></li>
-                </ul>
-            </nav>
-        </aside>
+            </aside>
         <main id="tvMainContent">
             <h1 style="color: white; margin-top: 0;"></h1>
             <div class="tv-channels-grid" id="tvChannelsGrid"></div>
@@ -1750,7 +1784,8 @@
 
         // Nuevos IDs para los filtros en modo TV
         const TV_BRAND_FILTER_KEYS = ['all', 'live', 'favorites', 'dazn', 'm+', 'eurosport'];
-        const TV_SPORT_FILTER_KEYS = ['futbol', 'baloncesto', 'tenis', 'boxeo', 'ciclismo', 'motorsport', 'f1'];
+        // MODIFICACIÓN: Se añaden 'motorsport' y 'f1' a la lista
+        const TV_SPORT_FILTER_KEYS = ['futbol', 'baloncesto', 'tenis', 'motorsport', 'f1'];
 
         const OTHER_SUBGROUPS = [
             'LIGA ENDESA',
@@ -1904,6 +1939,12 @@
         function clearAllTVFilterVisuals() {
             document.querySelectorAll('#tvSidebar .tv-nav-link').forEach(link => {
                 link.classList.remove('tv-sidebar-link-focused');
+            });
+            // Remover foco de los botones de la parte inferior
+            document.querySelectorAll('#tvSidebar button').forEach(button => {
+                if (button.id !== 'tvSearch') { // No queremos quitar el foco a la barra de búsqueda si está activa
+                    button.classList.remove('tv-sidebar-link-focused');
+                }
             });
         }
 
@@ -2928,7 +2969,7 @@
                     return a.localeCompare(b);
                 }
                 if (groupA.isEvent && !groupB.isEvent) return -1;
-                if (!groupA.isEvent && groupB.isEvent) return 1;
+                if (!groupB.isEvent && groupB.isEvent) return 1;
                 const indexA = groupOrder.indexOf(a);
                 const indexB = groupOrder.indexOf(b);
                 if (indexA === -1 && indexB === -1) {
@@ -2997,7 +3038,7 @@
                     'tenis': ['tenis', 'wimbledon', 'roland garros', 'us open', 'atp', 'wta'],
                     'boxeo': ['boxeo', 'boxing', 'lucha', 'ufc', 'mma'],
                     'ciclismo': ['ciclismo', 'tour', 'giro', 'vuelta'],
-                    'motorsport': ['gp', 'motogp', 'dakar', 'rally', 'wrc', 'nascar'],
+                    'motorsport': ['gp', 'motogp', 'dakar', 'rally', 'wrc', 'nascar', 'motor'],
                     'f1': ['f1', 'fórmula 1', 'formula 1', 'formulaone', 'fórmulaone']
                 };
                 let targetTerms = sportSearchTerms[normalizedSportFilter] || [normalizedSportFilter];
@@ -3071,7 +3112,7 @@
             const today = new Date();
             const dateStringA = eventA.date.toLowerCase();
             const dateStringB = eventB.date.toLowerCase();
-            
+
             const isTodayA = dateStringA === 'hoy';
             const isTodayB = dateStringB === 'hoy';
             const isTomorrowA = dateStringA === 'mañana';
@@ -3079,9 +3120,9 @@
             // CAMBIO: Añadir lógica para 'ayer'
             const isYesterdayA = dateStringA === 'ayer';
             const isYesterdayB = dateStringB === 'ayer';
-            
+
             // Prioridad: Hoy, Mañana, Ayer, Fecha
-            
+
             if (isTodayA && !isTodayB) return -1;
             if (!isTodayA && isTodayB) return 1;
             if (isTodayA && isTodayB) return eventA.time.localeCompare(eventB.time);
@@ -3089,14 +3130,14 @@
             if (isTomorrowA && !isTomorrowB) return -1;
             if (!isTomorrowA && isTomorrowB) return 1;
             if (isTomorrowA && isTomorrowB) return eventA.time.localeCompare(eventB.time);
-            
+
             if (isYesterdayA && !isYesterdayB) return -1;
             if (!isYesterdayA && isYesterdayB) return 1;
             if (isYesterdayA && isYesterdayB) return eventA.time.localeCompare(eventB.time);
 
             const dateA = parseDateString(eventA.date, today);
             const dateB = parseDateString(eventB.date, today);
-            
+
             if (dateA.getTime() !== dateB.getTime()) {
                 return dateA.getTime() - dateB.getTime();
             }
@@ -3382,7 +3423,7 @@
             const displayQuality = standardizeQuality(channel.quality);
             const sourceButton = ` <button class="channel-number-badge-button ${sourceBadgeClass}" data-id="${channel.id}" title="Copiar enlace (AceStream ID: ${channel.id})"><span class="channel-number">${channel.number}</span><span class="source-initials">${sourceBadgeText}</span></button> `;
             const liveIndicator = '';
-            return ` <div class="${cardClass}" data-id="${channel.id}" data-number="${channel.number}"> ${newIndicator} <div class="channel-card__quality"> ${displayQuality} ${channel.multiAudio ? '🎧' : ''} </div><div class="channel-header"><div class="channel-name">${channel.displayableName} ${liveIndicator}</div></div> ${sourceButton} <div class="rating-stars">${getStarRating(rating)}</div></div> `;
+            return ` <div class="${cardClass}" data-id="${channel.id}" data-number="${channel.number}"> ${newIndicator} <div class="channel-card__quality"> ${displayQuality} ${channel.multiAudio ? '??' : ''} </div><div class="channel-header"><div class="channel-name">${channel.displayableName} ${liveIndicator}</div></div> ${sourceButton} <div class="rating-stars">${getStarRating(rating)}</div></div> `;
         }
 
         function playChannel(acestreamId) {
@@ -3611,6 +3652,9 @@
                     brandLink.classList.add('tv-sidebar-link-focused');
                 }
             }
+
+            // Foco para el botón de ajustes si no hay un filtro activo o si se prefiere
+            // Nota: El foco inicial del manager de foco se encargará de esto si se recarga la página
         }
 
         function toggleTVMode() {
@@ -3677,7 +3721,7 @@
                 // Si hay logo, solo mostramos el nombre de forma oculta para mantener el layout,
                 // ya que el logo ocupa el centro. El LIVE se elimina de la tarjeta.
                 channelNameHTML = `<h3 style="font-size: 1.2rem; font-weight: 700; color: ${nameStyle}; white-space: normal; text-align: center; opacity: 0;">${channel.displayableName}</h3>`;
-                
+
                 // Si está en vivo, agregamos un indicador pequeño en la esquina o algo similar
                 // Pero por ahora, simplemente eliminamos el texto de LIVE.
             } else {
@@ -3925,15 +3969,22 @@
                     const searchElement = document.getElementById('tvSearch');
                     const sidebarLinks = Array.from(document.querySelectorAll('.tv-nav-link'));
                     const allCards = Array.from(document.querySelectorAll('.tv-card'));
-                    const normalModeBtn = document.getElementById('normalModeBtn');
-                    this.focusableElements = [searchElement, ...sidebarLinks, normalModeBtn, ...allCards].filter(el => el && el.offsetParent !== null);
+                    // Se elimina la referencia a normalModeBtn
+                    const settingsModeBtn = document.getElementById('settingsModeBtn');
+                    this.focusableElements = [searchElement, ...sidebarLinks, settingsModeBtn, ...allCards].filter(el => el && el.offsetParent !== null);
                 },
                 setFocus: function(element) {
                     if (!element) return;
                     this.removeFocusClasses();
                     this.currentFocus = element;
-                    if (element.id === 'tvSearch' || element.id === 'normalModeBtn') {
+
+                    // Comprobar si es un botón de la parte inferior para darle foco
+                    // Se elimina la comprobación para normalModeBtn
+                    if (element.id === 'tvSearch' || element.id === 'settingsModeBtn') {
                         element.focus();
+                        if (element.id !== 'tvSearch') {
+                            element.classList.add('tv-sidebar-link-focused');
+                        }
                     } else {
                         element.focus();
                         element.classList.add(element.classList.contains('tv-card') ? 'tv-card-focused' : 'tv-sidebar-link-focused');
@@ -3972,7 +4023,18 @@
                                 renderTVChannels();
                                 return;
                             }
-                            switchToNormalMode();
+                            // Si se está en un canal o en ajustes, y pulsa Escape/Backspace, sale del modo TV.
+                            if (this.currentFocus.classList.contains('tv-card') || this.currentFocus.id === 'settingsModeBtn') {
+                                switchToNormalMode();
+                                return;
+                            }
+                            // Si está en otro elemento de la barra lateral, regresa a 'Todos' o al canal más cercano
+                            const sidebarElements = Array.from(document.querySelectorAll('#tvSearch, .tv-nav-link, #settingsModeBtn'));
+                            if(sidebarElements.includes(this.currentFocus)) {
+                                switchToNormalMode(); // Opción alternativa: forzar salida si está en la barra lateral
+                                return;
+                            }
+                            switchToNormalMode(); // Fallback para salir si no hay foco claro
                             return;
                     }
                     if (nextElement) {
@@ -3982,7 +4044,7 @@
                 moveFocus: function(direction) {
                     this.updateFocusableElements();
                     const allCards = Array.from(document.querySelectorAll('.tv-card'));
-                    const sidebarElements = Array.from(document.querySelectorAll('#tvSearch, .tv-nav-link, #normalModeBtn'));
+                    const sidebarElements = Array.from(document.querySelectorAll('#tvSearch, .tv-nav-link, #settingsModeBtn'));
                     const focusedIndex = sidebarElements.indexOf(this.currentFocus);
 
                     // Lógica para moverse DENTRO de la barra lateral
@@ -4013,8 +4075,8 @@
                             if (indexInRow > 0) {
                                 return cardsInCurrentRow[indexInRow - 1];
                             } else {
-                                // Mover del primer canal a la barra lateral (al último elemento de la sidebar)
-                                return sidebarElements[sidebarElements.length - 1];
+                                // Mover del primer canal a la barra lateral (al botón de ajustes)
+                                return document.getElementById('settingsModeBtn');
                             }
                         } else if (direction === 'ArrowDown') {
                             if (currentRowIndex < allRows.length - 1) {
@@ -4045,8 +4107,9 @@
                             this.currentFocus.click();
                         } else if (this.currentFocus.id === 'tvSearch') {
                             this.currentFocus.focus();
-                        } else if (this.currentFocus.id === 'normalModeBtn') {
-                            this.currentFocus.click();
+                        } else if (this.currentFocus.id === 'settingsModeBtn') {
+                             // Lógica para abrir modal de ajustes
+                            document.getElementById('settingsModal').classList.add('modal--active');
                         }
                     }
                 }
@@ -4132,14 +4195,17 @@
                 }
             });
             document.getElementById('tvModeCheckbox').addEventListener('change', toggleTVMode);
-            document.getElementById('normalModeBtn').addEventListener('click', () => {
-                switchToNormalMode();
+
+            // NUEVO EVENT LISTENER PARA EL BOTÓN DE AJUSTES EN MODO TV
+            document.getElementById('settingsModeBtn').addEventListener('click', () => {
+                document.getElementById('settingsModal').classList.add('modal--active');
             });
 
             // Event listeners para filtros de TV (modificado para incluir nuevos)
             document.querySelectorAll('#tvSidebar .tv-nav-link').forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
+                    // MODIFICACIÓN: Se comprueba también si el filtro es de deporte
                     if (TV_BRAND_FILTER_KEYS.includes(this.dataset.filter)) {
                         applyTVFilter(this.dataset.filter, 'brand');
                     } else if (TV_SPORT_FILTER_KEYS.includes(this.dataset.sportKey)) {
