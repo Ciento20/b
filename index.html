@@ -513,7 +513,8 @@
             z-index: 100;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            /* CAMBIO CLAVE: Centrar verticalmente el contenido */
+            justify-content: center;
         }
 
         #tvSidebar .sidebar-logo {
@@ -942,12 +943,11 @@
                         <a href="#" class="tv-nav-link sport-filter" data-sport-key="motorsport" tabindex="0" title="Motorsport">🏁</a>
                         <a href="#" class="tv-nav-link sport-filter" data-sport-key="f1" tabindex="0" title="F1">🏎️</a>
                     </div>
-                    
-                    <div id="tvBottomNav">
-                        <button id="settingsModeBtn" tabindex="0"> ⚙️ </button>
-                    </div>
                     </ul>
             </nav>
+        </div>
+        <div id="tvBottomNav">
+            <button id="settingsModeBtn" tabindex="0"> ⚙️ </button>
         </div>
     </aside>
     <main id="tvMainContent">
@@ -962,6 +962,11 @@
             <h3 class="modal__title">⚙️ Ajustes</h3>
             <div class="settings-section">
                 <h4 class="settings-section__title">📺 Opciones de Interfaz</h4>
+                <div class="settings-item">
+                    <div class="settings-item__info"><span class="settings-icon">🖥️</span>
+                        <div><span class="settings-label">Pantalla Completa al Clic</span><span class="settings-description">Activa el modo de pantalla completa al hacer clic en cualquier parte de la interfaz.</span></div>
+                    </div><label class="settings-switch"><input type="checkbox" id="fullScreenOnClickCheckbox"><span class="settings-slider"></span></label>
+                </div>
                 <p class="settings-description" style="color: var(--text); opacity: 0.7; margin-bottom: 0.5rem;">
                     Esta interfaz está optimizada para TV/Mandos. Para escritorio, usa la versión normal.</p>
             </div>
@@ -1049,6 +1054,8 @@
             tvFocusManager: null,
             playerActive: false,
             lastPlayedByChannel: JSON.parse(localStorage.getItem('lastPlayedByChannel')) || {},
+            // NUEVO ESTADO: Controla si la pantalla completa al hacer clic está activa
+            fullScreenOnClick: localStorage.getItem('fullScreenOnClick') === 'true',
         };
         const LOGOPEDIA_BASE_URL = "https://static.wikia.nocookie.net/logopedia/images/";
         const IMAGE_PROXY_URL = "https://images.weserv.nl/?url=";
@@ -1274,6 +1281,31 @@
             document.getElementById('hideEventDetailsCheckbox').checked = state.hideEventDetails;
             document.body.classList.toggle('hide-event-details', state.hideEventDetails);
             renderTVChannels();
+        }
+
+        // NUEVA FUNCIÓN: Alterna el estado de Pantalla Completa al Clic
+        function toggleFullScreenOnClick() {
+            state.fullScreenOnClick = !state.fullScreenOnClick;
+            localStorage.setItem('fullScreenOnClick', state.fullScreenOnClick);
+            document.getElementById('fullScreenOnClickCheckbox').checked = state.fullScreenOnClick;
+        }
+
+        // NUEVA FUNCIÓN: Solicita el modo de pantalla completa
+        function requestFullScreen() {
+            if (document.fullscreenElement) {
+                // Si ya está en pantalla completa, no hacer nada o salir (depende del comportamiento deseado)
+                return;
+            }
+            const element = document.documentElement; // Todo el documento
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.mozRequestFullScreen) { // Firefox
+                element.mozRequestFullScreen();
+            } else if (element.webkitRequestFullscreen) { // Chrome, Safari, Opera
+                element.webkitRequestFullscreen();
+            } else if (element.msRequestFullscreen) { // IE/Edge
+                element.msRequestFullscreen();
+            }
         }
 
         function clearAllTVFilterVisuals() {
@@ -3401,6 +3433,7 @@
 
             document.getElementById('darkModeCheckbox').checked = state.darkMode;
             document.getElementById('hideEventDetailsCheckbox').checked = state.hideEventDetails;
+            document.getElementById('fullScreenOnClickCheckbox').checked = state.fullScreenOnClick; // Establecer estado inicial del nuevo switch
             document.body.classList.toggle('hide-event-details', state.hideEventDetails);
             
             const copyModal = document.getElementById('copyModal');
@@ -3414,6 +3447,17 @@
             window.addEventListener('click', (event) => {
                 if (event.target === copyModal) {
                     hideCopyModal();
+                }
+            });
+            
+            // NUEVO EVENT LISTENER para el cuerpo del documento
+            document.body.addEventListener('click', (e) => {
+                // Comprueba si la opción está activada, si no estamos en una modal o en la sidebar
+                if (state.fullScreenOnClick && 
+                    !e.target.closest('.modal') && 
+                    !e.target.closest('#tvSidebar') &&
+                    e.target.id !== 'tvSearch') {
+                    requestFullScreen();
                 }
             });
             
@@ -3446,6 +3490,8 @@
 
             document.getElementById('darkModeCheckbox').addEventListener('change', toggleDarkMode);
             document.getElementById('hideEventDetailsCheckbox').addEventListener('change', toggleHideEventDetails);
+            // NUEVO EVENT LISTENER para el nuevo switch
+            document.getElementById('fullScreenOnClickCheckbox').addEventListener('change', toggleFullScreenOnClick); 
             document.getElementById('closeSettingsBtn').addEventListener('click', () => document.getElementById('settingsModal').classList.remove('modal--active'));
             document.querySelectorAll('.color-option').forEach(btn => {
                 btn.addEventListener('click', () => changePrimaryColor(btn.dataset.color));
