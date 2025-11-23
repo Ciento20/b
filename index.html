@@ -849,6 +849,61 @@
             opacity: 0.7;
             font-weight: 400;
         }
+        
+        /* ESTILOS PARA EL MENSAJE DE NO RESULTADOS */
+        .no-results {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            margin-top: 1rem;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 800px;
+            width: 90%;
+        }
+
+        .no-results-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: .5;
+            color: #666;
+        }
+
+        .no-results-text {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin-bottom: .5rem;
+            font-weight: 600;
+        }
+
+        .no-results-hint {
+            font-size: .9rem;
+            color: var(--text);
+            opacity: .7;
+        }
+
+        /* Para modo oscuro */
+        body.dark-mode .no-results {
+            background: #222222;
+            border: 1px solid #383838;
+            box-shadow: none; /* Mantener sin shadow específico de card en modo oscuro TV */
+        }
+
+        body.dark-mode .no-results-icon {
+            color: #666;
+            opacity: 1;
+        }
+
+        body.dark-mode .no-results-text {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .no-results-hint {
+            color: #aaa;
+        }
     </style>
 </head>
 
@@ -1490,7 +1545,8 @@
                 } else if (isShowingBackup) {
                     showStatusMessage("Fallo al actualizar canales. Se sigue mostrando el historial.", "error");
                 } else {
-                    tvChannelsGrid.innerHTML = ` <div class="no-results" style="margin-left: 0; margin-right: 0; background: #222222; border: 1px solid #383838; box-shadow: none;"><div class="no-results-icon" style="color: #666; opacity: 1;">📡</div><div class="no-results-text" style="color: #e0e0e0;">Error al cargar los canales.</div><div class="no-results-hint" style="color: #aaa;">No se han conseguido cargar los canales (modo offline/sin historial).</div><button class="retry-button" onclick="loadInitialChannels()">Reintentar</button></div> `;
+                    // Usar las nuevas clases de estilo aquí
+                    tvChannelsGrid.innerHTML = ` <div class="no-results"><div class="no-results-icon">📡</div><div class="no-results-text">Error al cargar los canales.</div><div class="no-results-hint">No se han conseguido cargar los canales (modo offline/sin historial).</div><button class="retry-button" onclick="loadInitialChannels()">Reintentar</button></div> `;
                     showStatusMessage("Error al cargar canales. Sin historial disponible.", "error");
                 }
             } else if (isShowingBackup) {
@@ -1498,7 +1554,8 @@
                 showStatusMessage("Fallo al actualizar canales. Se sigue mostrando el historial.", "error");
             } else {
                 if (statusElement) statusElement.remove();
-                tvChannelsGrid.innerHTML = ` <div class="no-results" style="margin-left: 0; margin-right: 0; background: #222222; border: 1px solid #383838; box-shadow: none;"><div class="no-results-icon" style="color: #666; opacity: 1;">📡</div><div class="no-results-text" style="color: #e0e0e0;">Error al cargar los canales.</div><div class="no-results-hint" style="color: #aaa;">No se han conseguido cargar los canales (modo offline/sin historial).</div><button class="retry-button" onclick="loadInitialChannels()">Reintentar</button></div> `;
+                // Usar las nuevas clases de estilo aquí
+                tvChannelsGrid.innerHTML = ` <div class="no-results"><div class="no-results-icon">📡</div><div class="no-results-text">Error al cargar los canales.</div><div class="no-results-hint">No se han conseguido cargar los canales (modo offline/sin historial).</div><button class="retry-button" onclick="loadInitialChannels()">Reintentar</button></div> `;
                 showStatusMessage("Error al cargar canales. Sin historial disponible.", "error");
             }
         }
@@ -2790,10 +2847,10 @@
         function createTVChannelsHTML(groups, sortedGroupKeys) {
             if (sortedGroupKeys.length === 0) {
                 return `
-                    <div class="no-results" style="margin-left: 0; margin-right: 0; background: #222222; border: 1px solid #383838; box-shadow: none;">
-                        <div class="no-results-icon" style="color: #666; opacity: 1;">📡</div>
-                        <div class="no-results-text" style="color: #e0e0e0;">No se encontraron canales</div>
-                        <div class="no-results-hint" style="color: #aaa;">Prueba con otros filtros o términos de búsqueda</div>
+                    <div class="no-results">
+                        <div class="no-results-icon">📡</div>
+                        <div class="no-results-text">No se encontraron canales</div>
+                        <div class="no-results-hint">Prueba con otros filtros o términos de búsqueda</div>
                     </div>
                 `;
             }
