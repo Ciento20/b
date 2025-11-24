@@ -634,6 +634,8 @@
             padding: 0.75rem 1.25rem; /* Reducido a la mitad: 1.5rem 2.5rem -> 0.75rem 1.25rem */
             min-height: 100vh;
             background: #151515;
+            display: flex; /* Nuevo: Habilitar flexbox */
+            flex-direction: column; /* Nuevo: Apilar elementos */
         }
 
         #tvSidebar button#settingsModeBtn {
@@ -704,6 +706,9 @@
             display: flex;
             flex-direction: column;
             gap: 1.25rem; /* Reducido a la mitad: 2.5rem -> 1.25rem */
+            flex-grow: 1; /* Nuevo: Asegura que la cuadrícula ocupe el espacio restante */
+            min-height: 0; /* Fix para flex-grow en algunos navegadores */
+            justify-content: flex-start; /* Por defecto, alinear arriba */
         }
 
         .tv-group {
@@ -860,16 +865,22 @@
         }
         
         /* ESTILOS PARA EL MENSAJE DE NO RESULTADOS */
+        .no-results-container { /* Nuevo contenedor para centrar */
+            display: flex;
+            justify-content: center; /* Centrar horizontalmente */
+            align-items: center; /* Centrar verticalmente */
+            flex-grow: 1;
+            width: 100%;
+            height: 100%; /* Ocupar el espacio disponible */
+        }
+        
         .no-results {
-            grid-column: 1/-1;
             text-align: center;
             padding: 1rem; /* Reducido a la mitad: 2rem -> 1rem */
             background: var(--card-bg);
             border-radius: var(--radius-md);
             box-shadow: var(--shadow-sm);
-            margin-top: 0.5rem; /* Reducido a la mitad: 1rem -> 0.5rem */
-            margin-left: auto;
-            margin-right: auto;
+            margin: auto; /* Centrado dentro del no-results-container */
             max-width: 400px; /* Reducido a la mitad: 800px -> 400px */
             width: 90%;
         }
@@ -912,6 +923,24 @@
 
         body.dark-mode .no-results-hint {
             color: #aaa;
+        }
+        
+        /* ESTILO NUEVO: Ocultar botón '+' en modo "Ocultar botón opciones" */
+        body.hide-options-button-active .tv-card .tv-link-button {
+            visibility: hidden;
+            /* Usamos visibility: hidden en lugar de display: none para que el botón siga siendo accesible por eventos del ratón/teclado si es necesario, 
+            aunque en este caso la lógica principal de la card manejará el clic. */
+        }
+        
+        /* Ajuste para que tvChannelsGrid ocupe todo el espacio disponible en TVMainContent */
+        #tvChannelsGrid.no-channels {
+             display: flex;
+             flex-direction: column;
+             justify-content: center;
+             align-items: center;
+             height: 100%;
+             min-height: 50vh; /* Para que al menos se centre en una parte visible de la pantalla */
+             gap: 0;
         }
     </style>
 </head>
@@ -967,6 +996,11 @@
                         <div><span class="settings-label">Pantalla Completa al Clic</span><span class="settings-description">Activa el modo de pantalla completa al hacer clic en cualquier parte de la interfaz.</span></div>
                     </div><label class="settings-switch"><input type="checkbox" id="fullScreenOnClickCheckbox"><span class="settings-slider"></span></label>
                 </div>
+                <div class="settings-item">
+                    <div class="settings-item__info"><span class="settings-icon">➕</span>
+                        <div><span class="settings-label">Ocultar Botón de Opciones</span><span class="settings-description">Mantiene la funcionalidad del botón '+' pero lo hace invisible.</span></div>
+                    </div><label class="settings-switch"><input type="checkbox" id="hideOptionsButtonCheckbox"><span class="settings-slider"></span></label>
+                </div>
                 <p class="settings-description" style="color: var(--text); opacity: 0.7; margin-bottom: 0.5rem;">
                     Esta interfaz está optimizada para TV/Mandos. Para escritorio, usa la versión normal.</p>
             </div>
@@ -987,8 +1021,8 @@
                     <div class="color-picker"><button class="color-option" data-color="#2563eb"
                             style="background:#2563eb"></button><button class="color-option" data-color="#dc2626"
                             style="background:#dc2626"></button><button class="color-option" data-color="#16a34a"
-                            style="background:#16a34a"></button><button class="color-option" data-color="#9333ea"
-                            style="background:#9333ea"></button></div>
+                            style="background:#16a34a"></button><button class="color-option" data-color="#79006f"
+                            style="background:#79006f"></button></div>
                 </div>
             </div>
             <div class="settings-section">
@@ -1056,6 +1090,8 @@
             lastPlayedByChannel: JSON.parse(localStorage.getItem('lastPlayedByChannel')) || {},
             // NUEVO ESTADO: Controla si la pantalla completa al hacer clic está activa
             fullScreenOnClick: localStorage.getItem('fullScreenOnClick') === 'true',
+            // NUEVO ESTADO: Ocultar botón de opciones
+            hideOptionsButton: localStorage.getItem('hideOptionsButton') === 'true',
         };
         const LOGOPEDIA_BASE_URL = "https://static.wikia.nocookie.net/logopedia/images/";
         const IMAGE_PROXY_URL = "https://images.weserv.nl/?url=";
@@ -1288,6 +1324,16 @@
             state.fullScreenOnClick = !state.fullScreenOnClick;
             localStorage.setItem('fullScreenOnClick', state.fullScreenOnClick);
             document.getElementById('fullScreenOnClickCheckbox').checked = state.fullScreenOnClick;
+        }
+        
+        // NUEVA FUNCIÓN: Alterna el estado de Ocultar Botón de Opciones
+        function toggleHideOptionsButton() {
+            state.hideOptionsButton = !state.hideOptionsButton;
+            localStorage.setItem('hideOptionsButton', state.hideOptionsButton);
+            document.getElementById('hideOptionsButtonCheckbox').checked = state.hideOptionsButton;
+            // Aplicar/eliminar la clase CSS al body
+            document.body.classList.toggle('hide-options-button-active', state.hideOptionsButton);
+            renderTVChannels(); // Llama a render para asegurar que se actualicen las tarjetas si fuera necesario.
         }
 
         // NUEVA FUNCIÓN: Solicita el modo de pantalla completa
@@ -1595,7 +1641,7 @@
             } else {
                 if (statusElement) statusElement.remove();
                 // Usar las nuevas clases de estilo aquí
-                tvChannelsGrid.innerHTML = ` <div class="no-results"><div class="no-results-icon">📡</div><div class="no-results-text">Error al cargar los canales.</div><div class="no-results-hint">No se han conseguido cargar los canales (modo offline/sin historial).</div><button class="retry-button" onclick="loadInitialChannels()">Reintentar</button></div> `;
+                tvChannelsGrid.innerHTML = ` <div class="no-results-container"><div class="no-results"><div class="no-results-icon">📡</div><div class="no-results-text">Error al cargar los canales.</div><div class="no-results-hint">No se han conseguido cargar los canales (modo offline/sin historial).</div><button class="retry-button" onclick="loadInitialChannels()">Reintentar</button></div></div> `;
                 showStatusMessage("Error al cargar canales. Sin historial disponible.", "error");
             }
         }
@@ -2909,11 +2955,14 @@
 
         function createTVChannelsHTML(groups, sortedGroupKeys) {
             if (sortedGroupKeys.length === 0) {
+                // Nuevo HTML para el mensaje de no resultados, envuelto en el nuevo div para centrar
                 return `
-                    <div class="no-results">
-                        <div class="no-results-icon">📡</div>
-                        <div class="no-results-text">No se encontraron canales</div>
-                        <div class="no-results-hint">Prueba con otros filtros o términos de búsqueda</div>
+                    <div class="no-results-container">
+                        <div class="no-results">
+                            <div class="no-results-icon">📡</div>
+                            <div class="no-results-text">No se encontraron canales</div>
+                            <div class="no-results-hint">Prueba con otros filtros o términos de búsqueda</div>
+                        </div>
                     </div>
                 `;
             }
@@ -3015,6 +3064,14 @@
                 sortedGroupKeys
             } = getGroupedChannels();
             tvGrid.innerHTML = createTVChannelsHTML(groups, sortedGroupKeys);
+            
+            // Añadir/eliminar la clase de centrado si no hay canales
+            if (sortedGroupKeys.length === 0) {
+                tvGrid.classList.add('no-channels');
+            } else {
+                tvGrid.classList.remove('no-channels');
+            }
+            
             attachTVCardEvents();
 
             if (state.tvFocusManager) {
@@ -3051,15 +3108,41 @@
                 card.removeEventListener('click', handleTVCardPlay);
                 card.addEventListener('click', handleTVCardPlay);
                 const optionsButton = card.querySelector('.tv-link-button');
+                // IMPORTANTE: Aseguramos que el evento del botón SIEMPRE esté asociado
                 if (optionsButton) {
                     optionsButton.removeEventListener('click', handleTVCardOptionsClick);
                     optionsButton.addEventListener('click', handleTVCardOptionsClick);
+                }
+                
+                // Si el botón está oculto, asociamos el evento de opciones al clic de la tarjeta, 
+                // pero SÓLO si el clic no es un "play" normal (e.g., el clic en la esquina inferior derecha)
+                if (state.hideOptionsButton) {
+                    card.removeEventListener('auxiliaryclick', handleTVCardOptionsClick);
+                    // Usamos un nombre de evento auxiliar o una comprobación de coordenadas, 
+                    // pero para simplificar y cumplir con el requisito de "sigue funcionando si pulsas" en el área del botón:
+                    // Dejamos que el clic principal dispare play (handleTVCardPlay)
+                    // y la funcionalidad del botón la asociamos con un clic secundario (por ejemplo, doble clic o clic derecho, si no usáramos un control remoto).
+                    // Para el propósito del TV-Mode (navegación con flechas/Enter), el botón sigue siendo seleccionable, y el clic principal de la tarjeta es para "Play".
+                    
+                    // Si el requisito es que la tarjeta haga Play en cualquier lado, pero el clic **en el área del botón** abra las opciones:
+                    // Necesitaríamos una lógica de coordenadas. Para el modo TV, lo más sencillo es que el **Enter** en la tarjeta haga Play, y un **botón dedicado** haga Opciones.
+                    // Ya que el botón existe (`.tv-link-button`), y se hace invisible con CSS, si el botón tiene un `click` listener, este se disparará si el usuario logra hacer clic exactamente en el área *invisible* del botón.
+
+                    // La solución más simple y robusta para este caso de uso (botón invisible con funcionalidad) es dejar que el evento del botón se capture *solamente* por el botón.
+                    // Si el usuario hace clic en el área visible de la tarjeta, se dispara `handleTVCardPlay`.
+                    // Si el usuario logra hacer clic exactamente en el área invisible del botón, se dispara `handleTVCardOptionsClick` (porque el botón tiene `visibility: hidden`, no `display: none`).
+
+                    // Ya que `handleTVCardPlay` tiene `if (e.target.closest('.tv-link-button')) { return; }`, 
+                    // si el botón es clicado, el evento se propaga al botón, se dispara `handleTVCardOptionsClick`, y `handleTVCardPlay` se detiene.
+                    
+                    // Con `visibility: hidden` aplicado por CSS, la funcionalidad es correcta sin más cambios en JS.
                 }
             });
         };
         
         const handleTVCardPlay = (e) => {
             if (e.target.closest('.tv-link-button')) {
+                // Si se hace clic en el botón de opciones, no hacer play
                 return;
             }
             const card = e.currentTarget;
@@ -3428,12 +3511,16 @@
             document.body.classList.add('dark-mode');
             document.body.classList.add('tv-mode-active');
             
+            // Inicialización del nuevo ajuste
+            document.body.classList.toggle('hide-options-button-active', state.hideOptionsButton);
+            
             initializeTVNavigation();
             loadInitialChannels();
 
             document.getElementById('darkModeCheckbox').checked = state.darkMode;
             document.getElementById('hideEventDetailsCheckbox').checked = state.hideEventDetails;
-            document.getElementById('fullScreenOnClickCheckbox').checked = state.fullScreenOnClick; // Establecer estado inicial del nuevo switch
+            document.getElementById('fullScreenOnClickCheckbox').checked = state.fullScreenOnClick; 
+            document.getElementById('hideOptionsButtonCheckbox').checked = state.hideOptionsButton; // Establecer estado inicial del nuevo switch
             document.body.classList.toggle('hide-event-details', state.hideEventDetails);
             
             const copyModal = document.getElementById('copyModal');
@@ -3450,9 +3537,8 @@
                 }
             });
             
-            // NUEVO EVENT LISTENER para el cuerpo del documento
+            // Event Listener de Pantalla Completa al Clic
             document.body.addEventListener('click', (e) => {
-                // Comprueba si la opción está activada, si no estamos en una modal o en la sidebar
                 if (state.fullScreenOnClick && 
                     !e.target.closest('.modal') && 
                     !e.target.closest('#tvSidebar') &&
@@ -3490,8 +3576,10 @@
 
             document.getElementById('darkModeCheckbox').addEventListener('change', toggleDarkMode);
             document.getElementById('hideEventDetailsCheckbox').addEventListener('change', toggleHideEventDetails);
-            // NUEVO EVENT LISTENER para el nuevo switch
             document.getElementById('fullScreenOnClickCheckbox').addEventListener('change', toggleFullScreenOnClick); 
+            // NUEVO EVENT LISTENER para el nuevo switch
+            document.getElementById('hideOptionsButtonCheckbox').addEventListener('change', toggleHideOptionsButton); 
+            
             document.getElementById('closeSettingsBtn').addEventListener('click', () => document.getElementById('settingsModal').classList.remove('modal--active'));
             document.querySelectorAll('.color-option').forEach(btn => {
                 btn.addEventListener('click', () => changePrimaryColor(btn.dataset.color));
