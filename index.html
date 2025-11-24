@@ -2,6 +2,54 @@
 <html lang="es">
 
 <head>
+    <script>
+        (function() {
+            // La clave más simple que indica que el usuario ya ha pasado por el proceso de activación/uso.
+            // Si la clave 'darkMode' existe, el usuario está verificado.
+            const CLAVE_DE_ACTIVACION = 'darkMode'; 
+            
+            // Otras claves que indican que el usuario ya ha estado usando la web.
+            const INDICADORES_ADICIONALES = [
+                'favorites', 
+                'channelHistory', 
+                'primaryColor',
+                'channelRatings'
+            ];
+            
+            let accesoConcedido = false;
+
+            // Paso 1: Comprobar la clave de activación/uso básico
+            if (localStorage.getItem(CLAVE_DE_ACTIVACION) !== null) {
+                accesoConcedido = true;
+            } else {
+                // Paso 2: Si la clave de activación no existe, comprobar si existen otras claves
+                // que indican que el usuario es existente (por si se borró solo 'darkMode').
+                for (const key of INDICADORES_ADICIONALES) {
+                    if (localStorage.getItem(key) !== null) {
+                        accesoConcedido = true;
+                        break; 
+                    }
+                }
+            }
+
+            // Si no se encuentra NINGÚN indicador, se bloquea.
+            if (!accesoConcedido) {
+                // Mostrar un mensaje de error 404 discreto.
+                document.documentElement.innerHTML = `
+                    <style>
+                        body { font-family: sans-serif; text-align: center; padding-top: 100px; background-color: #151515; color: #e0e0e0; }
+                        h1 { color: #dc3545; }
+                    </style>
+                    <body>
+                        <h1>Error 404: Página no encontrada</h1>
+                        <p>Lamentamos las molestias, la dirección no existe en nuestros servidores.</p>
+                    </body>
+                `;
+                // Detener completamente la ejecución del resto del código de la página
+                window.stop(); 
+            }
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width,initial-scale=1.0,maximum-scale=1.6,user-scalable=no">
