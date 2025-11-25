@@ -2,164 +2,6 @@
 <html lang="es">
 
 <head>
-    <script>
-        (function() {
-            // La clave más simple que indica que el usuario ya ha pasado por el proceso de activación/uso.
-            // Si la clave 'darkMode' existe, el usuario está verificado.
-            const CLAVE_DE_ACTIVACION = 'darkMode'; 
-            
-            // Otras claves que indican que el usuario ya ha estado usando la web.
-            const INDICADORES_ADICIONALES = [
-                'favorites', 
-                'channelHistory', 
-                'primaryColor',
-                'channelRatings'
-            ];
-            
-            let accesoConcedido = false;
-
-            // Paso 1: Comprobar la clave de activación/uso básico
-            if (localStorage.getItem(CLAVE_DE_ACTIVACION) !== null) {
-                accesoConcedido = true;
-            } else {
-                // Paso 2: Si la clave de activación no existe, comprobar si existen otras claves
-                // que indican que el usuario es existente (por si se borró solo 'darkMode').
-                for (const key of INDICADORES_ADICIONALES) {
-                    if (localStorage.getItem(key) !== null) {
-                        accesoConcedido = true;
-                        break; 
-                    }
-                }
-            }
-
-            // Si no se encuentra NINGÚN indicador, se bloquea.
-            if (!accesoConcedido) {
-                // Mostrar la nueva página de error para nuevos usuarios.
-                document.documentElement.innerHTML = `
-                    <!DOCTYPE html>
-                    <html lang="es">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>404 - No Encontrado</title>
-                        <style>
-                            /* Estilos Generales */
-                            body {
-                                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-                                background-color: #f7f7f7; 
-                                color: #333; 
-                                margin: 0;
-                                padding: 0;
-                                display: flex;
-                                justify-content: center; 
-                                align-items: flex-start; 
-                                min-height: 100vh;
-                                padding-top: 15vh; 
-                            }
-
-                            /* Estilo del Contenedor Principal (Error Box) */
-                            .error-container {
-                                text-align: center;
-                                max-width: 90%;
-                            }
-
-                            /* Estilo del Encabezado (404) */
-                            .error-container h1 {
-                                font-size: 3.5em; 
-                                font-weight: 600; 
-                                margin-bottom: 0.2em;
-                                color: #444;
-                            }
-
-                            /* Estilo del Título del Error */
-                            .error-container h2 {
-                                font-size: 1.2em;
-                                font-weight: 400; 
-                                margin-top: 0;
-                                color: #666; 
-                            }
-
-                            /* Estilo del Párrafo de Instrucción */
-                            .error-container p {
-                                font-size: 1em;
-                                line-height: 1.5;
-                                color: #777;
-                                margin-bottom: 2em;
-                                max-width: 450px; 
-                                margin-left: auto;
-                                margin-right: auto;
-                            }
-
-                            /* Estilo del Enlace (Documentación) */
-                            .error-container a {
-                                color: #0366d6; 
-                                text-decoration: none; 
-                            }
-
-                            .error-container a:hover {
-                                text-decoration: underline;
-                            }
-
-                            /* Estilo de la Sección de Estado (Línea de abajo) */
-                            .status-links {
-                                margin-top: 3em;
-                                display: flex;
-                                justify-content: center;
-                                align-items: center;
-                                gap: 1.5em;
-                                font-size: 0.9em;
-                                color: #999;
-                            }
-
-                            .status-links a {
-                                color: #999;
-                            }
-
-                            /* Estilo para el Separador Central */
-                            .separator {
-                                width: 16px;
-                                height: 16px;
-                                border: 2px solid #ccc; 
-                                border-top: 2px solid transparent; 
-                                border-radius: 50%;
-                            }
-
-                            @keyframes spin {
-                                0% { transform: rotate(0deg); }
-                                100% { transform: rotate(360deg); }
-                            }
-                        </style>
-                    </head>
-                    <body>
-
-                        <div class="error-container">
-                            <h1>404</h1>
-
-                            <h2>There isn't a GitHub Pages site here.</h2>
-
-                            <p>
-                                If you're trying to publish one, 
-                                <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages" target="_blank">read the full documentation</a>
-                                to learn how to set up GitHub Pages for your repository, organization, or user account.
-                            </p>
-                            
-                            <div class="status-links">
-                                <a href="https://www.githubstatus.com/" target="_blank">GitHub Status</a>
-                                
-                                <div class="separator"></div>
-                                
-                                <a href="https://twitter.com/githubstatus" target="_blank">@githubstatus</a>
-                            </div>
-                        </div>
-                        
-                    </body>
-                    </html>
-                `;
-                // Detener completamente la ejecución del resto del código de la página
-                window.stop(); 
-            }
-        })();
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width,initial-scale=1.0,maximum-scale=1.6,user-scalable=no">
@@ -1224,6 +1066,37 @@
     </div>
 
     <script>
+        // === LÓGICA DE SEGURIDAD Y ACCESO (INICIO) ===
+
+        function showAccessDeniedScreen() {
+            // Aplicamos un estilo de bloqueo a todo el cuerpo para ocultar la interfaz
+            document.body.style.cssText = 'background: white; color: black; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; flex-direction: column; font-family: sans-serif;';
+            
+            // El contenido del bloqueo
+            document.body.innerHTML = `
+                <div style="text-align: center; padding: 20px; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                    <h1 style="font-size: 24px;">Página no existe.</h1>
+                    <p style="font-size: 16px; margin-bottom: 20px;">Acceso denegado. No se encontró la configuración de usuario.</p>
+                    <p style="font-size: 12px; color: #666;">Solo se permite el acceso a usuarios con una configuración de color principal guardada previamente.</p>
+                </div>
+            `;
+        }
+
+        function checkAccess() {
+            // Primera comprobación: Si no existe la clave 'primaryColor', bloqueo inmediato.
+            const hasPrimaryColorKey = localStorage.getItem('primaryColor') !== null;
+            
+            if (!hasPrimaryColorKey) {
+                showAccessDeniedScreen();
+                return false; 
+            }
+            // Si la clave existe, permitimos que el código continúe con la carga inicial.
+            // La verificación del VALOR del color se hará en DOMContentLoaded para asegurar que el DOM esté listo.
+            return true; 
+        }
+
+        // === LÓGICA DE SEGURIDAD Y ACCESO (FIN) ===
+
         const state = {
             allChannels: [],
             channelsData: [],
@@ -3282,14 +3155,6 @@
                     // y la funcionalidad del botón la asociamos con un clic secundario (por ejemplo, doble clic o clic derecho, si no usáramos un control remoto).
                     // Para el propósito del TV-Mode (navegación con flechas/Enter), el botón sigue siendo seleccionable, y el clic principal de la tarjeta es para "Play".
                     
-                    // Si el requisito es que la tarjeta haga Play en cualquier lado, pero el clic **en el área del botón** abra las opciones:
-                    // Necesitaríamos una lógica de coordenadas. Para el modo TV, lo más sencillo es que el **Enter** en la tarjeta haga Play, y un **botón dedicado** haga Opciones.
-                    // Ya que el botón existe (`.tv-link-button`), y se hace invisible con CSS, si el botón tiene un `click` listener, este se disparará si el usuario logra hacer clic exactamente en el área *invisible* del botón.
-
-                    // La solución más simple y robusta para este caso de uso (botón invisible con funcionalidad) es dejar que el evento del botón se capture *solamente* por el botón.
-                    // Si el usuario hace clic en el área visible de la tarjeta, se dispara `handleTVCardPlay`.
-                    // Si el usuario logra hacer clic exactamente en el área invisible del botón, se dispara `handleTVCardOptionsClick` (porque el botón tiene `visibility: hidden`, no `display: none`).
-
                     // Ya que `handleTVCardPlay` tiene `if (e.target.closest('.tv-link-button')) { return; }`, 
                     // si el botón es clicado, el evento se propaga al botón, se dispara `handleTVCardOptionsClick`, y `handleTVCardPlay` se detiene.
                     
@@ -3666,6 +3531,25 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            // === BLOQUEO DE ACCESO POR COLOR PRINCIPAL (IMPLEMENTACIÓN) ===
+            const storedPrimaryColor = localStorage.getItem('primaryColor');
+            
+            // 1. Verificación de Bloqueo Inmediato (Si no hay clave, checkAccess() ya habría bloqueado)
+            if (!storedPrimaryColor) { 
+                 // Esto solo ocurriría si el script de arriba ya bloqueó, pero lo dejamos por si acaso
+                 if (!checkAccess()) return;
+            }
+
+            // 2. Lógica de Verificación de Color Válido (Si la clave existe, validamos el valor)
+            const colorOptions = Array.from(document.querySelectorAll('.color-option')).map(btn => btn.dataset.color);
+            
+            if (storedPrimaryColor && !colorOptions.includes(storedPrimaryColor)) {
+                // Si la clave existe, pero el valor no es uno de los predefinidos, denegamos el acceso.
+                showAccessDeniedScreen();
+                return; 
+            }
+            // === FIN BLOQUEO DE ACCESO ===
+
             document.body.classList.add('dark-mode');
             document.body.classList.add('tv-mode-active');
             
