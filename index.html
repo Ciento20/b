@@ -53,7 +53,15 @@
             --era-source-color: #f55d3e;
             --channel-name-color: #888888;
             --player-bg: black;
-            --channel-number-color: #4b5563
+            --channel-number-color: #4b5563;
+            /* NUEVOS ESTILOS PARA EL STAGE */
+            --stage-bg: #1e1e1e; /* Fondo por defecto para el stage */
+            --stage-overlay-color: rgba(0, 0, 0, 0.4);
+            --stage-channel-name-color: #ffffff;
+            --stage-text-color: #cccccc;
+            --stage-live-color: #dc2626;
+            --stage-upcoming-color: #3b82f6;
+            --stage-finished-color: #888888;
         }
 
         body.dark-mode {
@@ -65,7 +73,10 @@
             --primary-light: rgba(var(--primary-rgb), 0.2);
             --channel-name-color: #e2e2ff;
             --player-bg: #1e1e1e;
-            --channel-number-color: #b0b0b0
+            --channel-number-color: #b0b0b0;
+            /* NUEVOS ESTILOS PARA EL STAGE (Modo Oscuro) */
+            --stage-bg: #1e1e1e;
+            --stage-overlay-color: rgba(0, 0, 0, 0.5);
         }
 
         body {
@@ -631,7 +642,7 @@
 
         #tvMainContent {
             margin-left: 50px; /* Reducido a la mitad: 100px -> 50px */
-            padding: 0.75rem 1.25rem; /* Reducido a la mitad: 1.5rem 2.5rem -> 0.75rem 1.25rem */
+            padding: 0 1.25rem; /* AJUSTE: Quitamos el padding top para que Stage use el espacio */
             min-height: 100vh;
             background: #151515;
             display: flex; /* Nuevo: Habilitar flexbox */
@@ -703,9 +714,7 @@
         }
 
         .tv-channels-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem; /* Reducido a la mitad: 2.5rem -> 1.25rem */
+            padding-top: 0.75rem; /* Añadido: Restaurar el padding que se eliminó en #tvMainContent para dejar espacio al Stage */
             flex-grow: 1; /* Nuevo: Asegura que la cuadrícula ocupe el espacio restante */
             min-height: 0; /* Fix para flex-grow en algunos navegadores */
             justify-content: flex-start; /* Por defecto, alinear arriba */
@@ -720,6 +729,16 @@
             padding: 0 0 0.4rem 0; /* Reducido a la mitad: 0.8rem -> 0.4rem */
             display: flex;
             align-items: center;
+            /* Estilo para que se vea clickable en TV Mode */
+            cursor: pointer; 
+            transition: background-color 0.2s;
+            border-radius: var(--radius-sm);
+        }
+        
+        /* Nuevo: Estilo de foco para el encabezado */
+        .tv-group-header:focus, .tv-group-header:hover {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.05);
         }
 
         .tv-group-title {
@@ -942,6 +961,768 @@
              min-height: 50vh; /* Para que al menos se centre en una parte visible de la pantalla */
              gap: 0;
         }
+        
+        /* ############################# */
+        /* ### ESTILOS STAGE INMERSIVO ### */
+        /* ############################# */
+        #tvStage {
+            position: relative;
+            /* CAMBIO CLAVE: Eliminar altura variable (20vh) y usar aspect-ratio */
+            height: auto; 
+            min-height: 150px;
+            aspect-ratio: 16 / 9; /* NUEVO: Relación de aspecto 16:9 forzada */
+            width: 100%;
+            
+            margin-bottom: 0.75rem; /* Espacio con la cuadrícula de abajo */
+            border-radius: var(--radius-md);
+            /* ELIMINAR background-color: var(--stage-bg); */
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            color: var(--stage-text-color);
+            transition: background-color 0.5s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        /* ELIMINAR: #tvStage::before { ... } */
+        #tvStage::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 15vh; /* Emoji grande centrado */
+            opacity: 0.1;
+            filter: grayscale(100%);
+            pointer-events: none;
+            transition: all 0.5s ease;
+            /* Ocultado para que el fondo CSS lo reemplace */
+            display: none; 
+        }
+
+        #tvStage .stage-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--stage-overlay-color);
+            z-index: 1;
+        }
+
+        #tvStage .stage-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            padding: 1rem 0.5rem; /* Reducido de 1.5rem 1rem */
+            width: 100%;
+            height: 100%;
+            transform: scale(0.9); /* <--- APLICACIÓN DE LA REDUCCIÓN DEL 10% */
+            transform-origin: center center;
+            transition: transform 0.3s ease; /* Para que la escala sea suave */
+        }
+        
+        #tvStage .stage-icon-container {
+            width: 10vh; 
+            height: 10vh;
+            min-width: 60px;
+            min-height: 60px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.1);
+            margin-right: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        #tvStage .stage-icon {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+        }
+
+        #tvStage .stage-text-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        #tvStage .stage-channel-name {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--stage-channel-name-color);
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #tvStage .stage-main-info {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        #tvStage .stage-secondary-info {
+            font-size: 0.6rem;
+            color: var(--stage-text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        #tvStage .stage-progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.25rem;
+        }
+
+        #tvStage .stage-progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--stage-live-color);
+            transition: width 0.5s ease, background-color 0.3s;
+        }
+        
+        #tvStage .stage-status {
+            font-size: 0.6rem;
+            font-weight: 700;
+            margin-right: 10px;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        #tvStage .status-live {
+            background-color: var(--stage-live-color);
+            color: white;
+            animation: soft-blink 1.5s infinite ease-in-out;
+        }
+        
+        #tvStage .status-upcoming {
+            background-color: var(--stage-upcoming-color);
+            color: white;
+        }
+
+        #tvStage .status-finished {
+            background-color: var(--stage-finished-color);
+            color: white;
+        }
+        
+        #tvStage .status-none {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: var(--stage-text-color);
+        }
+        
+        #tvStage .stage-no-event {
+            font-size: 0.8rem;
+            color: var(--stage-text-color);
+            font-style: italic;
+        }
+
+        /* Carrusel para modo no-foco */
+        #tvStage.carousel-mode {
+            cursor: pointer;
+        }
+        
+        .carousel-indicator {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 3px;
+        }
+        
+        .carousel-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3);
+            transition: background-color 0.3s;
+        }
+        
+        .carousel-dot.active {
+            background-color: var(--primary);
+        }
+        
+        /* ############################# */
+        /* ### ESTILOS DE CAMPO CSS ### */
+        /* ############################# */
+        
+        /* ESTILOS BASE DE CAMPO (DIMENSIONES UNIFORMES 16:9) */
+        .campo-base {
+            border: 3px solid #ccc;
+            position: absolute; /* Para que ocupe todo el #tvStage */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+            border-radius: var(--radius-md);
+        }
+
+
+        /* --- 1. FÚTBOL --- */
+
+        .campo-futbol {
+            background-color: #1a5e37;
+            border-color: #ffffff;
+            border-width: 5px; /* RESTAURADO a 5px */
+        }
+
+        /* Líneas y Áreas de Fútbol (Ajustadas para 150px de alto y 267px de ancho) */
+        .campo-futbol::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); height: 100%; width: 3px; background-color: #ffffff; } /* RESTAURADO a 3px */
+        
+        /* MODIFICACIÓN: Círculo central de fútbol ajustado a las dimensiones del círculo de baloncesto (40px de ancho/alto y 2px de borde) */
+        .campo-futbol::after { 
+            content: ''; 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 40px; /* ANTES: 60px */
+            height: 40px; /* ANTES: 60px */
+            border-radius: 50%; 
+            border: 2px solid #ffffff; /* ANTES: 3px */
+            /* ELIMINADO: box-shadow: 0 0 0 3px #ffffff inset; */
+        } 
+        
+        /* Áreas de penalti y meta restauradas */
+        .area-penalti-izq { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 40px; height: 90px; border: 3px solid #ffffff; border-left: none; box-sizing: border-box; } /* RESTAURADO a 3px */
+        .area-meta-izq { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 15px; height: 40px; border: 3px solid #ffffff; border-left: none; box-sizing: border-box; } /* RESTAURADO a 3px */
+        .punto-penalti-izq { position: absolute; top: 50%; left: 30px; transform: translateY(-50%); width: 4px; height: 4px; border-radius: 50%; background-color: #ffffff; } /* RESTAURADO a 4px */
+        .porteria-izq { position: absolute; top: 50%; left: -5px; transform: translateY(-50%); width: 5px; height: 25px; background-color: #ffffff; z-index: 20; } /* RESTAURADO a 5px */
+
+        .area-penalti-der { position: absolute; top: 50%; right: 0; transform: translateY(-50%); width: 40px; height: 90px; border: 3px solid #ffffff; border-right: none; box-sizing: border-box; } /* RESTAURADO a 3px */
+        .area-meta-der { position: absolute; top: 50%; right: 0; transform: translateY(-50%); width: 15px; height: 40px; border: 3px solid #ffffff; border-right: none; box-sizing: border-box; } /* RESTAURADO a 3px */
+        .punto-penalti-der { position: absolute; top: 50%; right: 30px; transform: translateY(-50%); width: 4px; height: 4px; border-radius: 50%; background-color: #ffffff; } /* RESTAURADO a 4px */
+        .porteria-der { position: absolute; top: 50%; right: -5px; transform: translateY(-50%); width: 5px; height: 25px; background-color: #ffffff; z-index: 20; } /* RESTAURADO a 5px */
+
+
+        /* --- 2. BALONCESTO (RESTAURADO) --- */
+        .campo-baloncesto { background-color: #ff8608; border-color: #ffffff; }
+        .campo-baloncesto::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); height: 100%; width: 2px; background-color: #ffffff; } /* RESTAURADO a 2px */
+        .campo-baloncesto::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; border-radius: 50%; border: 2px solid #ffffff; } /* ESTE es el círculo de referencia (40px/40px, 2px de borde) */
+        
+        /* Zonas de 3 y canastas restauradas */
+        .zona-3-izq { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 50px; height: 110px; border: 2px solid #ffffff; border-left: none; border-radius: 0 50% 50% 0 / 0 70% 70% 0; box-sizing: border-box; } /* RESTAURADO a 2px */
+        .canasta-izq { position: absolute; top: 50%; left: -1px; transform: translateY(-50%); width: 10px; height: 2px; background-color: #ffffff; } /* RESTAURADO a 2px */
+        .zona-3-der { position: absolute; top: 50%; right: 0; transform: translateY(-50%); width: 50px; height: 110px; border: 2px solid #ffffff; border-right: none; border-radius: 50% 0 0 50% / 70% 0 0 70%; box-sizing: border-box; } /* RESTAURADO a 2px */
+        .canasta-der { position: absolute; top: 50%; right: -1px; transform: translateY(-50%); width: 10px; height: 2px; background-color: #ffffff; } /* RESTAURADO a 2px */
+
+        /* --- 3. TENIS (MODIFICADO: AHORA ES IGUAL QUE PÁDEL AZUL Y SE CAMBIA A VERDE) --- */
+        .campo-tenis {
+            /* INICIO DE MODIFICACIÓN PARA COLOR VERDE */
+            background-color: #4c9e5e; /* Fondo de Tenis Verde */
+            /* Borde exterior de 2px blanco para que coincida con las líneas de servicio. */
+            border: 2px solid #ffffff; 
+            /* FIN DE MODIFICACIÓN */
+        }
+        
+        /* Red Central (antes ::before) */
+        .campo-tenis::before {
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            height: 100%; 
+            width: 5px; /* Red de Pádel */
+            background-color: #ffffff; 
+            z-index: 10;
+        } 
+        
+        /* Se eliminan los estilos ::after y las líneas de servicio originales de tenis.
+           Las líneas de servicio se definen ahora como clases del pádel: */
+           
+        /* Línea de Servicio Transversal IZQUIERDA (Estilo de Padel) */
+        .campo-tenis .linea-padel-servicio-izq { /* Uso de .campo-tenis para seleccionar solo las líneas dentro de esta cancha */
+            position: absolute; 
+            top: 0; 
+            left: calc(15% - 1px); 
+            height: 100%; 
+            width: 2px; 
+            background-color: #ffffff; 
+            z-index: 10; 
+        }
+
+        /* Línea de Servicio Transversal DERECHA (Estilo de Padel) */
+        .campo-tenis .linea-padel-servicio-der { /* Uso de .campo-tenis para seleccionar solo las líneas dentro de esta cancha */
+            position: absolute; 
+            top: 0; 
+            right: calc(15% - 1px); 
+            height: 100%; 
+            width: 2px; 
+            background-color: #ffffff; 
+            z-index: 10; 
+        }
+        
+        /* Línea Central de Servicio (Estilo de Padel) */
+        .campo-tenis .linea-padel-central-servicio-corregida { /* Uso de .campo-tenis para seleccionar solo las líneas dentro de esta cancha */
+            position: absolute;
+            top: 50%; 
+            transform: translateY(-50%);
+            left: 15%; 
+            width: 70%; 
+            height: 2px; 
+            background-color: #ffffff;
+            z-index: 12;
+        }
+
+        /* --- NUEVAS LÍNEAS DE DOBLES HORIZONTALES (Superior e Inferior) --- */
+        .campo-tenis .linea-dobles-sup {
+            position: absolute;
+            top: 5px; /* Distancia del borde superior */
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #ffffff;
+            z-index: 15;
+        }
+
+        .campo-tenis .linea-dobles-inf {
+            position: absolute;
+            bottom: 5px; /* Distancia del borde inferior */
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #ffffff;
+            z-index: 15;
+        }
+        /* FIN DE MODIFICACIÓN DE .campo-tenis */
+
+        /* --- 5. RUGBY (RESTAURADO) --- */
+        .campo-rugby { 
+            background-color: #2e7a3f; 
+            border-color: #ffffff; 
+            border-width: 8px; /* RESTAURADO a 8px */ 
+            border-radius: 0; 
+            overflow: hidden; 
+        } 
+        
+        /* Línea central */
+        .campo-rugby::before { 
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            height: 100%; 
+            width: 2px; 
+            background-color: #ffffff; 
+        } /* RESTAURADO a 2px */
+        
+        /* Línea de 10 y 22 metros */
+        .linea-10-izq { position: absolute; top: 0; left: 40%; height: 100%; width: 2px; background-color: #ffffff; } /* RESTAURADO a 2px */
+        .linea-10-der { position: absolute; top: 0; right: 40%; height: 100%; width: 2px; background-color: #ffffff; } /* RESTAURADO a 2px */
+        .linea-22-izq { position: absolute; top: 0; left: 20%; height: 100%; width: 2px; background-color: #ffffff; } /* RESTAURADO a 2px */
+        .linea-22-der { position: absolute; top: 0; right: 20%; height: 100%; width: 2px; background-color: #ffffff; } /* RESTAURADO a 2px */
+
+        /* Líneas discontinuas de 5m */
+        .linea-5m-izq { 
+            position: absolute; 
+            top: 0; 
+            left: 5%; 
+            width: 2px; /* RESTAURADO a 2px */
+            height: 100%; 
+            background-image: linear-gradient(to bottom, #ffffff 50%, transparent 50%); 
+            background-size: 100% 10px; 
+        }
+        .linea-5m-der { 
+            position: absolute; 
+            top: 0; 
+            right: 5%; 
+            width: 2px; /* RESTAURADO a 2px */
+            height: 100%; 
+            background-image: linear-gradient(to bottom, #ffffff 50%, transparent 50%); 
+            background-size: 100% 10px; 
+        }
+
+
+        /* --- 6. BALONMANO (RESTAURADO) --- */
+        .campo-balonmano { background-color: #cccccc; border-color: #333; overflow: hidden; }
+        .campo-balonmano::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); height: 100%; width: 2px; background-color: #ffffff; } /* RESTAURADO a 2px */
+        /* Áreas de arco restauradas */
+        .arco-6-izq { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 35px; height: 110px; border: 2px solid #ffffff; border-left: none; border-radius: 0 50% 50% 0 / 0 90% 90% 0; box-sizing: border-box; } /* RESTAURADO a 2px */
+        .arco-9-izq { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 55px; height: 130px; border: 2px dashed #ffffff; border-left: none; border-radius: 0 50% 50% 0 / 0 110% 110% 0; box-sizing: border-box; } /* RESTAURADO a 2px */
+        .arco-6-der { position: absolute; top: 50%; right: 0; transform: translateY(-50%); width: 35px; height: 110px; border: 2px solid #ffffff; border-right: none; border-radius: 50% 0 0 50% / 90% 0 0 90%; box-sizing: border-box; } /* RESTAURADO a 2px */
+        .arco-9-der { position: absolute; top: 50%; right: 0; transform: translateY(-50%); width: 55px; height: 130px; border: 2px dashed #ffffff; border-right: none; border-radius: 50% 0 0 50% / 110% 0 0 110%; box-sizing: border-box; } /* RESTAURADO a 2px */
+
+        /* --- 7. NATACIÓN (PISCINA - RESTAURADA) --- */
+
+        .piscina {
+            background-color: #3f7b9e; 
+            border-color: #000000;
+            overflow: hidden;
+        }
+
+        /* Líneas de Carril */
+        .carril-1, .carril-2, .carril-3 {
+            position: absolute;
+            width: 100%;
+            height: 4px; /* RESTAURADO a 4px */
+            
+            /* Patrón de puntos blancos y rojos */
+            background-image: repeating-linear-gradient(90deg, #ffffff, #ffffff 5px, #ff0000 5px, #ff0000 10px);
+            background-size: 10px 100%; 
+            background-repeat: repeat-x;
+        }
+
+        .carril-1 { top: 25%; }
+        .carril-2 { top: 50%; } 
+        .carril-3 { top: 75%; }
+        
+        /* Línea de inicio/final */
+        .piscina::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 0;
+            height: 100%;
+            width: 2px; /* RESTAURADO a 2px */
+            background-color: yellow;
+        }
+
+        /* ------------------------------------------- */
+        /* --- 8. ATLETISMO (PISTA DE 400M) - MODIFICADO A SEMICÍRCULOS MÁS PRONUNCIADOS --- */
+        /* ------------------------------------------- */
+        /* Conversión: 267px ancho, 150px alto */
+
+        .pista-atletismo {
+            background-color: #9e4b3f; 
+            border: none;
+            /* Mantiene el radio en píxeles, la mitad de la altura de la pista base (150px / 2 = 75px) */
+            border-radius: 75px / 75px; 
+            overflow: hidden; /* Cambiado de 'visible' a 'hidden' para contener mejor la forma */
+        }
+
+        /* Césped Interior */
+        .pista-atletismo::before {
+            content: '';
+            position: absolute;
+            /* Conversión: top: 20px -> 13.33% (20/150) | left: 20px -> 7.49% (20/267) */
+            top: 13.33%; 
+            left: 7.49%; 
+            /* Conversión: width: 227px -> 85.02% (227/267) | height: 110px -> 73.33% (110/150) */
+            width: 85.02%; 
+            height: 73.33%; 
+            background-color: #2e7a3f; 
+            /* Mantiene el radio en píxeles, la mitad de la altura del césped (110px / 2 = 55px) */
+            border-radius: 55px / 55px; 
+            z-index: 1;
+        }
+        
+        /* Línea del primer carril (el más exterior) */
+        .pista-atletismo::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: 1px solid #ffffff; 
+            /* Mantiene el radio en píxeles */
+            border-radius: 75px / 75px; 
+            z-index: 2;
+        }
+        
+        /* Carriles Interiores (Línea de inicio/fin) */
+        .pista-atletismo .carriles-interiores {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border-left: 3px solid #ffffff; 
+            /* Mantiene el radio en píxeles */
+            border-radius: 75px / 75px; 
+            box-sizing: border-box;
+            z-index: 5;
+        }
+        
+        /* Simulación de los 4 carriles interiores (del 4 al 1) */
+        .pista-atletismo .carriles-interiores::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            /* Mantiene el radio en píxeles */
+            border-radius: 75px / 75px; 
+            box-sizing: border-box;
+            /* El sombreado interior crea las líneas de carril, se mantiene el grosor de 8px */
+            box-shadow: 
+                0 0 0 1px #ffffff inset, 
+                0 0 0 8px #9e4b3f inset, 
+                0 0 0 9px #ffffff inset, 
+                0 0 0 16px #9e4b3f inset, 
+                0 0 0 17px #ffffff inset, 
+                0 0 0 24px #9e4b3f inset, 
+                0 0 0 25px #ffffff inset; 
+            z-index: 10;
+        }
+
+        /* --- 9. CICLISMO (SKILINE MONTAÑA - RESTAURADO A ORIGINAL) --- */
+        
+        .skyline-montana {
+            background-image: linear-gradient(to bottom, #87ceeb, #ffffff 80%); /* RESTAURADO: Cielo azul */
+            border: 3px solid #ccc; 
+            overflow: hidden;
+        }
+
+        /* Montaña de primer plano y fondo (RESTURADO) */
+        .skyline-montana::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70%; 
+            background-color: #587950; /* RESTAURADO: Tono verde oscuro */
+            clip-path: polygon(0% 100%, 10% 30%, 25% 65%, 40% 10%, 60% 75%, 85% 40%, 100% 70%, 100% 100%); /* RESTAURADO: Picos angulares */
+            z-index: 10;
+        }
+        
+        .skyline-montana::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -10%; 
+            width: 120%;
+            height: 50%;
+            background-color: #8db587; /* RESTAURADO: Tono verde claro */
+            clip-path: polygon(0% 100%, 15% 45%, 30% 20%, 50% 60%, 70% 35%, 90% 55%, 100% 40%, 100% 100%); /* RESTAURADO: Picos angulares */
+            z-index: 5;
+        }
+
+
+        /* --- 10. MOTORSPORT (CIRCUITO SINUOSO - MODIFICADO CON %) --- */
+        /* Conversión: 267px ancho, 150px alto */
+        .circuito-motorsport { background-color: #8c8c8c; border-color: #f0f0f0; overflow: hidden; }
+        
+        /* Trazado (::before) */
+        .circuito-motorsport::before { 
+            content: ''; 
+            position: absolute; 
+            /* Conversión: top: 10px -> 6.67% | left: 10px -> 3.75% */
+            top: 6.67%; 
+            left: 3.75%; 
+            /* Conversión: width: 247px -> 92.51% | height: 130px -> 86.67% */
+            width: 92.51%; 
+            height: 86.67%;
+            background-color: transparent; 
+            border: 15px solid #636363; /* Mantenido en px */
+            border-radius: 80% 30% 90% 20% / 40% 70% 30% 60%; 
+            box-sizing: border-box; 
+            z-index: 1;
+        }
+        
+        /* Césped Interior (::after) */
+        .circuito-motorsport::after { 
+            content: ''; 
+            position: absolute; 
+            /* Conversión: top: 30px -> 20% | left: 30px -> 11.24% */
+            top: 20%; 
+            left: 11.24%; 
+            /* Conversión: width: 207px -> 77.53% | height: 90px -> 60% */
+            width: 77.53%; 
+            height: 60%;
+            background-color: #2e7a3f; 
+            border-radius: 80% 30% 90% 20% / 40% 70% 30% 60%; 
+            box-sizing: border-box; 
+            z-index: 2;
+        }
+        
+        /* Bandera a cuadros (meta-salida) */
+        .meta-salida { 
+            position: absolute; 
+            /* MODIFICADO: Centrado con translateY(-50%) */
+            top: 50%; 
+            transform: translateY(-50%);
+            left: 5px; 
+            width: 30px; 
+            height: 10px; 
+            z-index: 30; 
+            background-color: white; 
+            background-image: 
+                linear-gradient(45deg, #000 25%, transparent 25%), 
+                linear-gradient(-45deg, #000 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #000 75%), 
+                linear-gradient(-45deg, transparent 75%, #000 75%);
+            background-size: 10px 10px; 
+            background-position: 0 0, 0 5px, 5px -5px, -5px 0px; 
+        }
+
+
+        /* --- 11. PÁDEL AZUL (RESTAURADO) --- */
+        .campo-padel-azul {
+            background-color: #0b4e8e; 
+            border: 3px solid #000000; /* RESTAURADO a 3px */
+            box-shadow: 
+                0 0 0 5px rgba(255, 255, 255, 0.4) inset, 
+                0 0 0 8px rgba(0, 0, 0, 0.2) inset; 
+        }
+        
+        /* Red Central */
+        .campo-padel-azul::before {
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            height: 100%; 
+            width: 5px; /* RESTAURADO a 5px */
+            background-color: #ffffff; 
+            z-index: 10;
+        }
+        
+        /* Línea de Servicio Transversal IZQUIERDA */
+        .linea-padel-servicio-izq { 
+            position: absolute; 
+            top: 0; 
+            left: calc(15% - 1px); 
+            height: 100%; 
+            width: 2px; /* RESTAURADO a 2px */
+            background-color: #ffffff; 
+            z-index: 10; 
+        }
+
+        /* Línea de Servicio Transversal DERECHA */
+        .linea-padel-servicio-der { 
+            position: absolute; 
+            top: 0; 
+            right: calc(15% - 1px); 
+            height: 100%; 
+            width: 2px; /* RESTAURADO a 2px */
+            background-color: #ffffff; 
+            z-index: 10; 
+        }
+        
+        /* Línea Central de Servicio */
+        .linea-padel-central-servicio-corregida {
+            position: absolute;
+            top: 50%; 
+            transform: translateY(-50%);
+            left: 15%; 
+            width: 70%; 
+            height: 2px; /* RESTAURADO a 2px */
+            background-color: #ffffff;
+            z-index: 12;
+        }
+
+
+        /* --- 12. CIRCUITO COMPLEJO (ÓVALO - MODIFICADO CON %) --- */
+        /* Conversión: 267px ancho, 150px alto */
+        .circuito-complejo {
+            background-color: #8c8c8c; 
+            border: 3px solid #f0f0f0; /* RESTAURADO a 3px */
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        /* Trazado (::before) */
+        .circuito-complejo::before {
+            content: '';
+            position: absolute;
+            /* Conversión: top: 15px -> 10% | left: 15px -> 5.62% */
+            top: 10%;
+            left: 5.62%;
+            /* Conversión: width: 237px -> 88.76% | height: 120px -> 80% */
+            width: 88.76%; 
+            height: 80%;
+            background-color: transparent;
+            border: 15px solid #636363; /* Mantenido en px */
+            box-sizing: border-box;
+            border-radius: 50% / 40%;
+            z-index: 1;
+        }
+
+        /* Césped Interior (::after) */
+        .circuito-complejo::after {
+            content: '';
+            position: absolute;
+            /* Conversión: top: 35px -> 23.33% | left: 35px -> 13.11% */
+            top: 23.33%;
+            left: 13.11%;
+            /* Conversión: width: 197px -> 73.78% | height: 80px -> 53.33% */
+            width: 73.78%; 
+            height: 53.33%;
+            background-color: #2e7a3f; 
+            box-sizing: border-box;
+            border-radius: 50% / 40%; 
+            z-index: 2;
+        }
+        
+        /* Bandera a cuadros (meta-salida) */
+        .circuito-complejo .meta-salida { 
+            position: absolute; 
+            top: 50%; 
+            left: 10px; 
+            transform: translateY(-50%);
+            width: 30px; 
+            height: 10px; 
+            z-index: 30; 
+            /* Se reutiliza la clase .meta-salida con el patrón de cuadros */
+        }
+
+        /* --- 13. RALLY / DAKAR (MODIFICADO: DUNAS DEL DESIERTO) --- */
+
+        .campo-rally {
+            /* CAMBIO: Fondo cálido para el cielo del desierto (reemplaza el color arena) */
+            background-image: linear-gradient(to bottom, #ffdb58, #ffffff 80%); 
+            border: 4px solid #9e7b4e; 
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        /* ELIMINADO: Trazado Punteado (Ruta Off-Road) */
+        .campo-rally::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70%; 
+            background-color: #c2b280; /* Duna de primer plano: Tono arena oscuro */
+            /* Patrón de dunas suaves */
+            clip-path: polygon(0% 100%, 10% 70%, 25% 45%, 40% 60%, 60% 30%, 85% 55%, 100% 40%, 100% 100%);
+            z-index: 10;
+        }
+        
+        .campo-rally::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -10%; 
+            width: 120%;
+            height: 50%;
+            background-color: #e3d8b5; /* Duna de fondo: Tono beige/arena claro */
+            /* Patrón de dunas suaves */
+            clip-path: polygon(0% 100%, 15% 55%, 30% 35%, 50% 45%, 70% 20%, 90% 40%, 100% 30%, 100% 100%);
+            z-index: 5;
+        }
+
+
+        /* ############################# */
+        /* ### FIN ESTILOS DE CAMPO CSS ### */
+        /* ############################# */
+        
     </style>
 </head>
 
@@ -980,8 +1761,39 @@
         </div>
     </aside>
     <main id="tvMainContent">
-        <div id="tvStatusMessageContainer" style="margin-bottom: 0.75rem;"></div>
-        <h1 style="color: white; margin-top: 0;"></h1>
+        <div id="tvStage"> 
+            <div id="tvStageBackground" class="campo-base pista-atletismo"> 
+                <div class="area-penalti-izq"></div>
+                <div class="area-meta-izq"></div>
+                <div class="punto-penalti-izq"></div>
+                <div class="porteria-izq"></div>
+                <div class="area-penalti-der"></div>
+                <div class="area-meta-der"></div>
+                <div class="punto-penalti-der"></div>
+                <div class="porteria-der"></div>
+                </div>
+
+            <div class="stage-overlay"></div>
+            <div class="stage-content">
+                <div class="stage-icon-container">
+                    <img id="stageChannelIcon" class="stage-icon" src="" alt="Icono del Canal" style="display: none;">
+                </div>
+                <div class="stage-text-area">
+                    <div id="stageStatusAndSecondary" style="display: flex; align-items: center; margin-bottom: 0.25rem;">
+                        <span id="stageStatus" class="stage-status status-none">CARGANDO...</span>
+                        <span id="stageSecondaryInfo" class="stage-secondary-info" style="margin-bottom: 0; margin-left: 5px;">Cargando lista de canales y eventos.</span>
+                    </div>
+                    <h3 id="stageChannelName" class="stage-channel-name">Bienvenido a la Guía TV.</h3>
+                    <h2 id="stageMainInfo" class="stage-main-info">Selecciona un canal para ver los detalles.</h2>
+                    <div id="stageProgressBarContainer" class="stage-progress-bar-container">
+                        <div id="stageProgressBar" class="stage-progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-indicator" id="stageCarouselIndicator"></div>
+        </div>
+        <div id="tvStatusMessageContainer"></div>
+        <h1 style="color: white; margin-top: 0; display: none;"></h1>
         <div class="tv-channels-grid" id="tvChannelsGrid"></div>
     </main>
 
@@ -1066,37 +1878,6 @@
     </div>
 
     <script>
-        // === LÓGICA DE SEGURIDAD Y ACCESO (INICIO) ===
-
-        function showAccessDeniedScreen() {
-            // Aplicamos un estilo de bloqueo a todo el cuerpo para ocultar la interfaz
-            document.body.style.cssText = 'background: white; color: black; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; flex-direction: column; font-family: sans-serif;';
-            
-            // El contenido del bloqueo
-            document.body.innerHTML = `
-                <div style="text-align: center; padding: 20px; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-                    <h1 style="font-size: 24px;">Página no existe.</h1>
-                    <p style="font-size: 16px; margin-bottom: 20px;">Acceso denegado. No se encontró la configuración de usuario.</p>
-                    <p style="font-size: 12px; color: #666;">Solo se permite el acceso a usuarios con una configuración de color principal guardada previamente.</p>
-                </div>
-            `;
-        }
-
-        function checkAccess() {
-            // Primera comprobación: Si no existe la clave 'primaryColor', bloqueo inmediato.
-            const hasPrimaryColorKey = localStorage.getItem('primaryColor') !== null;
-            
-            if (!hasPrimaryColorKey) {
-                showAccessDeniedScreen();
-                return false; 
-            }
-            // Si la clave existe, permitimos que el código continúe con la carga inicial.
-            // La verificación del VALOR del color se hará en DOMContentLoaded para asegurar que el DOM esté listo.
-            return true; 
-        }
-
-        // === LÓGICA DE SEGURIDAD Y ACCESO (FIN) ===
-
         const state = {
             allChannels: [],
             channelsData: [],
@@ -1123,6 +1904,11 @@
             fullScreenOnClick: localStorage.getItem('fullScreenOnClick') === 'true',
             // NUEVO ESTADO: Ocultar botón de opciones
             hideOptionsButton: localStorage.getItem('hideOptionsButton') === 'true',
+            // ESTADO STAGE
+            carouselChannels: [],
+            carouselIndex: 0,
+            carouselTimer: null,
+            isStageFocused: false,
         };
         const LOGOPEDIA_BASE_URL = "https://static.wikia.nocookie.net/logopedia/images/";
         const IMAGE_PROXY_URL = "https://images.weserv.nl/?url=";
@@ -1130,14 +1916,13 @@
         const championsLeagueImages = {
             'M+ LIGA DE CAMPEONES': '0/05/Liga_de_Campeones_por_Movistar_Plus%2B.svg/revision/latest?cb=20220128151054',
             'M+ COMEDIA': '2/27/Comedia_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230721191930',
-
             'M+ LIGA DE CAMPEONES 2': '3/33/Liga_de_Campeones_2_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171922',
             'M+ LIGA DE CAMPEONES 3': 'f/f8/Liga_de_Campeones_3_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171923',
             'M+ LIGA DE CAMPEONES 4': '0/0a/Liga_de_Campeones_4_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171811',
             'M+ LIGA DE CAMPEONES 5': 'b/b3/Liga_de_Campeones_5_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171812',
             'M+ LIGA DE CAMPEONES 6': 'd/d8/Liga_de_Campeones_6_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171813',
             'M+ LIGA DE CAMPEONES 7': 'b/bf/Liga_de_Campeones_7_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171814',
-            'M+ LIGA DE CAMPEONES 8': 'f/f8/Liga_de_Campeones_3_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171923',
+            'M+ LIGA DE CAMPEONES 8': '3/3f/Liga_de_Campeones_8_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171815',
             'M+ DEPORTES': 'd/d7/Deportes_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230721194319',
             'M+ DEPORTES 2': '7/7c/Deportes_2_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201028',
             'M+ DEPORTES 3': '4/40/Deportes_3_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230721201007',
@@ -1149,7 +1934,16 @@
             'M+ LA LIGA 3': '0/0e/LaLigaTV_3_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175336',
             'M+ LA LIGA 4': 'a/a2/LaLigaTV_4_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175337',
             'M+ LA LIGA 5': 'b/ba/LaLigaTV_5_por_Movistar_Plus%2B_2023.png/revision/latest?cb=20230708175338',
-            '★EUROSPORT 1': 'c/c8/Eurosport_1.svg/revision/latest?cb=20210911124742',
+            'M+ LIGA DE CAMPEONES 9': '5/5b/Liga_de_Campeones_9_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171816',
+            'M+ LIGA DE CAMPEONES 10': 'a/ad/Liga_de_Campeones_10_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171816',
+            'M+ LIGA DE CAMPEONES 11': 'e/e5/Liga_de_Campeones_11_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171817',
+            'M+ LIGA DE CAMPEONES 12': '1/1e/Liga_de_Campeones_12_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171818',
+            'M+ LIGA DE CAMPEONES 13': '0/02/Liga_de_Campeones_13_por_Movistar_Plus%2B.png/revision/latest?cb=20230708171819',
+            'M+ LIGA DE CAMPEONES 14': '1/10/Liga_de_Campeones_14_por_Movistar_Plus%2B.png/revision/latest?cb=20230708172106',
+            'M+ LIGA DE CAMPEONES 15': '0/0c/Liga_de_Campeones_15_por_Movistar_Plus%2B.png/revision/latest?cb=20230708172107',
+            'M+ LIGA DE CAMPEONES 16': '2/23/Liga_de_Campeones_16_por_Movistar_Plus%2B.png/revision/latest?cb=20230708172108',
+            'M+ LIGA DE CAMPEONES 17': '7/7b/Liga_de_Campeones_17_por_Movistar_Plus%2B.png/revision/latest?cb=20230708172109',
+            'LA 1': '1/19/Logo_TVE-1.svg/revision/latest?cb=20220319071348',            '★EUROSPORT 1': 'c/c8/Eurosport_1.svg/revision/latest?cb=20210911124742',
             'M+ PLUS': '0/07/Movistar_Plus%2B.svg/revision/latest?cb=20240116071854',
             'M+ FESTIVAL DE SAN SEBASTIÁN': '3/38/M%C3%BAsica_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230801070424',
             'M+ ROMANCE': '4/4d/Suspense_por_Movistar_Plus%2B_2023.svg/revision/latest?cb=20230801070149',
@@ -1180,6 +1974,47 @@
             'DAZN 2': '8/82/DAZN_2_2024.svg/revision/latest?cb=20240713212845',
             'DAZN 3': '0/0f/DAZN_3_2024.svg/revision/latest?cb=20240713212252',
             'DAZN 4': 'f/f7/DAZN_4_2024.svg/revision/latest?cb=20240713211915',
+        };
+        const SPORT_EMOJIS = {
+            'futbol': '⚽', 'baloncesto': '🏀', 'tenis': '🎾', 'motorsport': '🏁', 'f1': '🏎️',
+            'handball': '🤾‍♂️', 'paddle': '🥎', 'triatlon': '🏊🚴🏃', 'motor': '🚗', 'boxeo': '🥊',
+            'ciclismo': '🚴', 'beisbol': '⚾', 'golf': '⛳', 'voleibol': '🏐', 'hockey': '🏑',
+            'rugby': '🏉', 'natacion': '🏊', 'atletismo': '🏃', 'gimnasia': '🤸', 'esqui': '⛷️',
+            'surf': '🏄', 'e-sports': '🎮', 'ajedrez': '♟️', 'dardos': '🎯', 'billares': '🎱',
+            'patinaje': '⛸️', 'criquet': '🏏', 'default': '📺'
+        };
+        const SPORT_COLORS = {
+            'futbol': '#1a5e37', 
+            'baloncesto': '#e0974b', 
+            'tenis': '#5d9f3f', 
+            'paddle': '#0d8f5d', 
+            'padel': '#0b4e8e', 
+            'motorsport': '#8c8c8c', 
+            'f1': '#8c8c8c', 
+            'golf': '#4ee1b0', 
+            'rugby': '#2e7a3f',
+            'handball': '#cccccc',
+            'natacion': '#3f7b9e',
+            'atletismo': '#9e4b3f',
+            'ciclismo': '#6a5a4a',
+            'motor': '#8c8c8c', // RALLY / DAKAR
+            'default': '#9e4b3f', // PISTA DE ATLETISMO (TARTÁN)
+        };
+        const SPORT_FIELD_CLASSES = {
+            'futbol': { class: 'campo-futbol', elements: '<div class="area-penalti-izq"></div><div class="area-meta-izq"></div><div class="punto-penalti-izq"></div><div class="porteria-izq"></div><div class="area-penalti-der"></div><div class="area-meta-der"></div><div class="punto-penalti-der"></div><div class="porteria-der"></div>' },
+            'baloncesto': { class: 'campo-baloncesto', elements: '<div class="zona-3-izq"></div><div class="canasta-izq"></div><div class="zona-3-der"></div><div class="canasta-der"></div>' },
+            'tenis': { class: 'campo-tenis', elements: '<div class="linea-padel-servicio-izq"></div><div class="linea-padel-servicio-der"></div><div class="linea-padel-central-servicio-corregida"></div><div class="linea-dobles-sup"></div><div class="linea-dobles-inf"></div>' },
+            'paddle': { class: 'campo-padel-azul', elements: '<div class="linea-padel-servicio-izq"></div><div class="linea-padel-servicio-der"></div><div class="linea-padel-central-servicio-corregida"></div>' }, // Usar el azul mejorado para pádel por defecto
+            'padel': { class: 'campo-padel-azul', elements: '<div class="linea-padel-servicio-izq"></div><div class="linea-padel-servicio-der"></div><div class="linea-padel-central-servicio-corregida"></div>' },
+            'rugby': { class: 'campo-rugby', elements: '<div class="linea-22-izq"></div><div class="linea-22-der"></div><div class="linea-10-izq"></div><div class="linea-10-der"></div><div class="linea-5m-izq"></div><div class="linea-5m-der"></div>' },
+            'handball': { class: 'campo-balonmano', elements: '<div class="arco-9-izq"></div><div class="arco-6-izq"></div><div class="arco-9-der"></div><div class="arco-6-der"></div>' },
+            'natacion': { class: 'piscina', elements: '<div class="carril-1"></div><div class="carril-2"></div><div class="carril-3"></div>' },
+            'atletismo': { class: 'pista-atletismo', elements: '<div class="carriles-interiores"></div>' },
+            'ciclismo': { class: 'skyline-montana', elements: '' }, // Usamos skyline-montana como 'ciclismo'
+            'f1': { class: 'circuito-motorsport', elements: '<div class="meta-salida"></div>' },
+            'motor': { class: 'campo-rally', elements: '' }, // RALLY/DAKAR
+            'motorsport': { class: 'circuito-motorsport', elements: '<div class="meta-salida"></div>' },
+            'default': { class: 'pista-atletismo', elements: '<div class="carriles-interiores"></div>' }, // PISTA DE ATLETISMO como fallback
         };
 
         function getPlaceholderInfo(channelName) {
@@ -1614,6 +2449,9 @@
             const tvChannelsGrid = document.getElementById("tvChannelsGrid");
             
             document.getElementById('tvStatusMessageContainer').innerHTML = '';
+            
+            // Iniciar Stage en modo de carga
+            updateStage(null);
 
             const isShowingBackup = loadAndRenderBackupChannels();
             const temporaryLoadMessage = isShowingBackup ? "Mostrando historial. Obteniendo datos en tiempo real..." : "Cargando datos en tiempo real...";
@@ -1651,6 +2489,9 @@
                 renderTVChannels();
                 cleanObsoleteRatings();
                 
+                // Configurar el carrusel de Stage
+                setupCarouselChannels();
+                
                 if (statusElement) statusElement.remove();
 
                 if (hasOnlineSuccess) {
@@ -1669,11 +2510,13 @@
             } else if (isShowingBackup) {
                 if (statusElement) statusElement.remove();
                 showStatusMessage("Fallo al actualizar canales. Se sigue mostrando el historial.", "error");
+                setupCarouselChannels(); // Intenta el carrusel con el backup
             } else {
                 if (statusElement) statusElement.remove();
                 // Usar las nuevas clases de estilo aquí
                 tvChannelsGrid.innerHTML = ` <div class="no-results-container"><div class="no-results"><div class="no-results-icon">📡</div><div class="no-results-text">Error al cargar los canales.</div><div class="no-results-hint">No se han conseguido cargar los canales (modo offline/sin historial).</div><button class="retry-button" onclick="loadInitialChannels()">Reintentar</button></div></div> `;
                 showStatusMessage("Error al cargar canales. Sin historial disponible.", "error");
+                updateStage(null); // No hay nada que mostrar en el Stage
             }
         }
 
@@ -1962,14 +2805,32 @@
 
         function calculateDuration(sportName) {
             const normalizedName = normalizeText(sportName);
-            if (normalizedName.includes('futbol')) return 120;
-            if (normalizedName.includes('baloncesto') || normalizedName.includes('nba')) return 150;
-            if (normalizedName.includes('tenis')) return 300;
-            if (normalizedName.includes('formula 1') || normalizedName.includes('f1')) return 180;
-            if (normalizedName.includes('motor')) return 120;
-            if (normalizedName.includes('ciclismo')) return 180;
-            if (normalizedName.includes('boxeo')) return 120;
-            return 105;
+
+            // --- Lógica Específica para F1/Motorsport ---
+            if (normalizedName.includes('formula 1') || normalizedName.includes('f1')) {
+                if (normalizedName.includes('practice') || normalizedName.includes('entrenamiento')) {
+                    // Ejemplo: Free Practice / Práctica Libre -> 1 hora y 5 minutos
+                    return 65; 
+                } else if (normalizedName.includes('qualifying') || normalizedName.includes('clasificacion')) {
+                    // Ejemplo: Qualifying / Clasificación -> 1 hora y 30 minutos
+                    return 90; 
+                } else if (normalizedName.includes('race') || normalizedName.includes('carrera') || normalizedName.includes('gp')) {
+                    // Ejemplo: Race / Carrera (incluye el previo/post de 1 hora)
+                    return 180; 
+                }
+                return 180; // Default para F1 si no se especifica el tipo de evento
+            }
+            
+            // --- Lógica General de Deportes ---
+            if (normalizedName.includes('futbol')) return 120; // 90 min + 30 min (previo/descanso/post)
+            if (normalizedName.includes('baloncesto') || normalizedName.includes('nba')) return 150; // 48 min de juego + pausas y extras
+            if (normalizedName.includes('tenis')) return 300; // La duración es muy variable (5 horas)
+            if (normalizedName.includes('motor')) return 120; // 2 horas para otros deportes de motor
+            if (normalizedName.includes('ciclismo')) return 180; 
+            if (normalizedName.includes('boxeo')) return 120; 
+            
+            // Valor por defecto para otros eventos no clasificados (1 hora y 45 minutos)
+            return 105; 
         }
 
         function getEventTime(dateString, timeString) {
@@ -2028,7 +2889,7 @@
                         const normalizedSport = normalizeText(sportName);
                         if (normalizedSport.includes('futbol')) {
                             sportEmoji = '⚽';
-                        } else if (normalizedSport.includes('handball') || normalizedSport.includes('handball')) {
+                        } else if (normalizedSport.includes('handball') || normalizedSport.includes('balonmano')) {
                             sportEmoji = '🤾‍♂️';
                         } else if (normalizedSport.includes('baloncesto') || normalizedSport.includes('basket') || normalizedSport.includes('nba')) {
                             sportEmoji = '🏀';
@@ -2107,7 +2968,6 @@
                                 name: simplifiedName,
                                 quality: quality,
                                 multiAudio: multiAudio,
-                                isKnown: true,
                                 source: 'events',
                                 event: {
                                     time,
@@ -2117,7 +2977,8 @@
                                     sportEmoji,
                                     sportName,
                                     startTime: eventStartTime.getTime(),
-                                    endTime: eventEndTime.getTime()
+                                    endTime: eventEndTime.getTime(),
+                                    durationMinutes // Nuevo campo para el Stage
                                 }
                             });
                             trackFirstSeen(acestreamId);
@@ -2508,8 +3369,6 @@
                     'futbol': ['futbol', 'soccer', 'Hypermotion', 'copa del rey', 'premier league', 'bundesliga', 'serie a'],
                     'baloncesto': ['baloncesto', 'basket', 'nba', 'euroliga'],
                     'tenis': ['tenis', 'wimbledon', 'roland garros', 'us open', 'atp', 'wta'],
-                    'boxeo': ['boxeo', 'boxing', 'lucha', 'ufc', 'mma'],
-                    'ciclismo': ['ciclismo', 'tour', 'giro', 'vuelta'],
                     'motorsport': ['gp', 'motogp', 'dakar', 'rally', 'wrc', 'nascar', 'motor'],
                     'f1': ['f1', 'fórmula 1', 'formula 1', 'formulaone', 'fórmulaone']
                 };
@@ -3030,7 +3889,11 @@
                 
                 if (group.isEvent) {
                     const liveTimeClass = group.hasLive ? 'live-time-blink' : '';
-                    groupTitle = `<span class="${liveTimeClass}" style="margin-right: 7.5px;">${group.time}</span> ${group.sportEmoji} ${group.competition} - ${group.match}`;
+                    
+                    // MODIFICACIÓN CLAVE: Aplicar estilo al nombre de la competición (group.competition)
+                    const competitionHtml = `<span style="color: var(--primary);">${group.competition}</span>`;
+                    
+                    groupTitle = `<span class="${liveTimeClass}" style="margin-right: 7.5px;">${group.time}</span> ${group.sportEmoji} ${competitionHtml} - ${group.match}`;
                     
                     const isFirstGroupAfterDateHeader = !lastDateRendered || (group.date && formatEventDate(group.date) === lastDateRendered);
                     if(isFirstGroupAfterDateHeader) {
@@ -3038,8 +3901,14 @@
                     }
 
                 }
-
-                html += ` <div class="tv-group"><header class="tv-group-header"><h2 class="tv-group-title" style="${groupTitleStyle}">${groupTitle}</h2></header> `;
+                
+                // MODIFICACIÓN: Añadir onclick, tabindex y role="button" al tv-group-header
+                html += ` 
+                    <div class="tv-group">
+                        <header class="tv-group-header" tabindex="0" role="button" onclick="focusNextChannelInGroup(this)">
+                            <h2 class="tv-group-title" style="${groupTitleStyle}">${groupTitle}</h2>
+                        </header> 
+                `;
 
                 let cardsHTML = '';
                 const sortedSubGroupNames = Object.keys(subGroups).sort((a, b) => {
@@ -3076,6 +3945,43 @@
             }
             return html;
         }
+        
+        // #############################
+        // ### NUEVA FUNCIÓN DE FOCO SECUENCIAL ###
+        // #############################
+        function focusNextChannelInGroup(headerElement) {
+            const groupElement = headerElement.closest('.tv-group');
+            if (!groupElement) return;
+
+            const channelsInGroup = Array.from(groupElement.querySelectorAll('.tv-card'));
+            if (channelsInGroup.length === 0) return;
+
+            const currentFocus = state.tvFocusManager.currentFocus;
+            let nextElement = channelsInGroup[0]; // Por defecto, el primer canal
+
+            if (currentFocus && currentFocus.classList.contains('tv-card') && currentFocus.closest('.tv-group') === groupElement) {
+                const currentIndex = channelsInGroup.indexOf(currentFocus);
+                // Si no es el último, el siguiente
+                if (currentIndex < channelsInGroup.length - 1) {
+                    nextElement = channelsInGroup[currentIndex + 1];
+                } else {
+                    // Si es el último, vuelve al primero (cíclico)
+                    nextElement = channelsInGroup[0]; 
+                }
+            }
+            
+            // Si el foco actual era el propio encabezado, ir al primer canal
+            if (currentFocus === headerElement) {
+                 nextElement = channelsInGroup[0];
+            }
+
+            if (nextElement) {
+                state.tvFocusManager.setFocus(nextElement);
+            }
+        }
+        // #############################
+        // ### FIN NUEVA FUNCIÓN DE FOCO SECUENCIAL ###
+        // #############################
 
         function renderTVChannels() {
             const tvGrid = document.getElementById('tvChannelsGrid');
@@ -3109,16 +4015,37 @@
                 state.tvFocusManager.updateFocusableElements();
 
                 const tvSearch = document.getElementById('tvSearch');
+                const firstCard = document.querySelector('.tv-card');
+                const sidebarElements = Array.from(document.querySelectorAll('#tvSearch, .tv-nav-link, #settingsModeBtn'));
+
+                // Si el foco estaba en la barra de búsqueda, mantenerlo
                 if (previouslyFocusedElement === tvSearch || (tvSearch && document.activeElement === tvSearch)) {
                     state.tvFocusManager.setFocus(tvSearch);
+                    state.isStageFocused = false;
+                    updateStage(null); 
                     return;
                 }
-
+                
+                // Si el foco estaba en la sidebar y hay cards, enfocar la primera card.
+                const wasSidebarFocused = previouslyFocusedElement && sidebarElements.includes(previouslyFocusedElement);
+                if ((wasSidebarFocused || !previouslyFocusedElement) && firstCard) {
+                    state.tvFocusManager.setFocus(firstCard);
+                    return;
+                }
+                
+                // Si el foco estaba en un encabezado, mantener el foco en él o en el primer canal.
+                if (previouslyFocusedElement && previouslyFocusedElement.classList.contains('tv-group-header')) {
+                    state.tvFocusManager.setFocus(previouslyFocusedElement);
+                    return;
+                }
+                
+                // Si el elemento previamente enfocado aún existe, restablecer el foco en él.
                 if (previouslyFocusedElement && document.body.contains(previouslyFocusedElement)) {
                     state.tvFocusManager.setFocus(previouslyFocusedElement);
                     return;
                 }
 
+                // Lógica de fallback para establecer el foco inicial
                 let elementToFocus = null;
                 const activeSportFilterLink = document.querySelector(`.tv-nav-link.sport-filter.tv-sidebar-link-focused`);
                 const activeBrandLink = document.querySelector(`.tv-nav-link.brand-filter[data-filter="${state.tvCurrentFilter}"].tv-sidebar-link-focused`);
@@ -3128,11 +4055,302 @@
 
                 if (elementToFocus) {
                     state.tvFocusManager.setFocus(elementToFocus);
+                } else if (firstCard) {
+                    state.tvFocusManager.setFocus(firstCard);
                 } else {
                     state.tvFocusManager.setFocus(document.querySelector('.tv-nav-link[data-filter="all"]'));
                 }
             }
         }
+        
+        // #############################
+        // ### NUEVAS FUNCIONES STAGE ###
+        // #############################
+        
+        function getStageChannelInfo(channel) {
+            const now = new Date().getTime();
+            const info = {
+                channelName: channel.displayableName,
+                mainInfo: channel.name,
+                secondaryInfo: `${standardizeQuality(channel.quality)}${channel.multiAudio ? ' 🎧' : ''} | PID: ${channel.number}`,
+                status: 'Sin Evento',
+                statusClass: 'status-none',
+                progress: 0,
+                sportEmoji: SPORT_EMOJIS.default,
+                bgColor: SPORT_COLORS.default,
+                sportFieldClass: SPORT_FIELD_CLASSES.default.class,
+                sportFieldElements: SPORT_FIELD_CLASSES.default.elements,
+                isLive: false,
+                isEvent: false
+            };
+
+            if (channel.source === 'events' && channel.event) {
+                const event = channel.event;
+                info.isEvent = true;
+                info.mainInfo = `${event.match}`;
+                info.secondaryInfo = `${event.sportEmoji} ${event.competition} | ${event.time} ${event.date}`;
+                info.sportEmoji = event.sportEmoji;
+                
+                const fieldInfo = getSportField(event.sportName);
+                info.sportFieldClass = fieldInfo.class;
+                info.sportFieldElements = fieldInfo.elements;
+
+                const startTime = event.startTime;
+                const endTime = event.endTime;
+                const liveStartTime = startTime - (15 * 60 * 1000); // 15 minutos antes
+                
+                if (now < liveStartTime) {
+                    info.status = 'Próximamente';
+                    info.statusClass = 'status-upcoming';
+                    const diffMinutes = Math.floor((liveStartTime - now) / (60 * 1000));
+                    info.secondaryInfo += ` | Inicia en ${diffMinutes} min`;
+                    info.progress = 0;
+                } else if (now >= liveStartTime && now <= endTime) {
+                    info.status = 'EN VIVO';
+                    info.statusClass = 'status-live';
+                    info.isLive = true;
+                    
+                    const totalDuration = endTime - liveStartTime;
+                    const elapsed = now - liveStartTime;
+                    let progress = (elapsed / totalDuration) * 100;
+                    progress = Math.min(100, Math.max(0, progress));
+
+                    info.progress = progress;
+                    
+                    if (progress > 85) {
+                        info.status = 'A punto de acabar';
+                    }
+                } else {
+                    info.status = 'Finalizado';
+                    info.statusClass = 'status-finished';
+                    info.progress = 100;
+                }
+            }
+
+            return info;
+        }
+        
+        function getSportField(sportName) {
+            const normalizedName = normalizeText(sportName);
+            for (const key in SPORT_FIELD_CLASSES) {
+                if (key !== 'default' && normalizedName.includes(key)) {
+                    return SPORT_FIELD_CLASSES[key];
+                }
+            }
+            return SPORT_FIELD_CLASSES.default;
+        }
+
+        /* ELIMINADA: getSportColor() */
+
+        function updateStage(channel) {
+            const stage = document.getElementById('tvStage');
+            const stageBg = document.getElementById('tvStageBackground');
+            const channelIcon = document.getElementById('stageChannelIcon');
+            const channelNameEl = document.getElementById('stageChannelName');
+            const mainInfoEl = document.getElementById('stageMainInfo');
+            const secondaryInfoEl = document.getElementById('stageSecondaryInfo');
+            const statusEl = document.getElementById('stageStatus');
+            const progressBar = document.getElementById('stageProgressBar');
+            const carouselIndicator = document.getElementById('stageCarouselIndicator');
+            
+            // Si hay un carrusel activo, detenerlo.
+            if (state.carouselTimer) {
+                clearInterval(state.carouselTimer);
+                state.carouselTimer = null;
+            }
+            
+            // Si el canal es nulo o no está en foco, mostrar el carrusel (o un mensaje de carga/no hay eventos)
+            if (!channel || !state.isStageFocused) {
+                 stage.classList.add('carousel-mode');
+                 
+                 // Si hay canales para el carrusel, lo iniciamos
+                 if (state.carouselChannels.length > 0) {
+                     startCarousel();
+                     return;
+                 }
+                 
+                 // Sino hay canales de carrusel (ni live ni upcoming)
+                 stageBg.className = 'campo-base pista-atletismo';
+                 stageBg.innerHTML = SPORT_FIELD_CLASSES.default.elements;
+                 channelIcon.style.display = 'none';
+                 channelNameEl.innerHTML = 'Bienvenido a la Guía TV.';
+                 mainInfoEl.innerHTML = 'Selecciona un canal para ver los detalles.';
+                 secondaryInfoEl.textContent = 'No hay eventos en vivo o próximos en las próximas horas.';
+                 statusEl.className = 'stage-status status-none';
+                 statusEl.textContent = 'INFO';
+                 progressBar.style.width = '0%';
+                 carouselIndicator.innerHTML = ''; 
+                 return;
+            }
+            
+            // Modo Foco en Canal
+            stage.classList.remove('carousel-mode');
+            const info = getStageChannelInfo(channel);
+            
+            // 1. Icono y Fondo (Fondo de campo)
+            const logoInfo = getPlaceholderInfo(channel.name);
+            if (logoInfo) {
+                const fullUrl = LOGOPEDIA_BASE_URL + logoInfo.url;
+                channelIcon.src = proxyImage(fullUrl);
+                channelIcon.style.display = 'block';
+            } else {
+                channelIcon.src = '';
+                channelIcon.style.display = 'none';
+            }
+            
+            // Aplicar la clase de campo y los elementos
+            stageBg.className = `campo-base ${info.sportFieldClass}`;
+            stageBg.innerHTML = info.sportFieldElements;
+
+            // 2. Información
+            channelNameEl.innerHTML = info.channelName;
+            mainInfoEl.innerHTML = info.mainInfo;
+            secondaryInfoEl.textContent = info.secondaryInfo;
+
+            // 3. Estado y Progreso
+            statusEl.className = `stage-status ${info.statusClass}`;
+            statusEl.textContent = info.status;
+            progressBar.style.width = `${info.progress}%`;
+            
+            // 4. Indicador
+            carouselIndicator.innerHTML = ''; 
+
+            // Actualizar el stage cada segundo si está en vivo
+            if (info.isLive) {
+                state.carouselTimer = setInterval(() => {
+                    if (state.tvFocusManager && state.tvFocusManager.currentFocus && state.tvFocusManager.currentFocus.getAttribute('data-channel-id') === channel.id) {
+                        updateStage(channel);
+                    } else {
+                        clearInterval(state.carouselTimer);
+                        state.carouselTimer = null;
+                    }
+                }, 1000);
+            }
+        }
+        
+        function setupCarouselChannels() {
+            // Obtener todos los canales de eventos
+            const allEventChannels = state.channelsData.filter(c => c.source === 'events');
+            
+            // 1. Canales En Vivo
+            const liveChannels = allEventChannels
+                .filter(c => {
+                    const event = c.event;
+                    if (!event) return false;
+                    const now = new Date().getTime();
+                    const liveStartTime = event.startTime - (15 * 60 * 1000); 
+                    const liveEndTime = event.endTime;
+                    return now >= liveStartTime && now <= liveEndTime && !findConflictingSiblings(c, allEventChannels);
+                })
+                .sort((a, b) => a.event.endTime - b.event.endTime); // Primero los que están a punto de terminar
+                
+            // 2. Canales Próximamente (inician en menos de 1 hora, no finalizados)
+            const UPCOMING_THRESHOLD_MS = 60 * 60 * 1000;
+            const now = new Date().getTime();
+            
+            const upcomingChannels = allEventChannels
+                .filter(c => {
+                    const event = c.event;
+                    if (!event) return false;
+                    const liveStartTime = event.startTime - (15 * 60 * 1000); 
+                    const timeToStart = liveStartTime - now;
+                    return timeToStart > 0 && timeToStart <= UPCOMING_THRESHOLD_MS;
+                })
+                .sort((a, b) => a.event.startTime - b.event.startTime); // Primero los que inician antes
+
+            state.carouselChannels = [...liveChannels, ...upcomingChannels];
+            state.carouselIndex = 0;
+            
+            // Si no hay canales, Stage se queda en modo info
+            if (state.carouselChannels.length === 0) {
+                updateStage(null); 
+                return;
+            }
+            
+            // Si hay canales, iniciamos el carrusel
+            if (state.carouselChannels.length > 0) {
+                 startCarousel();
+            }
+        }
+        
+        function startCarousel() {
+            if (state.carouselChannels.length === 0) {
+                updateStage(null); 
+                return;
+            }
+
+            const stage = document.getElementById('tvStage');
+            
+            // Renderiza el contenido inicial
+            renderCarouselItem(state.carouselChannels[state.carouselIndex]);
+            
+            // Crea los indicadores
+            const indicatorContainer = document.getElementById('stageCarouselIndicator');
+            indicatorContainer.innerHTML = state.carouselChannels.map((_, index) => 
+                `<span class="carousel-dot ${index === state.carouselIndex ? 'active' : ''}"></span>`
+            ).join('');
+
+            // Inicia el temporizador
+            if (state.carouselTimer) clearInterval(state.carouselTimer);
+            state.carouselTimer = setInterval(nextCarouselItem, 5000);
+        }
+        
+        function nextCarouselItem() {
+            if (state.isStageFocused) return;
+            
+            state.carouselIndex = (state.carouselIndex + 1) % state.carouselChannels.length;
+            const nextChannel = state.carouselChannels[state.carouselIndex];
+            
+            renderCarouselItem(nextChannel);
+            
+            // Actualiza los indicadores
+            document.querySelectorAll('#stageCarouselIndicator .carousel-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === state.carouselIndex);
+            });
+        }
+        
+        function renderCarouselItem(channel) {
+            const stage = document.getElementById('tvStage');
+            const stageBg = document.getElementById('tvStageBackground');
+            const channelIcon = document.getElementById('stageChannelIcon');
+            const channelNameEl = document.getElementById('stageChannelName');
+            const mainInfoEl = document.getElementById('stageMainInfo');
+            const secondaryInfoEl = document.getElementById('stageSecondaryInfo');
+            const statusEl = document.getElementById('stageStatus');
+            const progressBar = document.getElementById('stageProgressBar');
+            
+            const info = getStageChannelInfo(channel);
+            
+            // 1. Icono y Fondo
+            const logoInfo = getPlaceholderInfo(channel.name);
+            if (logoInfo) {
+                const fullUrl = LOGOPEDIA_BASE_URL + logoInfo.url;
+                channelIcon.src = proxyImage(fullUrl);
+                channelIcon.style.display = 'block';
+            } else {
+                channelIcon.src = '';
+                channelIcon.style.display = 'none';
+            }
+            
+            // Aplicar la clase de campo y los elementos
+            stageBg.className = `campo-base ${info.sportFieldClass}`;
+            stageBg.innerHTML = info.sportFieldElements;
+
+            // 2. Información
+            channelNameEl.innerHTML = info.channelName;
+            mainInfoEl.innerHTML = info.mainInfo;
+            secondaryInfoEl.textContent = info.secondaryInfo;
+
+            // 3. Estado y Progreso
+            statusEl.className = `stage-status ${info.statusClass}`;
+            statusEl.textContent = info.status;
+            progressBar.style.width = `${info.progress}%`;
+        }
+
+        // #############################
+        // ### FIN NUEVAS FUNCIONES STAGE ###
+        // #############################
+
         const attachTVCardEvents = () => {
             const cards = document.querySelectorAll('.tv-card');
             cards.forEach(card => {
@@ -3145,21 +4363,18 @@
                     optionsButton.addEventListener('click', handleTVCardOptionsClick);
                 }
                 
-                // Si el botón está oculto, asociamos el evento de opciones al clic de la tarjeta, 
-                // pero SÓLO si el clic no es un "play" normal (e.g., el clic en la esquina inferior derecha)
-                if (state.hideOptionsButton) {
-                    card.removeEventListener('auxiliaryclick', handleTVCardOptionsClick);
-                    // Usamos un nombre de evento auxiliar o una comprobación de coordenadas, 
-                    // pero para simplificar y cumplir con el requisito de "sigue funcionando si pulsas" en el área del botón:
-                    // Dejamos que el clic principal dispare play (handleTVCardPlay)
-                    // y la funcionalidad del botón la asociamos con un clic secundario (por ejemplo, doble clic o clic derecho, si no usáramos un control remoto).
-                    // Para el propósito del TV-Mode (navegación con flechas/Enter), el botón sigue siendo seleccionable, y el clic principal de la tarjeta es para "Play".
-                    
-                    // Ya que `handleTVCardPlay` tiene `if (e.target.closest('.tv-link-button')) { return; }`, 
-                    // si el botón es clicado, el evento se propaga al botón, se dispara `handleTVCardOptionsClick`, y `handleTVCardPlay` se detiene.
-                    
-                    // Con `visibility: hidden` aplicado por CSS, la funcionalidad es correcta sin más cambios en JS.
-                }
+                // Con visibility: hidden aplicado por CSS, la funcionalidad es correcta sin más cambios en JS.
+            });
+            
+            // Adjuntar evento de foco secuencial a los encabezados
+            document.querySelectorAll('.tv-group-header').forEach(header => {
+                header.removeEventListener('click', focusNextChannelInGroup);
+                header.addEventListener('click', function(e) {
+                     // Solo ejecutar si no es un evento de teclado (ya que el keyboard focus se maneja en tvFocusManager)
+                     if (e.pointerType || e.detail === 0) { 
+                         focusNextChannelInGroup(this);
+                     }
+                });
             });
         };
         
@@ -3378,26 +4593,42 @@
                 updateFocusableElements: function() {
                     const searchElement = document.getElementById('tvSearch');
                     const sidebarLinks = Array.from(document.querySelectorAll('.tv-nav-link'));
-                    const allCards = Array.from(document.querySelectorAll('.tv-card'));
                     const settingsModeBtn = document.getElementById('settingsModeBtn');
-                    this.focusableElements = [searchElement, ...sidebarLinks, settingsModeBtn, ...allCards].filter(el => el && el.offsetParent !== null);
+                    // MODIFICACIÓN: Incluir los encabezados de grupo como elementos enfocables.
+                    const groupHeaders = Array.from(document.querySelectorAll('.tv-group-header'));
+                    const allCards = Array.from(document.querySelectorAll('.tv-card'));
+                    this.focusableElements = [searchElement, ...sidebarLinks, settingsModeBtn, ...groupHeaders, ...allCards].filter(el => el && el.offsetParent !== null);
                 },
                 setFocus: function(element) {
                     if (!element) return;
+                    
                     this.removeFocusClasses();
                     this.currentFocus = element;
                     
-                    if (element.id === 'tvSearch') {
-                        element.focus();
-                    } 
-                    else if (element.id === 'settingsModeBtn') {
-                        element.focus();
-                        element.classList.add('tv-sidebar-link-focused');
+                    // Lógica para el Stage: si es una tarjeta, actualizamos el Stage y entramos en modo foco.
+                    if (element.classList.contains('tv-card')) {
+                         state.isStageFocused = true;
+                         const channelId = element.getAttribute('data-channel-id');
+                         const channel = state.channelsData.find(c => c.id === channelId);
+                         updateStage(channel);
+                         element.classList.add('tv-card-focused');
+                    } else {
+                         state.isStageFocused = false;
+                         updateStage(null); // Vuelve al carrusel o a info
+                         if (element.id === 'tvSearch') {
+                            element.focus();
+                         } else if (element.id === 'settingsModeBtn') {
+                            element.focus();
+                            element.classList.add('tv-sidebar-link-focused');
+                         } else if (element.classList.contains('tv-group-header')) {
+                             // No añadir una clase de foco especial al encabezado, ya se maneja con el :focus/:hover CSS
+                             element.focus();
+                         } else {
+                            element.focus();
+                            element.classList.add('tv-sidebar-link-focused');
+                         }
                     }
-                    else {
-                        element.focus();
-                        element.classList.add(element.classList.contains('tv-card') ? 'tv-card-focused' : 'tv-sidebar-link-focused');
-                    }
+
                     element.scrollIntoView({
                         behavior: 'smooth',
                         block: 'nearest',
@@ -3462,24 +4693,55 @@
                     this.updateFocusableElements();
                     const allCards = Array.from(document.querySelectorAll('.tv-card'));
                     const sidebarElements = Array.from(document.querySelectorAll('#tvSearch, .tv-nav-link, #settingsModeBtn'));
-                    const focusedIndex = sidebarElements.indexOf(this.currentFocus);
+                    const focusedElement = this.currentFocus;
 
-                    if (sidebarElements.includes(this.currentFocus)) {
+                    // 1. Foco en Sidebar
+                    if (sidebarElements.includes(focusedElement)) {
+                        const focusedIndex = sidebarElements.indexOf(focusedElement);
                         if (direction === 'ArrowDown' && focusedIndex < sidebarElements.length - 1) {
                             return sidebarElements[focusedIndex + 1];
                         } else if (direction === 'ArrowUp' && focusedIndex > 0) {
                             return sidebarElements[focusedIndex - 1];
-                        } else if (direction === 'ArrowRight' && allCards.length > 0) {
-                            return allCards[0];
+                        } else if (direction === 'ArrowRight') {
+                             const firstHeader = document.querySelector('.tv-group-header');
+                             if (firstHeader) return firstHeader;
+                             if (allCards.length > 0) return allCards[0];
                         }
                     }
-                    else if (allCards.includes(this.currentFocus)) {
-                        const currentRow = this.currentFocus.closest('.tv-subgroup-content');
+                    
+                    // 2. Foco en Encabezado de Grupo
+                    else if (focusedElement.classList.contains('tv-group-header')) {
+                        const groupHeaders = Array.from(document.querySelectorAll('.tv-group-header'));
+                        const focusedIndex = groupHeaders.indexOf(focusedElement);
+                        
+                        if (direction === 'ArrowRight') {
+                            const cardsInGroup = Array.from(focusedElement.closest('.tv-group').querySelectorAll('.tv-card'));
+                            if (cardsInGroup.length > 0) return cardsInGroup[0];
+                        } else if (direction === 'ArrowLeft') {
+                            return document.getElementById('settingsModeBtn');
+                        } else if (direction === 'ArrowDown') {
+                            if (focusedIndex < groupHeaders.length - 1) {
+                                return groupHeaders[focusedIndex + 1];
+                            }
+                        } else if (direction === 'ArrowUp') {
+                            if (focusedIndex > 0) {
+                                return groupHeaders[focusedIndex - 1];
+                            } else {
+                                return document.querySelector('.tv-nav-link[data-filter="all"]');
+                            }
+                        }
+                    }
+
+                    // 3. Foco en Tarjeta (Lógica original)
+                    else if (focusedElement.classList.contains('tv-card')) {
+                        const currentRow = focusedElement.closest('.tv-subgroup-content');
                         if (!currentRow) return null;
+                        
                         const cardsInCurrentRow = Array.from(currentRow.querySelectorAll('.tv-card'));
-                        const indexInRow = cardsInCurrentRow.indexOf(this.currentFocus);
+                        const indexInRow = cardsInCurrentRow.indexOf(focusedElement);
                         const allRows = Array.from(document.querySelectorAll('.tv-subgroup-content'));
                         const currentRowIndex = allRows.indexOf(currentRow);
+                        const currentGroupHeader = focusedElement.closest('.tv-group').querySelector('.tv-group-header');
 
                         if (direction === 'ArrowRight') {
                             if (indexInRow < cardsInCurrentRow.length - 1) {
@@ -3489,7 +4751,7 @@
                             if (indexInRow > 0) {
                                 return cardsInCurrentRow[indexInRow - 1];
                             } else {
-                                return document.getElementById('settingsModeBtn');
+                                return currentGroupHeader;
                             }
                         } else if (direction === 'ArrowDown') {
                             if (currentRowIndex < allRows.length - 1) {
@@ -3503,10 +4765,11 @@
                                 const cardsInPrevRow = Array.from(prevRow.querySelectorAll('.tv-card'));
                                 return cardsInPrevRow[Math.min(indexInRow, cardsInPrevRow.length - 1)];
                             } else {
-                                return null;
+                                return currentGroupHeader;
                             }
                         }
                     }
+                    
                     return null;
                 },
                 selectFocused: function() {
@@ -3522,6 +4785,9 @@
                             setTimeout(() => {
                                 document.getElementById('closeSettingsBtn').focus();
                             }, 100);
+                        } else if (this.currentFocus.classList.contains('tv-group-header')) {
+                             // Si se presiona ENTER en el encabezado, llama a la función de foco secuencial.
+                             focusNextChannelInGroup(this.currentFocus);
                         }
                     }
                 }
@@ -3531,25 +4797,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // === BLOQUEO DE ACCESO POR COLOR PRINCIPAL (IMPLEMENTACIÓN) ===
-            const storedPrimaryColor = localStorage.getItem('primaryColor');
-            
-            // 1. Verificación de Bloqueo Inmediato (Si no hay clave, checkAccess() ya habría bloqueado)
-            if (!storedPrimaryColor) { 
-                 // Esto solo ocurriría si el script de arriba ya bloqueó, pero lo dejamos por si acaso
-                 if (!checkAccess()) return;
-            }
-
-            // 2. Lógica de Verificación de Color Válido (Si la clave existe, validamos el valor)
-            const colorOptions = Array.from(document.querySelectorAll('.color-option')).map(btn => btn.dataset.color);
-            
-            if (storedPrimaryColor && !colorOptions.includes(storedPrimaryColor)) {
-                // Si la clave existe, pero el valor no es uno de los predefinidos, denegamos el acceso.
-                showAccessDeniedScreen();
-                return; 
-            }
-            // === FIN BLOQUEO DE ACCESO ===
-
             document.body.classList.add('dark-mode');
             document.body.classList.add('tv-mode-active');
             
@@ -3638,8 +4885,28 @@
             });
             
             setInterval(() => {
+                // Si el foco está en un canal o en la barra lateral, no hacer nada.
+                if (state.tvFocusManager.currentFocus && (state.tvFocusManager.currentFocus.classList.contains('tv-card') || state.tvFocusManager.currentFocus.id !== 'tvSearch')) {
+                    // Si el foco está en un canal, solo se actualiza el Stage por el setInterval de updateStage (si está Live)
+                    // Si el foco está en la sidebar, el carrusel se encarga de las actualizaciones (si está activo)
+                    
+                    // Asegurar que el carrusel se actualice si no hay foco en una tarjeta
+                    if (!state.isStageFocused && state.carouselChannels.length > 0) {
+                        renderCarouselItem(state.carouselChannels[state.carouselIndex]);
+                    }
+                    
+                    // No hacemos renderTVChannels() completo, solo si es necesario (e.g. cada 1 min)
+                } else {
+                     // Si está en el modo de búsqueda o sin foco, hacemos un re-render suave de todo
+                     renderTVChannels();
+                }
+            }, 1000); 
+
+            setInterval(() => {
+                // Re-render completo para actualizar eventos en la cuadrícula
                 renderTVChannels();
-            }, 60000);
+                setupCarouselChannels(); // Recalcula canales del carrusel por si cambió de estado (Upcoming -> Live)
+            }, 60000); 
         });
     </script>
 </body>
