@@ -62,6 +62,9 @@
             --stage-live-color: #dc2626;
             --stage-upcoming-color: #3b82f6;
             --stage-finished-color: #888888;
+            /* NUEVO: Variables para el borde de foco del Stage */
+            --stage-focus-border-color: rgba(var(--primary-rgb), 0.8);
+            --stage-focus-shadow-color: rgba(var(--primary-rgb), 0.5);
         }
 
         body.dark-mode {
@@ -975,14 +978,66 @@
             
             margin-bottom: 0.75rem; /* Espacio con la cuadrícula de abajo */
             border-radius: var(--radius-md);
-            /* ELIMINAR background-color: var(--stage-bg); */
+            /* CAMBIO CLAVE: Aplicar el color de fondo para las zonas negras */
+            background-color: var(--player-bg);
+            
             overflow: hidden;
             display: flex;
             align-items: center;
             color: var(--stage-text-color);
-            transition: background-color 0.5s ease;
+            transition: background-color 0.5s ease, border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            
+            /* NUEVO: Borde por defecto para que se vea limpio */
+            border: 2px solid transparent; 
         }
+
+        /* NUEVO: Estilo de Stage Enfocado */
+        #tvStage.stage-focused {
+            border-color: var(--stage-focus-border-color); 
+            box-shadow: 0 0 0 2px var(--stage-focus-border-color), 0 4px 12px var(--stage-focus-shadow-color);
+        }
+        
+        /* #tvStageBackground: Borde interior para simular la línea exterior del campo */
+        #tvStageBackground {
+            transition: all 0.5s ease-in-out;
+            border: 2px solid var(--white) !important; /* Borde interior blanco forzado */
+        }
+
+        /* ############################# */
+        /* ### MODIFICACIÓN: MEDIA QUERY PARA ORIENTACIÓN HORIZONTAL ### */
+        /* ############################# */
+        @media (orientation: landscape) {
+            #tvStage {
+                /* Altura solicitada: 1/5 de la altura visible de la pantalla */
+                height: 60vh;
+                /* Eliminamos el aspecto forzado para que 20vh sea la prioridad */
+                aspect-ratio: auto; 
+                /* Mantenemos el min-height, aunque 20vh probablemente sea mayor */
+                min-height: 100px; 
+                margin-bottom: 0.5rem; /* Ajuste de margen inferior en horizontal */
+            }
+
+            #tvStage .stage-content {
+                /* Ajustar padding para pantallas más compactas */
+                padding: 1rem 0.75rem; 
+            }
+            
+            #tvStage .stage-icon-container {
+                /* Reducir el tamaño del icono un poco en pantallas horizontales */
+                width: 7vh; 
+                height: 7vh;
+                min-width: 45px;
+                min-height: 45px;
+            }
+            
+            #tvStage .stage-main-info {
+                font-size: 1rem; /* Reducir el tamaño de la fuente principal */
+            }
+        }
+        /* ############################# */
+        /* ### FIN MODIFICACIÓN ### */
+        /* ############################# */
 
         /* ELIMINAR: #tvStage::before { ... } */
         #tvStage::before {
@@ -1015,10 +1070,16 @@
             z-index: 2;
             display: flex;
             align-items: center;
-            padding: 1rem 0.5rem; /* Reducido de 1.5rem 1rem */
+            
+            /* CAMBIO CLAVE: Reajustar padding para compensar la eliminación del scale(0.9) */
+            padding: 1.5rem 1rem; 
+            
             width: 100%;
             height: 100%;
-            transform: scale(0.9); /* <--- APLICACIÓN DE LA REDUCCIÓN DEL 10% */
+            
+            /* CAMBIO CLAVE: ELIMINAMOS la reducción del 10% que causaba el hueco y la distorsión */
+            transform: none; 
+            
             transform-origin: center center;
             transition: transform 0.3s ease; /* Para que la escala sea suave */
         }
@@ -1436,6 +1497,7 @@
             border: 1px solid #ffffff; 
             /* Mantiene el radio en píxeles */
             border-radius: 75px / 75px; 
+            box-sizing: border-box;
             z-index: 2;
         }
         
@@ -1761,7 +1823,7 @@
         </div>
     </aside>
     <main id="tvMainContent">
-        <div id="tvStage"> 
+        <div id="tvStage" tabindex="0" role="button" aria-label="Escenario de Evento"> 
             <div id="tvStageBackground" class="campo-base pista-atletismo"> 
                 <div class="area-penalti-izq"></div>
                 <div class="area-meta-izq"></div>
@@ -1771,7 +1833,7 @@
                 <div class="area-meta-der"></div>
                 <div class="punto-penalti-der"></div>
                 <div class="porteria-der"></div>
-                </div>
+            </div>
 
             <div class="stage-overlay"></div>
             <div class="stage-content">
@@ -1985,20 +2047,20 @@
         };
         const SPORT_COLORS = {
             'futbol': '#1a5e37', 
-            'baloncesto': '#e0974b', 
-            'tenis': '#5d9f3f', 
-            'paddle': '#0d8f5d', 
+            'baloncesto': '#ff8608', 
+            'tenis': '#4c9e5e', 
+            'paddle': '#0b4e8e', 
             'padel': '#0b4e8e', 
-            'motorsport': '#8c8c8c', 
-            'f1': '#8c8c8c', 
+            'motorsport': '#8c8c8c', // Sinuoso
+            'f1': '#8c8c8c', // Sinuoso
             'golf': '#4ee1b0', 
             'rugby': '#2e7a3f',
             'handball': '#cccccc',
             'natacion': '#3f7b9e',
             'atletismo': '#9e4b3f',
-            'ciclismo': '#6a5a4a',
-            'motor': '#8c8c8c', // RALLY / DAKAR
-            'default': '#9e4b3f', // PISTA DE ATLETISMO (TARTÁN)
+            'ciclismo': '#87ceeb', // Cielo azul de montaña
+            'motor': '#ffdb58', // Fondo desierto Rally
+            'default': '#1e1e1e', // Fondo player_bg
         };
         const SPORT_FIELD_CLASSES = {
             'futbol': { class: 'campo-futbol', elements: '<div class="area-penalti-izq"></div><div class="area-meta-izq"></div><div class="punto-penalti-izq"></div><div class="porteria-izq"></div><div class="area-penalti-der"></div><div class="area-meta-der"></div><div class="punto-penalti-der"></div><div class="porteria-der"></div>' },
@@ -4094,6 +4156,7 @@
                 const fieldInfo = getSportField(event.sportName);
                 info.sportFieldClass = fieldInfo.class;
                 info.sportFieldElements = fieldInfo.elements;
+                info.bgColor = getSportColor(event.sportName);
 
                 const startTime = event.startTime;
                 const endTime = event.endTime;
@@ -4133,6 +4196,10 @@
         function getSportField(sportName) {
             const normalizedName = normalizeText(sportName);
             for (const key in SPORT_FIELD_CLASSES) {
+                // Modificación para evitar que 'f1' coincida con 'futbol' en 'motorsport' o 'motor'
+                 if (key === 'f1' && (normalizedName.includes('f1') || normalizedName.includes('formula 1'))) return SPORT_FIELD_CLASSES['f1'];
+                 if (key === 'motorsport' && (normalizedName.includes('motogp') || normalizedName.includes('motor'))) return SPORT_FIELD_CLASSES['motorsport'];
+                
                 if (key !== 'default' && normalizedName.includes(key)) {
                     return SPORT_FIELD_CLASSES[key];
                 }
@@ -4140,7 +4207,15 @@
             return SPORT_FIELD_CLASSES.default;
         }
 
-        /* ELIMINADA: getSportColor() */
+        function getSportColor(sportName) {
+            const normalizedName = normalizeText(sportName);
+            for (const key in SPORT_COLORS) {
+                 if (key !== 'default' && normalizedName.includes(key)) {
+                    return SPORT_COLORS[key];
+                 }
+            }
+            return SPORT_COLORS.default;
+        }
 
         function updateStage(channel) {
             const stage = document.getElementById('tvStage');
@@ -4159,6 +4234,12 @@
                 state.carouselTimer = null;
             }
             
+            // 1. Manejo del Foco del Stage
+            if (state.tvFocusManager && state.tvFocusManager.currentFocus === stage) {
+                state.isStageFocused = true;
+            }
+            stage.classList.toggle('stage-focused', state.isStageFocused);
+            
             // Si el canal es nulo o no está en foco, mostrar el carrusel (o un mensaje de carga/no hay eventos)
             if (!channel || !state.isStageFocused) {
                  stage.classList.add('carousel-mode');
@@ -4172,6 +4253,8 @@
                  // Sino hay canales de carrusel (ni live ni upcoming)
                  stageBg.className = 'campo-base pista-atletismo';
                  stageBg.innerHTML = SPORT_FIELD_CLASSES.default.elements;
+                 stageBg.style.backgroundColor = SPORT_COLORS.default;
+                 stage.style.backgroundColor = SPORT_COLORS.default;
                  channelIcon.style.display = 'none';
                  channelNameEl.innerHTML = 'Bienvenido a la Guía TV.';
                  mainInfoEl.innerHTML = 'Selecciona un canal para ver los detalles.';
@@ -4198,9 +4281,11 @@
                 channelIcon.style.display = 'none';
             }
             
-            // Aplicar la clase de campo y los elementos
+            // Aplicar la clase de campo, los elementos y el color
             stageBg.className = `campo-base ${info.sportFieldClass}`;
             stageBg.innerHTML = info.sportFieldElements;
+            stageBg.style.backgroundColor = info.bgColor; 
+            stage.style.backgroundColor = info.bgColor; 
 
             // 2. Información
             channelNameEl.innerHTML = info.channelName;
@@ -4218,9 +4303,12 @@
             // Actualizar el stage cada segundo si está en vivo
             if (info.isLive) {
                 state.carouselTimer = setInterval(() => {
-                    if (state.tvFocusManager && state.tvFocusManager.currentFocus && state.tvFocusManager.currentFocus.getAttribute('data-channel-id') === channel.id) {
-                        updateStage(channel);
+                    // Solo actualizar si el canal en foco es el mismo
+                    const currentChannelId = state.tvFocusManager.currentFocus ? state.tvFocusManager.currentFocus.getAttribute('data-channel-id') : null;
+                    if (currentChannelId === channel.id) {
+                        renderLiveProgress(channel);
                     } else {
+                        // Si el foco cambió, detenemos el contador
                         clearInterval(state.carouselTimer);
                         state.carouselTimer = null;
                     }
@@ -4228,6 +4316,15 @@
             }
         }
         
+        function renderLiveProgress(channel) {
+             const info = getStageChannelInfo(channel);
+             const statusEl = document.getElementById('stageStatus');
+             const progressBar = document.getElementById('stageProgressBar');
+             statusEl.className = `stage-status ${info.statusClass}`;
+             statusEl.textContent = info.status;
+             progressBar.style.width = `${info.progress}%`;
+        }
+
         function setupCarouselChannels() {
             // Obtener todos los canales de eventos
             const allEventChannels = state.channelsData.filter(c => c.source === 'events');
@@ -4254,7 +4351,8 @@
                     if (!event) return false;
                     const liveStartTime = event.startTime - (15 * 60 * 1000); 
                     const timeToStart = liveStartTime - now;
-                    return timeToStart > 0 && timeToStart <= UPCOMING_THRESHOLD_MS;
+                    // Se filtra también por si hay un conflicto, aunque es menos probable en upcoming
+                    return timeToStart > 0 && timeToStart <= UPCOMING_THRESHOLD_MS && !findConflictingSiblings(c, allEventChannels);
                 })
                 .sort((a, b) => a.event.startTime - b.event.startTime); // Primero los que inician antes
 
@@ -4263,23 +4361,22 @@
             
             // Si no hay canales, Stage se queda en modo info
             if (state.carouselChannels.length === 0) {
-                updateStage(null); 
+                if (!state.isStageFocused) updateStage(null); 
                 return;
             }
             
             // Si hay canales, iniciamos el carrusel
-            if (state.carouselChannels.length > 0) {
+            if (!state.isStageFocused) {
                  startCarousel();
             }
         }
         
         function startCarousel() {
-            if (state.carouselChannels.length === 0) {
-                updateStage(null); 
+            if (state.carouselChannels.length === 0 || state.isStageFocused) {
+                if (!state.isStageFocused) updateStage(null); 
                 return;
             }
-
-            const stage = document.getElementById('tvStage');
+            if (state.carouselTimer) clearInterval(state.carouselTimer);
             
             // Renderiza el contenido inicial
             renderCarouselItem(state.carouselChannels[state.carouselIndex]);
@@ -4291,7 +4388,6 @@
             ).join('');
 
             // Inicia el temporizador
-            if (state.carouselTimer) clearInterval(state.carouselTimer);
             state.carouselTimer = setInterval(nextCarouselItem, 5000);
         }
         
@@ -4332,9 +4428,11 @@
                 channelIcon.style.display = 'none';
             }
             
-            // Aplicar la clase de campo y los elementos
+            // Aplicar la clase de campo, los elementos y el color
             stageBg.className = `campo-base ${info.sportFieldClass}`;
             stageBg.innerHTML = info.sportFieldElements;
+            stageBg.style.backgroundColor = info.bgColor; 
+            stage.style.backgroundColor = info.bgColor; 
 
             // 2. Información
             channelNameEl.innerHTML = info.channelName;
@@ -4345,7 +4443,55 @@
             statusEl.className = `stage-status ${info.statusClass}`;
             statusEl.textContent = info.status;
             progressBar.style.width = `${info.progress}%`;
+            
+            // Si está en vivo, re-iniciamos el contador de progreso (con el de 5 segundos se pausa la animación)
+            if (info.isLive) {
+                 if (state.carouselTimer) clearInterval(state.carouselTimer);
+                 state.carouselTimer = setInterval(renderLiveProgress.bind(null, channel), 1000); 
+            } else {
+                 // Si no está en vivo, volvemos al carrusel
+                 if (state.carouselTimer) clearInterval(state.carouselTimer);
+                 state.carouselTimer = setInterval(nextCarouselItem, 5000);
+            }
         }
+        
+        function handleStageClickOrEnter() {
+            if (state.carouselChannels.length === 0) return;
+            
+            const currentEventChannel = state.carouselChannels[state.carouselIndex];
+            if (!currentEventChannel) return;
+            
+            const normalizedName = currentEventChannel.name.trim().toLowerCase();
+            
+            // 1. Buscar la mejor tarjeta visible en la cuadrícula para este canal/evento
+            const bestCard = Array.from(document.querySelectorAll('.tv-card'))
+                .find(card => {
+                    const cardChannelId = card.getAttribute('data-channel-id');
+                    const channel = state.channelsData.find(c => c.id === cardChannelId);
+                    return channel && normalizeText(channel.name).includes(normalizedName);
+                });
+                
+            if (bestCard) {
+                // 2. Mover el foco a la tarjeta para entrar en modo "foco de canal"
+                state.tvFocusManager.setFocus(bestCard);
+                state.isStageFocused = true;
+                
+                // 3. Simular clic para iniciar la reproducción
+                bestCard.click(); 
+                
+                showStatusMessage(`Reproduciendo evento: ${currentEventChannel.event.match}`, 'success');
+            } else {
+                // Si no se encuentra la tarjeta, buscar el primer canal de ese nombre en la lista de todos los canales
+                const bestFallbackChannel = state.channelsData.find(c => normalizeText(c.name).includes(normalizedName));
+                if(bestFallbackChannel) {
+                    handleChannelPlay(bestFallbackChannel);
+                    showStatusMessage(`Reproduciendo (sin tarjeta visible): ${bestFallbackChannel.name}`, 'warning');
+                } else {
+                    showStatusMessage(`No se encontró un canal para ${currentEventChannel.name}`, 'error');
+                }
+            }
+        }
+
 
         // #############################
         // ### FIN NUEVAS FUNCIONES STAGE ###
@@ -4376,6 +4522,16 @@
                      }
                 });
             });
+            
+            // Evento para Stage (click en modo carrusel)
+            const stageElement = document.getElementById('tvStage');
+            if (stageElement) {
+                stageElement.removeEventListener('click', handleStageClickOrEnter);
+                // Solo adjuntamos el manejador si hay canales en el carrusel
+                if(state.carouselChannels.length > 0) {
+                   stageElement.addEventListener('click', handleStageClickOrEnter);
+                }
+            }
         };
         
         const handleTVCardPlay = (e) => {
@@ -4413,7 +4569,7 @@
                     .filter(c => c)
                     .sort(compareChannelsForSort);
                 
-                const alternativeChannel = sortedOptions[1]; 
+                const alternativeChannel = sortedOptions.find(c => c.id !== channel.id); 
                 
                 if (alternativeChannel) {
                     channelToPlay = alternativeChannel;
@@ -4589,15 +4745,18 @@
                 removeFocusClasses: function() {
                     document.querySelectorAll('.tv-card-focused').forEach(el => el.classList.remove('tv-card-focused'));
                     document.querySelectorAll('.tv-sidebar-link-focused').forEach(el => el.classList.remove('tv-sidebar-link-focused'));
+                    document.getElementById('tvStage').classList.remove('stage-focused'); // Remover foco del Stage
                 },
                 updateFocusableElements: function() {
                     const searchElement = document.getElementById('tvSearch');
                     const sidebarLinks = Array.from(document.querySelectorAll('.tv-nav-link'));
                     const settingsModeBtn = document.getElementById('settingsModeBtn');
+                    const stageElement = document.getElementById('tvStage');
                     // MODIFICACIÓN: Incluir los encabezados de grupo como elementos enfocables.
                     const groupHeaders = Array.from(document.querySelectorAll('.tv-group-header'));
                     const allCards = Array.from(document.querySelectorAll('.tv-card'));
-                    this.focusableElements = [searchElement, ...sidebarLinks, settingsModeBtn, ...groupHeaders, ...allCards].filter(el => el && el.offsetParent !== null);
+                    // NUEVO: El Stage es enfocable (sólo si hay canales en el carrusel)
+                    this.focusableElements = [searchElement, ...sidebarLinks, settingsModeBtn, stageElement, ...groupHeaders, ...allCards].filter(el => el && el.offsetParent !== null);
                 },
                 setFocus: function(element) {
                     if (!element) return;
@@ -4612,6 +4771,12 @@
                          const channel = state.channelsData.find(c => c.id === channelId);
                          updateStage(channel);
                          element.classList.add('tv-card-focused');
+                         element.focus();
+                    } else if (element.id === 'tvStage') {
+                         state.isStageFocused = true;
+                         updateStage(null); // Esto iniciará el carrusel si hay canales
+                         element.classList.add('stage-focused');
+                         element.focus();
                     } else {
                          state.isStageFocused = false;
                          updateStage(null); // Vuelve al carrusel o a info
@@ -4649,6 +4814,13 @@
                         case ' ':
                             e.preventDefault();
                             this.selectFocused();
+                            return;
+                        case 't': // NUEVO: Foco al Stage
+                        case 'T':
+                            e.preventDefault();
+                            if (state.carouselChannels.length > 0) {
+                                this.setFocus(document.getElementById('tvStage'));
+                            }
                             return;
                         case 'Escape':
                         case 'Backspace':
@@ -4694,8 +4866,18 @@
                     const allCards = Array.from(document.querySelectorAll('.tv-card'));
                     const sidebarElements = Array.from(document.querySelectorAll('#tvSearch, .tv-nav-link, #settingsModeBtn'));
                     const focusedElement = this.currentFocus;
+                    const stageElement = document.getElementById('tvStage');
 
-                    // 1. Foco en Sidebar
+                    // 1. Foco en Stage (en medio de la transición)
+                    if (focusedElement === stageElement && allCards.length > 0) {
+                        if (direction === 'ArrowDown') {
+                            return document.querySelector('.tv-group-header') || allCards[0];
+                        } else if (direction === 'ArrowLeft') {
+                            return document.getElementById('settingsModeBtn');
+                        }
+                    }
+
+                    // 2. Foco en Sidebar
                     if (sidebarElements.includes(focusedElement)) {
                         const focusedIndex = sidebarElements.indexOf(focusedElement);
                         if (direction === 'ArrowDown' && focusedIndex < sidebarElements.length - 1) {
@@ -4703,13 +4885,14 @@
                         } else if (direction === 'ArrowUp' && focusedIndex > 0) {
                             return sidebarElements[focusedIndex - 1];
                         } else if (direction === 'ArrowRight') {
+                             if (stageElement && state.carouselChannels.length > 0) return stageElement;
                              const firstHeader = document.querySelector('.tv-group-header');
                              if (firstHeader) return firstHeader;
                              if (allCards.length > 0) return allCards[0];
                         }
                     }
                     
-                    // 2. Foco en Encabezado de Grupo
+                    // 3. Foco en Encabezado de Grupo
                     else if (focusedElement.classList.contains('tv-group-header')) {
                         const groupHeaders = Array.from(document.querySelectorAll('.tv-group-header'));
                         const focusedIndex = groupHeaders.indexOf(focusedElement);
@@ -4718,6 +4901,7 @@
                             const cardsInGroup = Array.from(focusedElement.closest('.tv-group').querySelectorAll('.tv-card'));
                             if (cardsInGroup.length > 0) return cardsInGroup[0];
                         } else if (direction === 'ArrowLeft') {
+                            if (stageElement && state.carouselChannels.length > 0) return stageElement;
                             return document.getElementById('settingsModeBtn');
                         } else if (direction === 'ArrowDown') {
                             if (focusedIndex < groupHeaders.length - 1) {
@@ -4727,12 +4911,13 @@
                             if (focusedIndex > 0) {
                                 return groupHeaders[focusedIndex - 1];
                             } else {
+                                if (stageElement && state.carouselChannels.length > 0) return stageElement;
                                 return document.querySelector('.tv-nav-link[data-filter="all"]');
                             }
                         }
                     }
 
-                    // 3. Foco en Tarjeta (Lógica original)
+                    // 4. Foco en Tarjeta (Lógica original)
                     else if (focusedElement.classList.contains('tv-card')) {
                         const currentRow = focusedElement.closest('.tv-subgroup-content');
                         if (!currentRow) return null;
@@ -4776,6 +4961,8 @@
                     if (this.currentFocus) {
                         if (this.currentFocus.classList.contains('tv-card')) {
                             this.currentFocus.click();
+                        } else if (this.currentFocus.id === 'tvStage') { // NUEVO: Acción para el Stage
+                            handleStageClickOrEnter();
                         } else if (this.currentFocus.classList.contains('tv-nav-link')) {
                             this.currentFocus.click();
                         } else if (this.currentFocus.id === 'tvSearch') {
@@ -4884,26 +5071,24 @@
                 }
             });
             
+            // Intervalo de 1 segundo para actualizaciones de progreso en vivo
             setInterval(() => {
-                // Si el foco está en un canal o en la barra lateral, no hacer nada.
-                if (state.tvFocusManager.currentFocus && (state.tvFocusManager.currentFocus.classList.contains('tv-card') || state.tvFocusManager.currentFocus.id !== 'tvSearch')) {
-                    // Si el foco está en un canal, solo se actualiza el Stage por el setInterval de updateStage (si está Live)
-                    // Si el foco está en la sidebar, el carrusel se encarga de las actualizaciones (si está activo)
-                    
-                    // Asegurar que el carrusel se actualice si no hay foco en una tarjeta
-                    if (!state.isStageFocused && state.carouselChannels.length > 0) {
-                        renderCarouselItem(state.carouselChannels[state.carouselIndex]);
+                // Si el foco está en un canal, su progreso se actualiza en `updateStage`.
+                // Si está en el Stage (carrusel), se encarga `renderLiveProgress`.
+                
+                // Si no hay foco en el Stage/Tarjeta, aseguramos que el carrusel se actualice por si un evento pasó a Live
+                if (!state.isStageFocused && state.carouselChannels.length > 0) {
+                    // Solo si hay canales activos. La lógica de inicio/stop está en `startCarousel`/`renderCarouselItem`.
+                    // Aquí solo necesitamos la actualización de progreso si es un canal live.
+                    const currentChannel = state.carouselChannels[state.carouselIndex];
+                    if (currentChannel && currentChannel.event && getStageChannelInfo(currentChannel).isLive) {
+                        renderLiveProgress(currentChannel);
                     }
-                    
-                    // No hacemos renderTVChannels() completo, solo si es necesario (e.g. cada 1 min)
-                } else {
-                     // Si está en el modo de búsqueda o sin foco, hacemos un re-render suave de todo
-                     renderTVChannels();
                 }
             }, 1000); 
 
+            // Intervalo de 1 minuto para re-render y recalcular carrusel
             setInterval(() => {
-                // Re-render completo para actualizar eventos en la cuadrícula
                 renderTVChannels();
                 setupCarouselChannels(); // Recalcula canales del carrusel por si cambió de estado (Upcoming -> Live)
             }, 60000); 
