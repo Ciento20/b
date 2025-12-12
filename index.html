@@ -1,23 +1,2509 @@
-<!doctype html>
-<html lang="es">
+<!doctype html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.6,user-scalable=no"><title>TV</title><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.8em%22 font-size=%2285%22>📺</text></svg>"><style>:root{--primary:#2563eb;--primary-light:rgba(37,99,235,0.1);--primary-dark:#1e50c7;--bg-light:#f1f5f9;--card-bg:#ffffff;--text:#1e293b;--border-color:#e2e8f0;--white:#ffffff;--radius-md:5px;--radius-sm:3px;--shadow-sm:0 0.5px 1.5px rgba(0,0,0,0.1);--primary-rgb:37,99,235;--secondary:#000000;--success:#4cc9f0;--warning:#f8961e;--info:#4895ef;--movistar-blue:#0085C1;--eurosport-blue:#5e17eb;--dazn-black:#000000;--f1-red:#ff3535;--action-red:#ff544d;--cinema-red:#fa3732;--sports-green:#11a45b;--vamos-green:#1fc23d;--copadelrey-green:#449653;--champions-teal:#52c29c;--liga-teal:#21ffb8;--hypermotion-cyan:#04d2d7;--golf-teal:#4ee1b0;--eurosport-number-red:#ff3535;--plus-blue:#3399ff;--western-red:#e60000;--documentary-purple:#a06cf5;--originals-blue:#3985b0;--ellas-green:#35fd9b;--series-orange:#ff8c1f;--gist-source-color:#2d077d;--elcano-source-color:#7d070e;--special-gist-color:#9c27b0;--events-source-color:#074f7d;--shickat-badge:#077b3b;--era-source-color:#f55d3e;--channel-name-color:#888888;--player-bg:black;--channel-number-color:#4b5563}body.dark-mode{--bg-light:#131313;--card-bg:#282828;--text:#f8fafc;--border-color:#555555;--shadow-sm:0 0.5px 1.5px rgba(0,0,0,0.3);--primary-light:rgba(var(--primary-rgb),0.2);--channel-name-color:#e2e2ff;--player-bg:#1e1e1e;--channel-number-color:#b0b0b0}body{background:#151515!important;color:#e0e0e0!important;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;line-height:1.6;margin:0;padding:0;transition:all .3s}.channel-card{min-width:140px;max-width:140px;flex:0 0 auto;scroll-snap-align:start;background:var(--card-bg);border:0.5px solid var(--border-color);border-radius:var(--radius-md);padding:0.25rem 0.5rem 0.5rem 0.5rem;cursor:pointer;box-shadow:var(--shadow-sm);transition:all .2s;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;text-align:center}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.6,user-scalable=no">
-    <title>TV</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.8em%22 font-size=%2285%22>📺</text></svg>">
+                .status-message{text-align:center;padding:0.25rem;font-size:.425rem;background-color:rgba(76,201,240,.1);border-radius:var(--radius-sm);margin-bottom:0.25rem;opacity:1;transition:all .5s ease-in-out,margin .5s ease-in-out;margin-left:auto;margin-right:auto;max-width:400px;width:90%;box-shadow:var(--shadow-sm);z-index:50}.status-message.hide{opacity:0;transform:translateY(-10px);pointer-events:none;margin-bottom:0}.status-message.success{color:var(--primary);background-color:var(--primary-light)}.status-message.info{color:var(--primary);background-color:var(--primary-light)}.status-message.error{color:var(--text);background-color:rgba(247,37,133,.2)}.status-message.warning{color:var(--warning);background-color:rgba(248,150,30,.1)}.modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;justify-content:center;align-items:center;z-index:1001}.modal--active{display:flex}.modal__content{background:var(--card-bg);border-radius:var(--radius-md);padding:0.6rem;width:90%;max-width:175px;box-shadow:var(--shadow-sm)}.modal__title{margin-bottom:0.4rem;color:var(--text);font-size:0.55rem;display:flex;align-items:center;gap:4px}.modal__actions{display:flex;justify-content:flex-end;gap:0.3rem;margin-top:0.5rem}.modal__btn{padding:0.25rem 0.4rem;border:none;border-radius:var(--radius-sm);cursor:pointer;font-weight:500;font-size:0.45rem;transition:all .2s}.modal__btn--primary{background:var(--primary);color:#fff}.modal__btn--primary:hover{background:var(--primary-dark)}.settings-section{margin-bottom:0.6rem;padding-bottom:0.5rem;border-bottom:0.5px solid var(--border-color)}.settings-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}.settings-section__title{font-size:0.45rem;color:var(--primary);margin-bottom:0.4rem;display:flex;align-items:center;gap:4px}.settings-item{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;padding:0.25rem;border-radius:var(--radius-sm);transition:background .2s}.settings-item:hover{background:var(--primary-light)}.settings-item__info{display:flex;align-items:center;gap:6px;flex:1}.settings-icon{font-size:0.6rem}.settings-label{font-size:0.45rem;color:var(--text);font-weight:500;display:block}.settings-description{font-size:0.375rem;color:var(--text);opacity:.7;display:block;margin-top:1px}.settings-switch{position:relative;display:inline-block;width:25px;height:12px}.settings-switch input{opacity:0;width:0;height:0}.settings-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.4s;border-radius:12px}body.dark-mode .settings-slider{background-color:#555555}.settings-slider:before{position:absolute;content:"";height:8px;width:8px;left:2px;bottom:2px;background-color:#fff;transition:.4s;border-radius:50%}input:checked+.settings-slider{background-color:var(--primary)}input:checked+.settings-slider:before{transform:translateX(13px)}.color-picker{display:flex;gap:3px}.color-option{width:12px;height:12px;border-radius:50%;border:1px solid transparent;cursor:pointer;transition:transform .2s}.color-option:hover{transform:scale(1.1)}.color-option.active{border-color:var(--text);transform:scale(1.1)}.modal__title,.channel-option-name,.settings-label{color:var(--text)!important}.settings-description{color:var(--text)!important;opacity:.7!important}.settings-section__title{color:var(--primary)!important}.degradado-comedia{background-image:linear-gradient(to right,#ff3c3c,orange);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight}.copy-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--card-bg);border:0.5px solid var(--border-color);border-radius:var(--radius-md);padding:0.75rem;box-shadow:0 2px 6px rgba(0,0,0,.2);z-index:2000;width:90%;max-width:160px;display:none;flex-direction:column;align-items:center;text-align:center;animation:fadeIn .3s ease-out}.copy-modal.active{display:flex}.copy-modal-icon{font-size:1.25rem;margin-bottom:0.4rem}.copy-modal-text{font-size:0.475rem;color:var(--text);margin-bottom:0.5rem}.copy-modal-button{padding:0.3rem 0.6rem;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:0.45rem;font-weight:600;transition:background .2s;margin-bottom:0.25rem}.copy-modal-button:hover{background:var(--primary-dark)}.copy-modal-url{background-color:var(--bg-light);color:var(--text);padding:0.25rem;margin-bottom:0.5rem;border-radius:var(--radius-sm);font-family:monospace;word-break:break-all;font-size:0.425rem;display:block}body.dark-mode .copy-modal-url{background-color:var(--border-color)}@keyframes fadeIn{from{opacity:0;transform:translate(-50%,-60%)}to{opacity:1;transform:translate(-50%,-50%)}}.copy-message{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:0.3rem 0.6rem;border-radius:var(--radius-sm);font-size:0.45rem;z-index:2001;opacity:0;transition:opacity .4s ease-in-out}.copy-message.show{opacity:1}.floating-save-button{display:none!important}.live-time-blink{color:var(--primary)!important;animation:soft-blink 1.5s infinite ease-in-out;font-weight:700}@keyframes soft-blink{0%,100%{opacity:1}50%{opacity:.5}}.live-separator{display:none}.subgroup-title,.subgroup-content{display:none!important}.tv-mode-active{background:#151515!important;color:#e0e0e0!important}#tvSidebar{background:#111111;color:#e0e0e0;padding:0.75rem 0.25rem;position:fixed;left:0;top:0;width:50px;height:100vh;overflow-y:auto;border-right:0.5px solid #383838;z-index:100;display:flex;flex-direction:column;justify-content:center}#tvSidebar .sidebar-logo{font-size:0.5rem;font-weight:800;color:white;margin-bottom:1rem;padding-left:2.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#tvSidebar input#tvSearch{width:100%;padding:4px 2.5px;border-radius:3px;font-size:0.4rem;box-sizing:border-box;background-color:#383838;color:#ffffff;border:0.5px solid #555555;box-shadow:0 1px 2px rgba(0,0,0,0.4)}#tvSidebar input#tvSearch:focus{outline:none;border-color:var(--primary)}#tvSidebar .tv-nav-link{display:flex;flex-direction:column;align-items:center;padding:4px 0;border-radius:3px;color:#e0e0e0;text-decoration:none;font-weight:600;transition:background-color 0.2s;text-align:center;font-size:0.375rem;line-height:1.1}#tvSidebar .tv-nav-link.brand-filter{padding:2.5px 0;margin:2.5px auto;justify-content:center;width:100%;height:auto}#tvSidebar .tv-nav-link.dazn-filter{width:40px;height:24px}#tvSidebar .tv-nav-link.movistar-filter{width:40px;height:16.5px}#tvSidebar .tv-nav-link.eurosport-filter{width:40px;height:24px}#tvSidebar .tv-nav-link.brand-filter img{max-width:90%;max-height:90%;width:auto;height:auto;object-fit:contain}#tvSidebar .tv-nav-link.sport-filter{font-size:0.6rem;padding:5px 0;height:10px;width:20px;border-radius:50%;margin:0 2.5px}#tvSportFilters{display:flex;flex-wrap:wrap;justify-content:center;gap:2.5px;padding:2.5px 0;margin-bottom:0.25rem;border-bottom:0.5px solid #383838;border-top:0.5px solid #383838}#tvSidebar .tv-nav-link span{margin-right:0!important;margin-bottom:1.5px;font-size:0.55rem!important}#tvSidebar .tv-nav-link:hover,#tvSidebar .tv-nav-link.focused-link{background-color:#2d2d2d}
+
+        .tv-sidebar-link-focused {
+            background-color: var(--primary) !important;
+            border: 1px solid white; /* Reducido a la mitad: 2px -> 1px */
+            outline-offset: 1px; /* Reducido a la mitad: 2px -> 1px */
+            transform: scale(1.02);
+        }
+
+        #tvMainContent {
+            margin-left: 50px; /* Reducido a la mitad: 100px -> 50px */
+            padding: 0.75rem 1.25rem; /* Reducido a la mitad: 1.5rem 2.5rem -> 0.75rem 1.25rem */
+            min-height: 100vh;
+            background: #151515;
+            display: flex; /* Nuevo: Habilitar flexbox */
+            flex-direction: column; /* Nuevo: Apilar elementos */
+        }
+
+        #tvSidebar button#settingsModeBtn {
+            width: 20px; /* Reducido a la mitad: 40px -> 20px */
+            height: 20px; /* Reducido a la mitad: 40px -> 20px */
+            padding: 0;
+            font-size: 0.6rem; 
+            background-color: #383838;
+            color: #e0e0e0;
+            border: none;
+            border-radius: 50%;
+            margin: 0.25rem auto; /* Reducido a la mitad: 0.5rem auto -> 0.25rem auto */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        #tvSidebar button#settingsModeBtn:hover,
+        #tvSidebar button#settingsModeBtn.tv-sidebar-link-focused {
+            background-color: var(--primary) !important;
+            border: 1px solid white; /* Reducido a la mitad: 2px -> 1px */
+            outline-offset: 1px; /* Reducido a la mitad: 2px -> 1px */
+            transform: scale(1.1);
+        }
+        
+        #tvBottomNav {
+            padding: 0 2.5px; /* Reducido a la mitad: 0 5px -> 0 2.5px */
+            margin-top: 0.5rem;         }
+        
+        .tv-card {
+            min-width: 150px; /* Reducido a la mitad: 300px -> 150px */
+            max-width: 150px; /* Reducido a la mitad: 300px -> 150px */
+            height: 84.5px; /* Reducido a la mitad: 169px -> 84.5px */
+            border-radius: 6px; /* Reducido a la mitad: 12px -> 6px */
+            background: #2d2d2d;
+            border: 1px solid transparent; /* Reducido a la mitad: 2px -> 1px */
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-start;
+            padding: 5px 0; /* Reducido a la mitad: 10px 0 -> 5px 0 */
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, border-color 0.3s ease-in-out;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            box-shadow: 0 2px 7.5px rgba(0, 0, 0, 0.4); 
+        }
+
+        .tv-card-focused {
+            transform: scale(1.05);
+            border-color: var(--primary) !important;
+            box-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.5); 
+        }
+
+        .tv-channels-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem; /* Reducido a la mitad: 2.5rem -> 1.25rem */
+            flex-grow: 1; /* Nuevo: Asegura que la cuadrícula ocupe el espacio restante */
+            min-height: 0; /* Fix para flex-grow en algunos navegadores */
+            justify-content: flex-start; /* Por defecto, alinear arriba */
+        }
+
+        .tv-group {
+            padding: 0;
+            margin-bottom: 0;
+        }
+
+        .tv-group-header {
+            padding: 0 0 0.4rem 0; /* Reducido a la mitad: 0.8rem -> 0.4rem */
+            display: flex;
+            align-items: center;
+        }
+
+        .tv-group-title {
+            font-size: 0.75rem;             font-weight: 700;
+            color: #e0e0e0;
+            border-left: 2px solid var(--primary); /* Reducido a la mitad: 4px -> 2px */
+            padding-left: 7.5px; /* Reducido a la mitad: 15px -> 7.5px */
+            width: 100%;
+            margin-top: 0; 
+        }
+
+        .tv-date-header {
+            font-size: 0.9rem; /* Reducido a la mitad: 1.8rem -> 0.9rem */
+            font-weight: 800;
+            color: #e0e0e0;
+            margin-top: 1rem; /* Reducido a la mitad: 2rem -> 1rem */
+            margin-bottom: 0.25rem; /* Reducido a la mitad: 0.5rem -> 0.25rem */
+            padding-left: 0;
+            width: 100%;
+        }
+        
+        .tv-date-header:first-of-type {
+            margin-top: 0;
+        }
+
+
+        .tv-subgroup-content {
+            display: flex;
+            gap: 0.75rem;             padding: 0.25rem 0; /* Reducido a la mitad: 0.5rem 0 -> 0.25rem 0 */
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            scroll-snap-type: x mandatory;
+        }
+
+        .tv-subgroup-content::-webkit-scrollbar {
+            height: 0;
+            display: none;
+        }
+
+        .modal__content {
+            max-width: 225px; /* Reducido a la mitad: 450px -> 225px */
+        }
+
+        .channel-option-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px; /* Reducido a la mitad: 10px -> 5px */
+            margin-bottom: 2.5px; /* Reducido a la mitad: 5px -> 2.5px */
+            border-radius: var(--radius-sm);
+            background: #343434; 
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: 0.5px solid #444444; 
+        }
+
+        .channel-option-item:hover {
+            background: #333333;
+            border-color: var(--primary);
+        }
+
+        .channel-option-name {
+            font-weight: 600;
+            color: var(--text);
+            flex-grow: 1;
+            margin-left: 5px; /* Reducido a la mitad: 10px -> 5px */
+            font-size: 0.45rem; /* Añadido: Se reduce el tamaño de fuente */
+        }
+        
+        .channel-option-name-container {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .last-viewed-indicator {
+            margin-left: 2.5px; /* Reducido a la mitad: 5px -> 2.5px */
+            margin-right: 5px; /* Reducido a la mitad: 10px -> 5px */
+            font-size: 0.55rem;             color: var(--primary);
+            font-weight: 700;
+        }
+        
+        .channel-option-details {
+            font-size: 0.4rem; /* Añadido: Se reduce el tamaño de fuente */
+            display: flex;
+            align-items: center;
+            gap: 3px; /* Añadido: Espacio reducido */
+        }
+
+        .tv-link-button {
+            position: absolute;
+            bottom: 2.5px; /* Reducido a la mitad: 5px -> 2.5px */
+            right: 2.5px; /* Reducido a la mitad: 5px -> 2.5px */
+            width: 15px; /* Reducido a la mitad: 30px -> 15px */
+            height: 15px; /* Reducido a la mitad: 30px -> 15px */
+            border-radius: 50%;
+            background-color: rgba(120, 120, 120, 0.15);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.45rem; /* Reducido a la mitad: 0.9rem -> 0.45rem */
+            box-shadow: 0 0.5px 2px rgba(0, 0, 0, 0.4); 
+            z-index: 50;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .tv-link-button:hover,
+        .tv-link-button-focused {
+            background-color: var(--primary);
+            transform: scale(1.05);
+        }
+        
+        .favorite-toggle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin-right: 2.5px; /* Reducido a la mitad: 5px -> 2.5px */
+            font-size: 0.6rem; 
+            color: #FFD700;
+            transition: transform 0.1s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .favorite-toggle-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .favorite-toggle-btn.is-not-favorite {
+            color: var(--channel-name-color);
+            opacity: 0.7;
+            font-weight: 400;
+        }
+        
+        /* ESTILOS PARA EL MENSAJE DE NO RESULTADOS */        .no-results-container{display:flex;justify-content:center;align-items:center;flex-grow:1;width:100%;height:100%}.no-results{text-align:center;padding:1rem;background:var(--card-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);margin:auto;max-width:400px;width:90%}.no-results-icon{font-size:1.5rem;margin-bottom:.5rem;opacity:.5;color:#666}.no-results-text{font-size:.55rem;color:var(--text);margin-bottom:.25rem;font-weight:600}.no-results-hint{font-size:.45rem;color:var(--text);opacity:.7}body.dark-mode .no-results{background:#222;border:.5px solid #383838;box-shadow:none}body.dark-mode .no-results-icon{color:#666;opacity:1}body.dark-mode .no-results-text{color:#e0e0e0}body.dark-mode .no-results-hint{color:#aaa}body.hide-options-button-active .tv-card .tv-link-button{visibility:hidden}#tvChannelsGrid.no-channels{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100%;min-height:50vh;gap:0}</style></head><body class="tv-mode-active dark-mode"><aside id="tvSidebar"><div><div style="margin-bottom:.5rem;padding:0 2.5px"><input type="text" id="tvSearch" placeholder="Buscar canal..." tabindex="0"></div><nav><ul style="list-style:none;padding:0;margin:0"><li style="margin-bottom:.25rem"><a href="#" class="tv-nav-link" data-filter="events_only" tabindex="0"><span>📅</span> Eventos </a></li><li style="margin-bottom:.25rem"><a href="#" class="tv-nav-link" data-filter="all" tabindex="0"><span>🌐</span> Todos </a></li><li style="margin-bottom:.25rem"><a href="#" class="tv-nav-link" data-filter="live" tabindex="0"><span>🔴</span> Directo </a></li><li style="margin-bottom:.25rem"><a href="#" class="tv-nav-link" data-filter="favorites" tabindex="0"> <span>⭐</span>Favoritos </a></li><li style="margin:.25rem 0;border-top:.5px solid #383838"></li><li style="margin-top:.25rem"><a href="#" class="tv-nav-link brand-filter dazn-filter" data-filter="dazn" tabindex="0"> <img src="https://images.weserv.nl/?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Flogopedia%2Fimages%2F7%2F7c%2FDAZN.svg%2Frevision%2Flatest%3Fcb%3D20210824163814" alt="DAZN Logo"> </a></li><li><a href="#" class="tv-nav-link brand-filter movistar-filter" data-filter="m+" tabindex="0"><img src="https://images.weserv.nl/?url=https://static.wikia.nocookie.net/logopedia/images/a/af/Movistar_2025.svg/revision/latest?cb=20251005163444" alt="Movistar+ Logo"> </a></li><li style="margin-bottom:.25rem"><a href="#" class="tv-nav-link brand-filter eurosport-filter" data-filter="eurosport" tabindex="0"> <img src="https://images.weserv.nl/?url=https://static.wikia.nocookie.net/logopedia/images/9/99/Eurosport_Mobile_Logo.png/revision/latest?cb=20180407080639"> </a></li><div id="tvSportFilters"><a href="#" class="tv-nav-link sport-filter" data-sport-key="futbol" tabindex="0" title="Fútbol">⚽</a><a href="#" class="tv-nav-link sport-filter" data-sport-key="baloncesto" tabindex="0" title="Baloncesto">🏀</a><a href="#" class="tv-nav-link sport-filter" data-sport-key="tenis" tabindex="0" title="Tenis">🎾</a><a href="#" class="tv-nav-link sport-filter" data-sport-key="motorsport" tabindex="0" title="Motorsport">🏁</a><a href="#" class="tv-nav-link sport-filter" data-sport-key="f1" tabindex="0" title="F1">🏎️</a></div></ul></nav></div><div id="tvBottomNav"><button id="settingsModeBtn" tabindex="0"> ⚙️ </button></div></aside><main id="tvMainContent"><div id="tvStatusMessageContainer" style="margin-bottom:.75rem"></div><h1 style="color:white;margin-top:0"></h1><div class="tv-channels-grid" id="tvChannelsGrid"></div></main><div class="modal" id="settingsModal"><div class="modal__content"><h3 class="modal__title">⚙️ Ajustes</h3><div class="settings-section"><h4 class="settings-section__title">📺 Opciones de Interfaz</h4><div class="settings-item"><div class="settings-item__info"><span class="settings-icon">🖥️</span><div><span class="settings-label">Pantalla Completa al Clic</span><span class="settings-description">Activa el modo de pantalla completa al hacer clic en cualquier parte de la interfaz.</span></div></div><label class="settings-switch"><input type="checkbox" id="fullScreenOnClickCheckbox"><span class="settings-slider"></span></label></div><div class="settings-item"><div class="settings-item__info"><span class="settings-icon">➕</span><div><span class="settings-label">Ocultar Botón de Opciones</span><span class="settings-description">Mantiene la funcionalidad del botón '+' pero lo hace invisible.</span></div></div><label class="settings-switch"><input type="checkbox" id="hideOptionsButtonCheckbox"><span class="settings-slider"></span></label></div></div><div class="settings-section"><h4 class="settings-section__title">🎨 Apariencia</h4><div class="settings-item"><div class="settings-item__info"><span class="settings-icon">🎨</span><div><span class="settings-label">Color principal</span><span class="settings-description">Elige un color para la interfaz</span></div></div><div class="color-picker"><button class="color-option" data-color="#2563eb" style="background:#2563eb"></button><button class="color-option" data-color="#dc2626" style="background:#dc2626"></button><button class="color-option" data-color="#16a34a" style="background:#16a34a"></button><button class="color-option" data-color="#79006f" style="background:#79006f"></button></div></div></div><div class="settings-section"><h4 class="settings-section__title">🔧 Datos</h4><div class="settings-item"><div class="settings-item__info"><span class="settings-icon">⭐</span><div><span class="settings-label">Restablecer puntuaciones</span><span class="settings-description">Borra la puntuación de estabilidad de todos los canales</span></div></div><button class="modal__btn" onclick="resetRatings()">Reiniciar</button></div></div><div class="modal__actions"><button class="modal__btn modal__btn--primary" id="closeSettingsBtn">Cerrar</button></div></div></div><div class="copy-modal" id="copyModal"><div class="copy-modal-icon">🔗</div><div class="copy-modal-text">Enlace AceStream a copiar:</div><p id="copyUrlDisplayAceStream" class="copy-modal-url"></p><button class="copy-modal-button" id="copyAceStreamBtn" data-format="acestream">Copiar AceStream</button><button class="modal__btn modal__btn--cancel" id="cancelCopyBtn">Cancelar</button></div><div class="copy-message" id="copyMessage">URL copiada con éxito!</div><div class="modal" id="tvChannelOptionsModal"><div class="modal__content" style="max-width:225px"><h3 class="modal__title">📺 Opciones de Canal <span id="tvModalChannelName"></span></h3><div id="tvModalChannelList" style="max-height:350px;overflow-y:auto"></div><div class="modal__actions"><button class="modal__btn modal__btn--primary" id="closeTvOptionsBtn">Cerrar</button></div></div></div><script>        const state = {
+            allChannels: [],
+            channelsData: [],
+            favorites: JSON.parse(localStorage.getItem('favorites')) || [],
+            channelHistory: JSON.parse(localStorage.getItem('channelHistory')) || {},
+            currentChannel: null,
+            clearButtonClickCount: 0, 
+            lastClearButtonClickTime: 0,
+            elcanoRetries: 0,
+            eventsRetries: 0,
+            primaryColor: localStorage.getItem('primaryColor') || '#2563eb',
+            channelRatings: JSON.parse(localStorage.getItem('channelRatings')) || {},
+            lastChannelPlay: JSON.parse(localStorage.getItem('lastChannelPlay')) || null,
+            firstSeen: JSON.parse(localStorage.getItem('firstSeen')) || {},
+            hideEventDetails: localStorage.getItem('hideEventDetails') === 'true',
+            tvCurrentFilter: localStorage.getItem('tvCurrentFilter') || 'all',
+            tvSportFilter: localStorage.getItem('tvSportFilter') || 'all', 
+            tvSearchTerm: '',
+            tvFocusManager: null,
+            playerActive: false,
+            lastPlayedByChannel: JSON.parse(localStorage.getItem('lastPlayedByChannel')) || {},
+            channelLogos: JSON.parse(localStorage.getItem('channelLogos')) || {}, // NUEVO: Estado para almacenar los logos
+            fullScreenOnClick:localStorage.getItem('fullScreenOnClick')==='true',hideOptionsButton:localStorage.getItem('hideOptionsButton')==='true'};const LOGOPEDIA_BASE_URL="https://static.wikia.nocookie.net/logopedia/images/";const IMAGE_PROXY_URL="https://images.weserv.nl/?url=";const ERA_URL="https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/data/listas/listaplana.txt";
+        
+        // Se elimina el objeto championsLeagueImages
+
+        function getPlaceholderInfo(channelName) {
+            // MODIFICADO: Ahora busca en el nuevo estado de logos
+            const logoUrl = state.channelLogos[channelName.trim()];
+            if (logoUrl) {
+                return {
+                    logo: proxyImage(logoUrl),
+                    color: null // Mantenerlo nulo para que use el color por marca o el predeterminado
+                };
+            }
+            return null;
+        }
+
+        function proxyImage(url) {
+            return IMAGE_PROXY_URL + encodeURIComponent(url);
+        }
+        const PROXIES = [
+            'https://api.allorigins.win/raw?url=',
+            'https://cors-anywhere.herokuapp.com/',
+            'https://api.codetabs.com/v1/proxy/?quest=',
+            'https://proxy-cors-simple.vercel.app/api?url=',
+            'https://yacdn.org/proxy/',
+            'https://cors-proxy.fringe.co.kr/?'
+        ];
+        const GIST_URL = "https://gist.githubusercontent.com/Ciento20/f7847e86d06e5011706fa76f2dab90be/raw";
+        const ELCANO_URL = 'https://ipfs.io/ipns/elcano.top';
+        const EVENTS_URL = 'https://eventos-eight-dun.vercel.app/';
+        const SHICKAT_URL = 'https://shickat.me/';
+        const BACKUP_KEYS = {
+            gist: 'gist_channels_backup',
+            elcano: 'elcano_channels_backup',
+            events: 'events_channels_backup',
+            shickat: 'shickat_channels_backup',
+            era: 'era_channels_backup',
+            logos: 'logos_backup' // NUEVO: Clave para el backup de logos
+        };
+        const MAX_RETRIES = 3;const BACKUP_EXPIRY_HOURS = 480;
+const HISTORY_EXPIRY_HOURS = 168;
+const TV_BRAND_FILTER_KEYS = ['all', 'events_only', 'live', 'favorites', 'dazn', 'm+', 'eurosport'];
+const TV_SPORT_FILTER_KEYS = ['futbol', 'baloncesto', 'tenis', 'motorsport', 'f1'];
+const OTHER_SUBGROUPS = ['LIGA ENDESA','CANAL DE TENIS','SUPERTENNIS','BUNDESLIGA','PRIMERA FEDERACIÓN','1RFEF','ARAGON TV','BEIN','BT SPORT','CANAL+SPORT','ESPN','ESSPN','SKY','ESPORT 3','FOX','GOL PLAY','REAL MADRID TV','ORANGE TV','RALLY TV','MOTOR','NBA','NFL','PREMIER SPORTS','DISCOVERY CHANNEL','DARK','AMC','LA 1','LA 2','ANTENA 3','Cuatro','Telecinco','LA SEXTA','24 HORAS','TELEDEPORTE','CAZA Y PESCA','CANAL COCINA','DECASA','ONETORO','ZIGGO','XTRM','MIXED TV','DAZN','(DE)','(PL)','(RU)'];
+function normalizeText(text) {
+    if (!text) return '';
+    return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+function extractPID(enlace) {
+    if (!enlace) return '';
+    return enlace.replace('acestream://', '').trim();
+}
+async function hashContent(text) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+function trackFirstSeen(channelId) {
+    if (!state.firstSeen[channelId]) {
+        state.firstSeen[channelId] = new Date().getTime();
+        localStorage.setItem('firstSeen', JSON.stringify(state.firstSeen));
+    }
+}
+function isChannelNew(channelId) {
+    const firstSeenTime = state.firstSeen[channelId];
+    if (!firstSeenTime) {
+        return false;
+    }
+    const tenMinutesInMs = 10 * 60 * 1000;
+    return (new Date().getTime() - firstSeenTime) < tenMinutesInMs;
+}
+function cleanupOldFirstSeenRecords() {
+    const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
+    const now = new Date().getTime();
+    for (const channelId in state.firstSeen) {
+        if ((now - state.firstSeen[channelId]) > oneWeekInMs) {
+            delete state.firstSeen[channelId];
+        }
+    }
+    localStorage.setItem('firstSeen', JSON.stringify(state.firstSeen));
+}
+function toggleFavorite(channelId) {
+    const index = state.favorites.indexOf(channelId);
+    if (index > -1) {
+        state.favorites.splice(index, 1);
+    } else {
+        state.favorites.push(channelId);
+    }
+    localStorage.setItem('favorites', JSON.stringify(state.favorites));
+    renderTVChannels();
+}
+function toggleFullScreenOnClick() {
+    state.fullScreenOnClick = !state.fullScreenOnClick;
+    localStorage.setItem('fullScreenOnClick', state.fullScreenOnClick);
+    document.getElementById('fullScreenOnClickCheckbox').checked = state.fullScreenOnClick;
+}
+function toggleHideOptionsButton() {
+    state.hideOptionsButton = !state.hideOptionsButton;
+    localStorage.setItem('hideOptionsButton', state.hideOptionsButton);
+    document.getElementById('hideOptionsButtonCheckbox').checked = state.hideOptionsButton;
+    document.body.classList.toggle('hide-options-button-active', state.hideOptionsButton);
+    renderTVChannels();
+}
+function requestFullScreen() {
+    if (document.fullscreenElement) {
+        return;
+    }
+    const element = document.documentElement;
+    if (element.requestFullscreen) {
+        element.requestFullscreen();
+    } else if (element.mozRequestFullScreen) {
+        element.mozRequestFullScreen();
+    } else if (element.webkitRequestFullscreen) {
+        element.webkitRequestFullscreen();
+    } else if (element.msRequestFullscreen) {
+        element.msRequestFullscreen();
+    }
+}function clearAllTVFilterVisuals() {
+    document.querySelectorAll('#tvSidebar .tv-nav-link').forEach(link => {
+        link.classList.remove('tv-sidebar-link-focused');
+    });
+    document.querySelectorAll('#tvBottomNav button').forEach(button => {
+        button.classList.remove('tv-sidebar-link-focused');
+    });
+}
+function applyTVFilter(filter, type) {
+    let updateNeeded = false;
+    if (type === 'brand') {
+        if (filter === 'all' && state.tvSearchTerm) {
+            state.tvSearchTerm = '';
+            const tvSearchInput = document.getElementById('tvSearch');
+            if (tvSearchInput) {
+                tvSearchInput.value = '';
+            }
+            updateNeeded = true;
+        }
+        if (state.tvCurrentFilter !== filter) {
+            state.tvCurrentFilter = filter;
+            localStorage.setItem('tvCurrentFilter', filter);
+            updateNeeded = true;
+        } else if (filter === 'all' || filter === 'live' || filter === 'favorites' || filter === 'events_only') {
+            updateNeeded = false;
+        } else {
+            state.tvCurrentFilter = 'all';
+            localStorage.setItem('tvCurrentFilter', 'all');
+            updateNeeded = true;
+        }
+        if (state.tvSportFilter !== 'all') {
+            state.tvSportFilter = 'all';
+            localStorage.setItem('tvSportFilter', 'all');
+            updateNeeded = true;
+        }
+    }
+    if (type === 'sport') {
+        state.tvSportFilter = state.tvSportFilter === filter ? 'all' : filter;
+        localStorage.setItem('tvSportFilter', state.tvSportFilter);
+        updateNeeded = true;
+        if (state.tvSportFilter !== 'all' && state.tvCurrentFilter !== 'all') {
+            state.tvCurrentFilter = 'all';
+            localStorage.setItem('tvCurrentFilter', 'all');
+        }
+    }
+    if (updateNeeded) {
+        renderTVChannels();
+    }
+}
+function showStatusMessage(message, type = "info") {
+    let statusElement;
+    let container;
+    container = document.getElementById('tvStatusMessageContainer');
+    statusElement = container.querySelector(".status-message");
+    if (!statusElement) {
+        statusElement = document.createElement("div");
+        statusElement.className = "status-message";
+        container.prepend(statusElement);
+    }
+    statusElement.textContent = message;
+    statusElement.className = `status-message ${type}`;
+    statusElement.classList.remove('hide');
+    if (type === 'error') {
+        statusElement.style.color = 'var(--text)';
+    } else if (type === 'warning') {
+        statusElement.style.color = 'var(--warning)';
+    } else if (type === 'success' || type === 'info') {
+        statusElement.style.color = 'var(--primary)';
+    }
+     else {
+        statusElement.style.color = '';
+    }
+    if (type === "success" || type === "info") {
+        setTimeout(() => {
+            statusElement.classList.add('hide');
+            statusElement.addEventListener('transitionend', () => {
+                if (statusElement.classList.contains('hide')) {
+                    statusElement.remove();
+                }
+            }, {
+                once: true
+            });
+        }, 3000);
+    }
+}
+function saveBackup(data, key, contentHash = null) {
+    try {
+        localStorage.setItem(key, JSON.stringify({
+            timestamp: new Date().getTime(),
+            data,
+            contentHash
+        }));
+    } catch (e) {
+        console.error(`Error al guardar la copia de seguridad para ${key}:`, e);
+    }
+}
+function loadBackup(key) {
+    try {
+        const backupData = localStorage.getItem(key);
+        if (backupData) {
+            const {
+                timestamp,
+                data,
+                contentHash
+            } = JSON.parse(backupData);
+            const backupAgeHours = (new Date().getTime() - timestamp) / (1000 * 60 * 60);
+            if (backupAgeHours > BACKUP_EXPIRY_HOURS) {
+                localStorage.removeItem(key);
+                return null;
+            }
+            return {
+                timestamp,
+                data,
+                contentHash
+            };
+        }
+    } catch (e) {
+        console.error(`Error al cargar la copia de seguridad para ${key}:`, e);
+    }
+    return null;
+}
+function mergeChannels(channelsArray) {
+    const allChannels = channelsArray;
+    const eventChannels = allChannels.filter(channel => channel.source === 'events');
+    const otherChannels = allChannels.filter(channel => channel.source !== 'events');
+    const eventIds = new Set(eventChannels.map(channel => channel.id));
+    const uniqueOtherChannelsMap = new Map();
+    const orderedOtherSources = ['elcano', 'shickat', 'era', 'gist'];
+    orderedOtherSources.forEach(source => {
+        otherChannels.forEach(channel => {
+            if (channel.source === source) {
+                if (!eventIds.has(channel.id)) {
+                    if (!uniqueOtherChannelsMap.has(channel.id)) {
+                        uniqueOtherChannelsMap.set(channel.id, channel);
+                    }
+                }
+            }
+        });
+    });
+    const mergedOtherChannels = Array.from(uniqueOtherChannelsMap.values());
+    return eventChannels.concat(mergedOtherChannels);
+}function loadAndRenderBackupChannels() {
+    let allBackupChannels = [];
+    let hasBackup = false;
+    for (const key in BACKUP_KEYS) {
+        // Excluimos la clave 'logos' ya que es un mapa de URLs y no una lista de canales para renderizar.
+        if (key === 'logos') continue;
+        const backup = loadBackup(BACKUP_KEYS[key]);
+        if (backup && backup.data) {
+            allBackupChannels = allBackupChannels.concat(backup.data.map(c => ({
+                ...c,
+                source: key,
+                name: c.name || `Canal de ${key.toUpperCase()}`,
+                id: c.id || `${key}_${Math.random()}`,
+                number: (c.id || `${key}_${Math.random()}`).substring(0, 3),
+                displayableName: c.displayableName || c.name
+            })));
+            hasBackup = true;
+        }
+    }
+    if (allBackupChannels.length > 0) {
+        const newChannels = mergeChannels(allBackupChannels);
+        state.channelsData = newChannels;
+        processChannelNames();
+        renderTVChannels();
+        return true;
+    }
+    return false;
+}
+// NUEVA FUNCIÓN: Carga y procesa el Gist como fuente de Logos
+async function loadChannelLogos() {
+    let logos = {};
+    const backupKey = BACKUP_KEYS.logos;
     
-    <link rel="stylesheet" href="styles.css">
+    try {
+        const response = await fetch(GIST_URL);
+        if (!response.ok) throw new Error("Error al obtener el contenido del Gist (Logos)");
+        const infoContent = await response.text();
+        
+        const contentHash = await hashContent(infoContent);
+        const backup = loadBackup(backupKey);
+        
+        if (backup && backup.contentHash === contentHash) {
+            logos = backup.data;
+            console.log("[Logos] Contenido sin cambios. Usando backup local.");
+        } else {
+            logos = processGistLogos(infoContent);
+            saveBackup(logos, backupKey, contentHash);
+            console.log("[Logos] Contenido actualizado o nuevo. Procesado y guardado.");
+        }
 
-</head>
+    } catch (error) {
+        console.error(`Fallo al cargar de Gist (Logos):`, error);
+        
+        const backup = loadBackup(backupKey);
+        if (backup && backup.data) {
+            logos = backup.data;
+            console.log(`Fallo de Gist (Logos). Mostrando logos del historial.`);
+        } else {
+            console.log(`Fallo de Gist (Logos). Sin historial disponible.`);
+        }
+    }
+    
+    state.channelLogos = logos;
+    localStorage.setItem('channelLogos', JSON.stringify(logos)); 
+}
 
-<body class="tv-mode-active dark-mode">
-    <aside id="tvSidebar">
-        </aside>
-    <main id="tvMainContent">
-        </main>
+// NUEVA FUNCIÓN: Procesar el contenido del Gist para obtener Logos
+function processGistLogos(infoContent) {
+    const logosMap = {};
+    const lines = infoContent.split('\n').filter(line => line.trim() !== '');
+    
+    for (const line of lines) {
+        const parts = line.split(': ');
+        if (parts.length >= 2) {
+            const name = parts[0].trim();
+            // La URL puede contener ": " si es un proxy o un protocolo (ej: https://)
+            const url = parts.slice(1).join(': ').trim(); 
+            if (name && url.startsWith('http')) {
+                logosMap[name.toUpperCase().trim()] = url;
+            }
+        }
+    }
+    
+    // Mapeamos a las versiones simplificadas de los nombres
+    const simplifiedLogosMap = {};
+    for (const rawName in logosMap) {
+        let simplifiedName = rawName;
+        
+        // Aplicar la normalización que se hace en processChannelNames
+        const simplifiedChannelName = normalizeChannelName(rawName);
+        simplifiedLogosMap[simplifiedChannelName.toUpperCase().trim()] = logosMap[rawName];
+        
+        // Si el nombre crudo ya era la versión simplificada, simplemente lo añadimos también
+        simplifiedLogosMap[rawName.toUpperCase().trim()] = logosMap[rawName];
+    }
+    
+    return simplifiedLogosMap;
+}
 
-    <script src="script.js"></script>
+        async function fetchAndProcessSource(sourceName, url, processor, backupKey) {
+            let channels = null;
+            let message = '';
+            let contentHash = null;
 
-</body>
-</html>
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Error al obtener el contenido de la fuente");
+                const infoContent = await response.text();
+                
+                contentHash = await hashContent(infoContent);
+
+                const backup = loadBackup(backupKey);
+
+                if (backup && backup.contentHash === contentHash) {
+                    channels = backup.data;
+                    message = `Canales de ${sourceName} cargados (Sin cambios).`;
+                    console.log(`[${sourceName}] Contenido sin cambios. Usando backup local.`);
+                } else {
+                    channels = await processor(infoContent);
+                    saveBackup(channels, backupKey, contentHash);
+                    message = `Canales de ${sourceName} cargados y actualizados.`;
+                    console.log(`[${sourceName}] Contenido actualizado o nuevo. Procesado y guardado.`);
+                }
+
+            } catch (error) {
+                console.error(`Fallo al cargar de ${sourceName}:`, error);
+                
+                const backup = loadBackup(backupKey);
+                if (backup && backup.data) {
+                    channels = backup.data;
+                    message = `Fallo de ${sourceName}. Mostrando canales del historial.`;
+                } else {
+                    message = `Fallo de ${sourceName}. Sin historial disponible.`;
+                }
+            }
+
+            return {
+                name: sourceName,
+                channels,
+                message
+            };
+        }async function loadInitialChannels() {
+    const tvChannelsGrid = document.getElementById("tvChannelsGrid");
+    document.getElementById('tvStatusMessageContainer').innerHTML = '';
+    
+    // PASO 1: Cargar Logos de Gist (ahora tiene su propia función)
+    await loadChannelLogos();
+    
+    // PASO 2: Cargar y Renderizar Canales de Backup (sin el Gist)
+    const isShowingBackup = loadAndRenderBackupChannels();
+    const temporaryLoadMessage = isShowingBackup ? "Mostrando historial. Obteniendo datos en tiempo real..." : "Cargando datos en tiempo real...";
+    showStatusMessage(temporaryLoadMessage, "warning");
+    
+    // PASO 3: Cargar Canales en Tiempo Real
+    const results = await Promise.allSettled([
+        fetchAndProcessSource('events', EVENTS_URL, loadEventsSource, BACKUP_KEYS.events),
+        fetchAndProcessSource('era', ERA_URL, loadEraChannels, BACKUP_KEYS.era),
+        // fetchAndProcessSource('gist', GIST_URL, loadGistChannels, BACKUP_KEYS.gist), // ELIMINADO: Gist ya no es fuente de canales
+        fetchProxyContentAndProcess('shickat', SHICKAT_URL, processShickatData, BACKUP_KEYS.shickat),
+        fetchProxyContentAndProcess('elcano', ELCANO_URL, processElcanoDataFromHtml, BACKUP_KEYS.elcano)
+    ]);
+    
+    let allChannels = [];
+    let hasFallback = false;
+    let hasOnlineSuccess = false;
+    
+    results.forEach(result => {
+        if (result.status === 'fulfilled' && result.value.channels) {
+            if (result.value.message.includes('historial')) {
+                hasFallback = true;
+                allChannels = allChannels.concat(result.value.channels);
+            } else {
+                allChannels = allChannels.concat(result.value.channels);
+                hasOnlineSuccess = true;
+            }
+        }
+    });
+    
+    const statusElement = document.querySelector("#tvStatusMessageContainer .status-message");
+    
+    if (allChannels.length > 0) {
+        const newChannels = mergeChannels(allChannels);
+        state.channelsData = newChannels;
+        processChannelNames();
+        renderTVChannels();
+        cleanObsoleteRatings();
+        if (statusElement) statusElement.remove();
+        if (hasOnlineSuccess) {
+            if (hasFallback) {
+                showStatusMessage("Canales actualizados (algunos con historial).", "warning");
+            } else {
+                showStatusMessage("Canales actualizados correctamente.", "success");
+            }
+        } else if (isShowingBackup) {
+            showStatusMessage("Fallo al actualizar canales. Se sigue mostrando el historial.", "error");
+        } else {
+            tvChannelsGrid.innerHTML = ` <div class="no-results"><div class="no-results-icon">📡</div><div class="no-results-text">Error al cargar los canales.</div><div class="no-results-hint">No se han conseguido cargar los canales (modo offline/sin historial).</div><button class="retry-button" onclick="loadInitialChannels()">Reintentar</button></div> `;
+            showStatusMessage("Error al cargar canales. Sin historial disponible.", "error");
+        }
+    } else if (isShowingBackup) {
+        if (statusElement) statusElement.remove();
+        showStatusMessage("Fallo al actualizar canales. Se sigue mostrando el historial.", "error");
+    } else {
+        if (statusElement) statusElement.remove();
+        tvChannelsGrid.innerHTML = ` <div class="no-results-container"><div class="no-results"><div class=\"no-results-icon\">📡</div><div class=\"no-results-text\">Error al cargar los canales.</div><div class=\"no-results-hint\">No se han conseguido cargar los canales (modo offline/sin historial).</div><button class=\"retry-button\" onclick=\"loadInitialChannels()\">Reintentar</button></div></div> `;
+        showStatusMessage("Error al cargar canales. Sin historial disponible.", "error");
+    }
+}
+function normalizeChannelName(name) {
+            if (name.includes('Eurosport 1')) {
+                return '★EUROSPORT 1';
+            } else if (name.includes('Eurosport 2')) {
+                return '★EUROSPORT 2';
+            } else if (name.includes('Eurosport')) {
+                return '★EUROSPORT 1';
+            } else if (name.includes('Teledeporte')) {
+                return 'Teledeporte';
+            }
+            return name;
+        }
+
+        async function loadGistChannels(infoContent) {
+            // ELIMINADO: Esta función ya no se usa para cargar canales
+            // Se mantiene el nombre solo por si alguna otra parte del código la referenciara, pero sin su funcionalidad original
+            return [];
+        }
+
+        async function loadEraChannels(infoContent) {
+            return processGistData(infoContent).map(c => ({
+                ...c,
+                source: 'era',
+                name: c.name
+            }));
+        }
+
+        function processGistData(infoCanales) {
+            const numberedChannels = [];
+            const lines = infoCanales.split('\n').filter(line => line.trim() !== '');
+            const channelMappings = {
+    'Movistar': 'M+',
+    'DAZN LA LIGA 1': 'DAZN La Liga',
+    'LALIGA': 'La Liga',
+    'Premier': 'Premier League',
+    'Eurosport': '★EUROSPORT',
+    'HYPERMOTION': 'La Liga Hypermotion',
+    'LIGA DE CAMPEONES': 'M+ Liga de Campeones',
+    'PLUS': 'Plus',
+    'VAMOS': 'Vamos',
+    'Deportes': 'Deportes'
+};
+            for (let i = 0; i < lines.length; i += 2) {
+                const nameLine = lines[i].trim();
+                const idLine = lines[i + 1] ? lines[i + 1].trim() : '';
+                if (nameLine.includes('-->') && idLine.length > 0) {
+                    let namePart = nameLine.split('-->')[0].trim().toUpperCase();
+                    const acestreamId = idLine.replace(/p$/, '');
+                    if (acestreamId.length === 40) {
+                        let quality = 'SD';
+                        let multiAudio = false;
+                        if (namePart.includes('FHD')) {
+                            quality = 'FHD';
+                            namePart = namePart.replace('FHD', '').trim();
+                        } else if (namePart.includes('4K')) {
+                            quality = '4K';
+                            namePart = namePart.replace('4K', '').trim();
+                        } else if (namePart.includes('HD')) {
+                            quality = 'HD';
+                            namePart = namePart.replace('HD', '').trim();
+                        } else if (namePart.includes('SD')) {
+                            quality = 'SD';
+                            namePart = namePart.replace('SD', '').trim();
+                        }
+                        if (namePart.includes('MULTI')) {
+                            multiAudio = true;
+                            namePart = namePart.replace('MULTI', '').trim();
+                        }
+                        namePart = namePart.replace(/\(ES\)|\(Es\)/g, '', ).trim();
+                        let simplifiedName = namePart;
+                        for (const key in channelMappings) {
+                            if (simplifiedName.includes(key)) {
+                                simplifiedName = simplifiedName.replace(key, channelMappings[key]);
+                            }
+                        }
+                        simplifiedName = normalizeChannelName(simplifiedName);
+                        numberedChannels.push({
+                            id: acestreamId,
+                            number: acestreamId.substring(0, 3),
+                            name: simplifiedName,
+                            quality: quality,
+                            multiAudio: multiAudio,
+                            isKnown: true,
+                            source: 'gist'
+                        });
+                        trackFirstSeen(acestreamId);
+                    }
+                }
+            }
+            return numberedChannels;
+        }
+
+        async function fetchProxyContentAndProcess(sourceName, url, processor, backupKey) {
+            let lastError;
+            let content = null;
+            let finalMessage = '';
+
+            for (const proxy of PROXIES) {
+                try {
+                    const proxyUrl = proxy + encodeURIComponent(url);
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 15000);
+                    
+                    const response = await fetch(proxyUrl, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    
+                    if (!response.ok) throw new Error(`Proxy ${proxy} responded with ${response.status}`);
+                    
+                    content = await response.text();
+                    
+                    const contentHash = await hashContent(content);
+
+                    const backup = loadBackup(backupKey);
+                    
+                    if (backup && backup.contentHash === contentHash) {
+                        finalMessage = `Canales de ${sourceName} cargados (Sin cambios).`;
+                        console.log(`[${sourceName}] Contenido sin cambios. Usando backup local.`);
+                        return { name: sourceName, channels: backup.data, message: finalMessage };
+                    } else {
+                        const channels = await processor(content); 
+                        saveBackup(channels, backupKey, contentHash);
+                        finalMessage = `Canales de ${sourceName} cargados y actualizados.`;
+                        console.log(`[${sourceName}] Contenido actualizado o nuevo. Procesado y guardado.`);
+                        return { name: sourceName, channels, message: finalMessage };
+                    }
+
+                } catch (error) {
+                    lastError = error;
+                    console.warn(`Proxy ${proxy} falló para ${sourceName}:`, error);
+                    continue;
+                }
+            }
+
+            const backup = loadBackup(backupKey);
+            if (backup && backup.data) {
+                finalMessage = `Fallo de ${sourceName}. Mostrando canales del historial.`;
+                return { name: sourceName, channels: backup.data, message: finalMessage };
+            } else {
+                finalMessage = `Fallo de ${sourceName}. Sin historial disponible.`;
+                throw lastError || new Error(`Todos los proxies fallaron para la fuente ${sourceName}.`);
+            }
+        }
+        
+        async function loadElcanoSource(htmlContent) {
+            return processElcanoDataFromHtml(htmlContent);
+        }
+        
+        function processElcanoDataFromHtml(htmlContent) {
+            const jsonMatch = htmlContent.match(/const linksData\s*=\s*({[\s\S]*?});/);
+            if (!jsonMatch) throw new Error("No se encontró linksData o el formato HTML ha cambiado.");
+            let jsonString = jsonMatch[1];
+            jsonString = jsonString.replace(/\s*\/\/.*(?:\n|$)/g, '');
+            jsonString = jsonString.replace(/,\s*}/g, '}')
+                .replace(/,\s*]/g, ']');
+            const linksData = JSON.parse(jsonString);
+            if (!linksData || !linksData.links || !Array.isArray(linksData.links)) {
+                throw new Error("Estructura de linksData incorrecta o falta el array 'links'.");
+            }
+            return processElcanoData(linksData.links);
+        }
+
+        async function loadEventsSource(htmlContent) {
+            return processEventsData(htmlContent);
+        }
+
+        async function loadShickatChannels(htmlContent) {
+            return processShickatData(htmlContent);
+        }
+
+        function processShickatData(htmlContent) {
+            const numberedChannels = [];
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+            const cards = doc.querySelectorAll('article.canal-card');
+            const nameMappings = {
+    'Ellas Vamos': 'Ellas',
+    'Movistar': 'M+',
+    'Clasicos': 'Clásicos',
+    'Accion': 'Acción',
+    'Deportes': 'Deportes',
+    'Plus': 'Plus',
+    'M+ Liga de Campeones': 'M+ Liga de Campeones',
+    'Golf': 'Golf'
+};
+            cards.forEach(card => {
+                const nameElement = card.querySelector('.canal-nombre');
+                const acestreamLinkElement = card.querySelector('.acestream-link');
+                if (nameElement && acestreamLinkElement) {
+                    const rawName = nameElement.textContent.trim();
+                    const acestreamId = acestreamLinkElement.textContent.trim();
+                    if (acestreamId.length === 40) {
+                        let quality = '720p';
+                        let simplifiedName = rawName;
+                        if (rawName.includes('(HD)')) {
+                            quality = '720p';
+                            simplifiedName = rawName.replace('(HD)', '').trim();
+                        } else if (rawName.includes('(FHD)')) {
+                            quality = '1080p';
+                            simplifiedName = simplifiedName.replace('(FHD)', '').trim();
+                        }
+                        const multiAudio = simplifiedName.includes('MultiAudio');
+                        for (const key in nameMappings) {
+                            if (simplifiedName.includes(key)) {
+                                simplifiedName = simplifiedName.replace(key, nameMappings[key]);
+                                break;
+                            }
+                        }
+                        if (simplifiedName.includes('M. LaLiga')) {
+                            simplifiedName = simplifiedName.replace('M. LaLiga', 'M+ La Liga');
+                        } else if (simplifiedName.includes('Movistar')) {
+                            simplifiedName = simplifiedName.replace('Movistar', 'M+');
+                        }
+                        if (simplifiedName.includes('LaLiga')) {
+                            simplifiedName = simplifiedName.replace('LaLiga', 'La Liga');
+                        }
+                        simplifiedName = normalizeChannelName(simplifiedName);
+                        numberedChannels.push({
+                            id: acestreamId,
+                            number: acestreamId.substring(0, 3),
+                            name: simplifiedName,
+                            quality: quality,
+                            multiAudio: multiAudio,
+                            isKnown: true,
+                            source: 'shickat'
+                        });
+                        trackFirstSeen(acestreamId);
+                    }
+                }
+            });
+            return numberedChannels;
+        }
+
+        function processElcanoData(links) {
+            const numberedChannels = [];
+            const nameMap = {
+    'M. LaLiga': 'M+ La Liga',
+    'LaLiga Smartbank': 'La Liga Hypermotion',
+    'LaLiga': 'La Liga',
+    'MovistarPlus': 'M+ Plus',
+    'Vamos': 'M+ Vamos',
+    'Deporte': 'M+ Deportes',
+    'Dedporte': 'M+ Deportes',
+    'Dazn': 'DAZN',
+    'Campeones': 'M+ Liga de Campeones'
+};
+            links.forEach(link => {
+                if (link.url && link.url.startsWith('acestream://')) {
+                    const acestreamId = link.url.split('://')[1];
+                    let quality = '720p';
+                    let multiAudio = false;
+                    if (link.name.includes('1080')) quality = '1080p';
+                    if (link.name.includes('720')) quality = '720p';
+                    if (link.name.includes('UHD')) quality = 'UHD';
+                    multiAudio = link.name.includes('MultiAudio') || link.name.includes('Multi Audio') || link.name.toLowerCase().includes('multi');
+                    let simplifiedName = link.name
+                        .replace(/1080P|1080|720|UHD|MultiAudio|Multi Audio|\(.*?\)/g, '')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+                    for (const key in nameMap) {
+                        if (simplifiedName.includes(key)) {
+                            simplifiedName = simplifiedName.replace(key, nameMap[key]);
+                            break;
+                        }
+                    }
+                    simplifiedName = normalizeChannelName(simplifiedName);
+                    numberedChannels.push({
+                        id: acestreamId,
+                        number: acestreamId.substring(0, 3),
+                        name: simplifiedName,
+                        quality: quality,
+                        multiAudio: multiAudio,
+                        isKnown: true,
+                        source: 'elcano'
+                    });
+                    trackFirstSeen(acestreamId);
+                }
+            });
+            return numberedChannels;
+        }
+
+        function calculateDuration(sportName) {
+            const normalizedName = normalizeText(sportName);
+
+            // --- Lógica Específica para F1/Motorsport ---
+            if (normalizedName.includes('formula 1') || normalizedName.includes('f1')) {
+                if (normalizedName.includes('practice') || normalizedName.includes('entrenamiento')) {
+                    // Ejemplo: Free Practice / Práctica Libre -> 1 hora y 5 minutos
+                    return 65; 
+                } else if (normalizedName.includes('qualifying') || normalizedName.includes('clasificacion')) {
+                    // Ejemplo: Qualifying / Clasificación -> 1 hora y 30 minutos
+                    return 90; 
+                } else if (normalizedName.includes('race') || normalizedName.includes('carrera') || normalizedName.includes('gp')) {
+                    // Ejemplo: Race / Carrera (incluye el previo/post de 1 hora)
+                    return 180; 
+                }
+                return 180; // Default para F1 si no se especifica el tipo de evento
+            }
+            
+            // --- Lógica General de Deportes ---
+            if (normalizedName.includes('futbol')) return 120; // 90 min + 30 min (previo/descanso/post)
+            if (normalizedName.includes('baloncesto') || normalizedName.includes('nba')) return 150; // 48 min de juego + pausas y extras
+            if (normalizedName.includes('tenis')) return 300; // La duración es muy variable (5 horas)
+            if (normalizedName.includes('motor')) return 120; // 2 horas para otros deportes de motor
+            if (normalizedName.includes('ciclismo')) return 180; 
+            if (normalizedName.includes('boxeo')) return 120; 
+            
+            // Valor por defecto para otros eventos no clasificados (1 hora y 45 minutos)
+            return 105; 
+        }
+
+        function getEventTime(dateString, timeString) {
+            const now = new Date();
+            const date = parseDateString(dateString, now);
+            if (date.getTime() === now.getTime()) {
+                date.setHours(now.getHours());
+                date.setMinutes(now.getMinutes());
+            }
+            const [hours, minutes] = timeString.split(':').map(Number);
+            const eventTime = new Date(date);
+            eventTime.setHours(hours, minutes, 0, 0);
+            const todayYear = now.getFullYear();
+            const todayMonth = now.getMonth();
+            const todayDate = now.getDate();
+            if (dateString.toLowerCase() === 'hoy' || (eventTime.getDate() === todayDate && eventTime.getMonth() === todayMonth && eventTime.getFullYear() === todayYear)) {
+                return eventTime;
+            }
+            return eventTime;
+        }
+
+        function processEventsData(htmlContent) {
+            const numberedChannels = [];
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+            const table = doc.querySelector('table');
+            if (!table) {
+                console.warn("No se encontró la tabla de eventos");
+                return numberedChannels;
+            }
+            const rows = table.querySelectorAll('tbody tr');
+            const channelMappings = {
+                'Movistar': 'M+',
+                'DAZN LA LIGA 1': 'DAZN La Liga',
+                'LALIGA': 'La Liga',
+                'Premier': 'Premier League',
+                'Eurosport': '★EUROSPORT',
+                'HYPERMOTION': 'La Liga Hypermotion',
+                'LIGA DE CAMPEONES': 'M+ Liga de Campeones',
+                'PLUS': 'Plus',
+                'VAMOS': 'Vamos',
+                'Deportes': 'Deportes'
+            };
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 6) {
+                    const date = cells[0].textContent.trim();
+                    const time = cells[1].textContent.trim();
+                    const sportName = cells[2].textContent.trim();
+                    const competition = cells[3].textContent.trim();                    const match = cells[4].textContent.trim();
+                    const canalesCell = cells[5];
+                    const links = canalesCell.querySelectorAll('a[href^="acestream://"]');
+                    if (links.length > 0) {
+                        // Concatenamos el nombre del deporte, competición y partido para un cálculo de duración más robusto
+                        const durationString = `${sportName} ${competition} ${match}`;
+                        const eventStartTime = getEventTime(date, time);
+                        const durationMinutes = calculateDuration(durationString);
+                        let sportEmoji = '❓';
+                        const normalizedSport = normalizeText(sportName);
+                        if (normalizedSport.includes('futbol')) {
+                            sportEmoji = '⚽';
+                        } else if (normalizedSport.includes('handball') || normalizedSport.includes('handball')) {
+                            sportEmoji = '🤾‍♂️';
+                        } else if (normalizedSport.includes('baloncesto') || normalizedSport.includes('basket') || normalizedSport.includes('nba')) {
+                            sportEmoji = '🏀';
+                        } else if (normalizedSport.includes('tenis')) {
+                            sportEmoji = '🎾';
+                        } else if (normalizedSport.includes('motogp') || normalizedSport.includes('motos')) {
+                            sportEmoji = '🏍️';
+                        } else if (normalizedSport.includes('paddle') || normalizedSport.includes('padel')) {
+                            sportEmoji = '🥎';
+                        } else if (normalizedSport.includes('triatlon') || normalizedSport.includes('triathlon')) {
+                            sportEmoji = '🏊🚴🏃';
+                        } else if (normalizedSport.includes('motor') || normalizedSport.includes('rally')) {
+                            sportEmoji = '🚗';
+                        } else if (normalizedSport.includes('f1') || normalizedSport.includes('formula')) {
+                            sportEmoji = '🏎️';
+                        } else if (normalizedSport.includes('boxeo') || normalizedSport.includes('lucha')) {
+                            sportEmoji = '🥊';
+                        } else if (normalizedSport.includes('ciclismo') || normalizedSport.includes('tour')) {
+                            sportEmoji = '🚴';
+                        } else if (normalizedSport.includes('beisbol') || normalizedSport.includes('baseball')) {
+                            sportEmoji = '⚾';
+                        } else if (normalizedSport.includes('golf')) {
+                            sportEmoji = '⛳';
+                        } else if (normalizedSport.includes('voleibol') || normalizedSport.includes('voley')) {
+                            sportEmoji = '🏐';
+                        } else if (normalizedSport.includes('hockey')) {
+                            sportEmoji = '🏑';
+                        } else if (normalizedSport.includes('rugby')) {
+                            sportEmoji = '🏉';
+                        } else if (normalizedSport.includes('natacion') || normalizedSport.includes('agua')) {
+                            sportEmoji = '🏊';
+                        } else if (normalizedSport.includes('atletismo') || normalizedSport.includes('pista')) {
+                            sportEmoji = '🏃';
+                        } else if (normalizedSport.includes('gimnasia')) {
+                            sportEmoji = '🤸';
+                        } else if (normalizedSport.includes('esqui') || normalizedSport.includes('nieve')) {
+                            sportEmoji = '⛷️';
+                        } else if (normalizedSport.includes('surf')) {
+                            sportEmoji = '🏄';
+                        } else if (normalizedSport.includes('e-sports') || normalizedSport.includes('esports')) {
+                            sportEmoji = '🎮';
+                        } else if (normalizedSport.includes('ajedrez')) {
+                            sportEmoji = '♟️';
+                        } else if (normalizedSport.includes('dardos')) {
+                            sportEmoji = '🎯';
+                        } else if (normalizedSport.includes('billares') || normalizedSport.includes('pool')) {
+                            sportEmoji = '🎱';
+                        } else if (normalizedSport.includes('patinaje') || normalizedSport.includes('roller')) {
+                            sportEmoji = '⛸️';
+                        } else if (normalizedSport.includes('criquet') || normalizedSport.includes('cricket')) {
+                            sportEmoji = '🏏';
+                        }
+                        const eventEndTime = new Date(eventStartTime.getTime() + durationMinutes * 60000);
+                        links.forEach(link => {
+const acestreamId = link.href.split('://')[1];
+                            let channelName = link.textContent.trim();
+                            for (const key in channelMappings) {
+                                const regex = new RegExp(key, 'gi');
+                                channelName = channelName.replace(regex, channelMappings[key]);
+                            }
+                            let simplifiedName = channelName
+                                .replace(/Estable|New Era II|New Loop|New Era VI|FHD|4K|HD|UHD|MultiAudio|SD|\(.*?\)|-->.*$/g, '')
+                                .replace(/\s+/g, ' ')
+                                .trim();
+                            let quality = '720p';
+                            if (channelName.includes('1080') || channelName.includes('FHD')) quality = '1080p';
+                            if (channelName.includes('UHD') || channelName.includes('4K')) quality = 'UHD';
+                            if (channelName.includes('SD') && !channelName.includes('FHD')) quality = 'SD';
+                            const multiAudio = channelName.includes('Multi') || channelName.includes('multi');
+                            simplifiedName = normalizeChannelName(simplifiedName);
+                            numberedChannels.push({
+                                id: acestreamId,
+                                number: acestreamId.substring(0, 3),
+                                name: simplifiedName,
+                                quality: quality,
+                                multiAudio: multiAudio,
+                                isKnown: true,
+                                source: 'events',
+                                event: {
+                                    time,
+                                    competition,
+                                    match,
+                                    date,
+                                    sportEmoji,
+                                    sportName,
+                                    startTime: eventStartTime.getTime(),
+                                    endTime: eventEndTime.getTime()
+                                }
+                            });
+                            trackFirstSeen(acestreamId);
+                        });
+                    }
+                }
+            });
+            return numberedChannels;
+        }
+
+        function processChannelNames() {
+            const brands = [{
+                name: 'M+',
+                class: 'movistar'
+            }, {
+                name: '★Eurosport',
+                class: 'eurosport'
+            }, {
+                name: 'DAZN',
+                class: 'dazn'
+            }, {
+                name: 'F1',
+                class: 'f1'
+            }, {
+                name: 'Acción',
+                class: 'action'
+            }, {
+                name: 'Deportes',
+                class: 'sports'
+            }, {
+                name: 'Clásicos',
+                class: 'cinema-red'
+            }, {
+                name: 'Vamos',
+                class: 'vamos'
+            }, {
+                name: 'Copa del Rey',
+                class: 'copadelrey'
+            }, {
+                name: 'Liga de Campeones',
+                class: 'champions'
+            }, {
+                name: 'La Liga',
+                class: 'liga'
+            }, {
+                name: 'Hypermotion',
+                class: 'hypermotion'
+            }, {
+                name: 'Golf',
+                class: 'golf'
+            }, {
+                name: '★EUROSPORT\\d+',
+                class: 'eurosport-number',
+                regex: true
+            }, {
+                name: 'Smartbank',
+                class: 'smartbank'
+            }, {
+                name: 'Plus',
+                class: 'plus'
+            }, {
+                name: 'Western',
+                class: 'western'
+            }, {
+                name: 'Documentales',
+                class: 'documentary'
+            }, {
+                name: 'Originales',
+                class: 'originals'
+            }, {
+                name: 'Hits',
+                class: 'cinema-red'
+            }, {
+                name: 'Estrenos',
+                class: 'cinema-red'
+            }, {
+                name: 'Indie',
+                class: 'cinema-red'
+            }, {
+                name: 'Cine Español',
+                class: 'cinema-red'
+            }, {
+                name: 'Drama',
+                class: 'cinema-red'
+            }, {
+                name: 'Ellas',
+                class: 'ellas'
+            }, {
+                name: 'Series',
+                class: 'series'
+            }];
+            state.channelsData.forEach(channel => {
+                let result = channel.name;
+                brands.forEach(brand => {
+                    if (brand.regex) {
+                        const regex = new RegExp(`(${brand.name})`, 'gi');
+                        result = result.replace(regex, `<span class="${brand.class}">$1</span>`);
+                    } else {
+                        const escapedName = brand.name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                        const regex = new RegExp(`(${escapedName})`, 'gi');
+                        result = result.replace(regex, `<span class="${brand.class}">$1</span>`);
+                    }
+                });
+                const comediaRegex = /(comedia)/gi;
+                result = result.replace(comediaRegex, '<span class="degradado-comedia">Comedia</span>');
+                channel.displayableName = result;
+            });
+        }
+
+        function compareChannelsForSort(a, b) {
+            const channelA = state.channelsData.find(c => c.id === a.id) || a;
+            const channelB = state.channelsData.find(c => c.id === b.id) || b;
+            
+            const ratingA = state.channelRatings[channelA.id] !== undefined ? state.channelRatings[channelA.id] : 2.5;
+            const ratingB = state.channelRatings[channelB.id] !== undefined ? state.channelRatings[channelB.id] : 2.5;
+
+            if (ratingA !== ratingB) {
+                return ratingB - ratingA;
+            }
+            
+            const qualityMap = { 'UHD': 6, '4K': 5, 'FHD': 4, 'HD': 3, 'SD': 2, 'N/A': 1 };
+            const qualityA = qualityMap[standardizeQuality(channelA.quality)] || 0;
+            const qualityB = qualityMap[standardizeQuality(channelB.quality)] || 0;
+            if (qualityB !== qualityA) {
+                return qualityB - qualityA;
+            }
+            
+            return channelA.name.localeCompare(channelB.name);
+        }
+
+        function getBestChannelInSubgroup(channels) {
+            if (!channels || channels.length === 0) return null;
+            
+            const mainChannelName = channels[0].name.trim().toLowerCase();
+            const lastPlayedId = state.lastPlayedByChannel[mainChannelName];
+
+            if (lastPlayedId) {
+                const lastPlayedChannel = channels.find(c => c.id === lastPlayedId);
+                if (lastPlayedChannel) {
+                    const rating = state.channelRatings[lastPlayedId] !== undefined ? state.channelRatings[lastPlayedId] : 2.5;
+                    if (rating >= 3) {
+                         const others = channels.filter(c => c.id !== lastPlayedId);
+                         return [lastPlayedChannel, ...others].sort(compareChannelsForSort)[0];
+                    }
+                }
+            }
+            
+            const sortedChannels = [...channels].sort((a, b) => {
+                const ratingA = state.channelRatings[a.id] !== undefined ? state.channelRatings[a.id] : 2.5;
+                const ratingB = state.channelRatings[b.id] !== undefined ? state.channelRatings[b.id] : 2.5;
+                if (ratingA !== ratingB) {
+                    return ratingB - ratingA;
+                }
+                if (a.isLive && !b.isLive) return -1;
+                if (!a.isLive && b.isLive) return 1;
+                const qualityMap = {
+                    'UHD': 6,
+                    '4K': 5,
+                    'FHD': 4,
+                    'HD': 3,
+                    'SD': 2,
+                    'N/A': 1
+                };
+                const qualityA = qualityMap[standardizeQuality(a.quality)] || 0;
+                const qualityB = qualityMap[standardizeQuality(b.quality)] || 0;
+                if (qualityB !== qualityA) {
+                    return qualityB - qualityA;
+                }
+                const sourcePriorityMap = {
+                    'gist': 4,
+                    'era': 3,
+                    'events': 2,
+                    'shickat': 1,
+                    'elcano': 0,
+                    'history': -1
+                };
+                const sourceA = sourcePriorityMap[a.source] || 0;
+                const sourceB = sourcePriorityMap[b.source] || 0;
+                if (sourceB !== sourceA) {
+                    return sourceB - sourceA;
+                }
+                return a.name.localeCompare(b.name);
+            });
+            return sortedChannels[0];
+        }
+
+        function getGroupedChannels() {
+            const filteredChannels = filterChannels();
+            const allEventChannels = state.channelsData.filter(c => c.source === 'events');
+            filteredChannels.forEach(channel => {
+                channel.isLive = isChannelLive(channel, allEventChannels);
+            });
+            const sortedChannels = [...filteredChannels].sort((a, b) => {
+                if (a.isLive && !b.isLive) return -1;
+                if (!a.isLive && b.isLive) return 1;
+                const aIsOff = a.name.includes('(OFF)');
+                const bIsOff = b.name.includes('(OFF)');
+                if (aIsOff && !bIsOff) return 1;
+                if (!aIsOff && bIsOff) return -1;
+                const nameNumberA = getChannelNumberFromName(a.name);
+                const nameNumberB = getChannelNumberFromName(b.name);
+                if (nameNumberA !== nameNumberB) {
+                    return nameNumberA - nameNumberB;
+                }
+                const qualityMap = {
+                    '4K': 5,
+                    'FHD': 4,
+                    'HD': 3,
+                    'SD': 2,
+                    'N/A': 1,
+                    'UHD': 6
+                };
+                const qualityA = qualityMap[standardizeQuality(a.quality)] || 0;
+                const qualityB = qualityMap[standardizeQuality(b.quality)] || 0;
+                if (qualityB !== qualityA) {
+                    return qualityB - qualityA;
+                }
+                const sourcePriorityMap = {
+                    'gist': 4,
+                    'era': 3,
+                    'events': 2,
+                    'shickat': 1,
+                    'elcano': 0,
+                    'history': -1
+                };
+                const sourceA = sourcePriorityMap[a.source] || 0;
+                const sourceB = sourcePriorityMap[b.source] || 0;
+                if (sourceB !== sourceA) {
+                    return sourceB - sourceA;
+                }
+                return a.name.localeCompare(b.name);
+            });
+            const groups = {};
+            const eventGroupKeysByChannelName = new Map();
+            sortedChannels.forEach(channel => {
+                let groupName;
+                let isEventGroup = false;
+                
+                // Nueva Lógica de Agrupación: Si el filtro es 'all', agrupamos por marca y forzamos ocultar detalles de evento
+                if (state.tvCurrentFilter === 'all') {
+                    groupName = determineBrandGroup(channel);
+                    isEventGroup = false;
+                }                // Si el filtro es 'events_only', agrupamos por evento y mostramos detalles
+                else if (state.tvCurrentFilter === 'events_only' && channel.source === 'events' && channel.event) {
+                     groupName = `${channel.event.date}###${channel.event.competition}###${channel.event.match}`;
+                     isEventGroup = true;
+                }
+                // Lógica original para otros filtros (incluyendo Live, Favorites, Marcas, y Eventos fuera del filtro 'events_only' o 'all')
+                else if (channel.source === 'events' && channel.event) {
+                    groupName = `${channel.event.date}###${channel.event.competition}###${channel.event.match}`;
+                    isEventGroup = true;
+                    const normalizedChannelName = normalizeText(channel.name);
+                    if (!eventGroupKeysByChannelName.has(normalizedChannelName)) {
+                        eventGroupKeysByChannelName.set(normalizedChannelName, new Set());
+                    }
+                    eventGroupKeysByChannelName.get(normalizedChannelName).add(groupName);
+                } else {
+                    groupName = determineBrandGroup(channel);
+                    const normalizedChannelName = normalizeText(channel.name);
+                    if (!state.hideEventDetails && eventGroupKeysByChannelName.has(normalizedChannelName)) {
+                        const eventGroupKeys = eventGroupKeysByChannelName.get(normalizedChannelName);
+                        for (const eventGroupKey of eventGroupKeys) {
+                            const eventGroup = groups[eventGroupKey];
+                            if (eventGroup) {
+                                eventGroup.channels.push(channel);
+                                return;
+                            }
+                        }
+                    }
+                }
+                
+                if (!groups[groupName]) {
+                    groups[groupName] = {
+                        name: groupName,
+                        channels: [],
+                        isEvent: isEventGroup,
+                        time: isEventGroup ? channel.event.time : null,
+                        date: isEventGroup ? channel.event.date : null,
+                        sportEmoji: isEventGroup ? channel.event.sportEmoji : null,
+                        sportName: isEventGroup ? channel.event.sportName : null,
+                        competition: isEventGroup ? channel.event.competition : null,
+                        match: isEventGroup ? channel.event.match : null,
+                        hasLive: channel.isLive
+                    };
+                } else {
+                    if (channel.isLive) {
+                        groups[groupName].hasLive = true;
+                    }
+                }
+                groups[groupName].channels.push(channel);
+            });
+            Object.values(groups).forEach(group => {
+                const subGroups = {};
+                group.channels.forEach(channel => {
+                    let subGroupName = channel.name.trim();
+                    if (group.name === 'Otros') {
+                        const normalizedChannelName = normalizeText(channel.name);
+                        let foundSubGroup = null;
+                        for (const subGroupKey of OTHER_SUBGROUPS) {
+                            const normalizedSubGroupKey = normalizeText(subGroupKey);
+                            if (normalizedChannelName.includes(normalizedSubGroupKey)) {
+                                foundSubGroup = subGroupKey;
+                                break;
+                            }
+                        }
+                        subGroupName = foundSubGroup || subGroupName;
+                    }
+                    if (subGroupName.includes('DAZN') && subGroupName.includes('BAR')) {
+                        subGroupName = subGroupName.replace(' BAR', '').trim();
+                    }
+                    if (!subGroups[subGroupName]) {
+                        subGroups[subGroupName] = [];
+                    }
+                    subGroups[subGroupName].push(channel);
+                });
+                group.subGroups = subGroups;
+            });
+            const sortedGroupKeys = Object.keys(groups).sort((a, b) => {
+                const groupA = groups[a];
+                const groupB = groups[b];
+                const aHasLive = groupA.channels.some(c => c.isLive);
+                const bHasLive = groupB.channels.some(c => c.isLive);
+                if (aHasLive && !bHasLive) return -1;
+                if (!aHasLive && bHasLive) return 1;
+                if (groupA.isEvent && groupB.isEvent) {
+                    const dateCompare = compareEventDates(groupA, groupB);
+                    if (dateCompare !== 0) return dateCompare;
+                    return a.localeCompare(b);
+                }
+                if (groupA.isEvent && !groupB.isEvent) return -1;
+                if (!groupA.isEvent && groupB.isEvent) return 1;
+                const indexA = groupOrder.indexOf(a);
+                const indexB = groupOrder.indexOf(b);
+                if (indexA === -1 && indexB === -1) {
+                    return a.localeCompare(b);
+                }
+                if (indexA === -1) return 1;
+                if (indexB === -1) return -1;
+                return indexA - indexB;
+            });
+            if (groups['Otros']) {
+                sortedGroupKeys.push(sortedGroupKeys.splice(sortedGroupKeys.indexOf('Otros'), 1)[0]);
+            }
+            return {
+                groups,
+                sortedGroupKeys
+            };
+        }
+
+        function filterChannels() {
+            let filteredChannels = state.channelsData;
+            const searchTerm = state.tvSearchTerm.trim().toLowerCase();
+            state.searchTerm = state.tvSearchTerm.trim();
+
+            if (searchTerm) {
+                filteredChannels = filteredChannels.filter(channel => {
+                    const normalizedSearchTerm = normalizeText(searchTerm);
+                    const nameMatches = normalizeText(channel.name).includes(normalizedSearchTerm);
+                    const idMatches = channel.id && channel.id.toLowerCase().includes(normalizedSearchTerm.replace('#', ''));
+                    let eventDetailsMatch = false;
+                    if (channel.event) {
+                        const {
+                            time,
+                            competition,
+                            match,
+                            date,
+                            sportName
+                        } = channel.event;
+                        eventDetailsMatch = normalizeText(time || '').includes(normalizedSearchTerm) || normalizeText(sportName || '').includes(normalizedSearchTerm) || normalizeText(competition || '').includes(normalizedSearchTerm) || normalizeText(match || '').includes(normalizedSearchTerm) || normalizeText(date || '').includes(normalizedSearchTerm);
+                    }
+                    return nameMatches || idMatches || eventDetailsMatch;
+                });
+            }
+
+            let currentFilter = state.tvCurrentFilter;
+            let currentSportFilter = state.tvSportFilter;
+            
+            if (currentSportFilter !== 'all') {
+                currentFilter = 'all'; 
+            }
+
+            if (currentFilter === 'events_only') {
+                filteredChannels = filteredChannels.filter(c => c.source === 'events');
+            } else if (currentFilter === 'favorites') {
+                filteredChannels = filteredChannels.filter(c => state.favorites.includes(c.id));
+            } else if (currentFilter === 'live') {
+                filteredChannels = filteredChannels.filter(c => {
+                    const allEventChannels = state.channelsData.filter(ch => ch.source === 'events');
+                    return isChannelLive(c, allEventChannels);
+                });
+            } else if (currentFilter !== 'all' && currentFilter !== 'events_only' && currentFilter !== 'live' && currentFilter !== 'favorites') {
+                filteredChannels = filteredChannels.filter(channel => normalizeText(channel.name).includes(normalizeText(currentFilter.replace('+', ''))));
+            }
+
+            if (currentSportFilter !== 'all') {
+                const normalizedSportFilter = normalizeText(currentSportFilter);
+                const sportSearchTerms = {
+                    'futbol': ['futbol', 'soccer', 'Hypermotion', 'copa del rey', 'premier league', 'bundesliga', 'serie a'],
+                    'baloncesto': ['baloncesto', 'basket', 'nba', 'euroliga'],
+                    'tenis': ['tenis', 'wimbledon', 'roland garros', 'us open', 'atp', 'wta'],
+                    'motorsport': ['gp', 'motogp', 'dakar', 'rally', 'wrc', 'nascar', 'motor'],
+                    'f1': ['f1', 'fórmula 1', 'formula 1', 'formulaone', 'fórmulaone']
+                };
+                let targetTerms = sportSearchTerms[normalizedSportFilter] || [normalizedSportFilter];
+                if (normalizedSportFilter === 'motorsport' && sportSearchTerms['f1']) {
+                    targetTerms = targetTerms.concat(sportSearchTerms['f1']);
+                }
+                filteredChannels = filteredChannels.filter(channel => {
+                    const normalizedName = normalizeText(channel.name);
+                    const eventDetailsMatch = channel.event && (
+                        normalizeText(channel.event.sportName || '').includes(normalizedSportFilter) ||
+                        targetTerms.some(term => normalizeText(channel.event.competition || '').includes(term)) ||
+                        targetTerms.some(term => normalizeText(channel.event.match || '').includes(term))
+                    );
+                    const nameMatch = targetTerms.some(term => normalizedName.includes(term));
+                    return eventDetailsMatch || nameMatch;
+                });
+            }
+
+            return filteredChannels;
+        }
+
+        function standardizeQuality(quality) {
+            if (!quality) return 'SD';
+            quality = quality.toLowerCase();
+            if (quality.includes('uhd') || quality.includes('4k')) {
+                return '4K';
+            }
+            if (quality.includes('1080') || quality.includes('fhd')) {
+                return 'FHD';
+            }
+            if (quality.includes('720') || quality.includes('hd')) {
+                return 'HD';
+            }
+            return 'SD';
+        }
+
+        function getChannelNumberFromName(name) {
+            const match = name.match(/\d+/);
+            return match ? parseInt(match[0], 10) : 1;
+        }
+
+        function formatEventDate(dateString) {
+            const normalizedDate = dateString.toLowerCase();
+            const today = new Date();
+
+            // 1. Manejar "Hoy", "Mañana", "Ayer" (Devolver solo el día)
+            if (normalizedDate === 'hoy' || normalizedDate === 'mañana' || normalizedDate === 'ayer') {
+                const date = parseDateString(dateString, today);
+                const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+                
+                // Si es "Hoy" o "Mañana", devolvemos la palabra en español para la conjugación correcta (Eventos de Hoy)
+                if (normalizedDate === 'hoy' || normalizedDate === 'mañana') {
+                    return normalizedDate.charAt(0).toUpperCase() + normalizedDate.slice(1);
+                }
+                
+                // Si es "Ayer", devolvemos el día de la semana para una mejor UX
+                return weekdays[date.getDay()];
+            }
+
+            // 2. Manejar formato de fecha DD/MM/YY o DD/MM/YYYY (Devolver "el [Día] [fecha]")
+            const parts = dateString.split('/');
+            if (parts.length >= 2 && parts.length <= 3) {
+                const date = parseDateString(dateString, today);
+                const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+                
+                // Devuelve el día y la fecha original (ej: "el Sábado 13/7/25")
+                return `el ${weekdays[date.getDay()]} ${dateString}`; 
+            }
+            
+            // 3. Fallback: Devolver la cadena original
+            return dateString; 
+        }
+
+        function compareEventDates(eventA, eventB) {
+            const today = new Date();
+            const dateStringA = eventA.date.toLowerCase();
+            const dateStringB = eventB.date.toLowerCase();
+            
+            const isTodayA = dateStringA === 'hoy';
+            const isTodayB = dateStringB === 'hoy';
+            const isTomorrowA = dateStringA === 'mañana';
+            const isTomorrowB = dateStringB === 'mañana';
+            const isYesterdayA = dateStringA === 'ayer';
+            const isYesterdayB = dateStringB === 'ayer';
+            
+            if (isTodayA && !isTodayB) return -1;
+            if (!isTodayA && isTodayB) return 1;
+            if (isTodayA && isTodayB) return eventA.time.localeCompare(eventB.time);
+
+            if (isTomorrowA && !isTomorrowB) return -1;
+            if (!isTomorrowA && isTomorrowB) return 1;
+            if (isTomorrowA && isTomorrowB) return eventA.time.localeCompare(eventB.time);
+            
+            if (isYesterdayA && !isYesterdayB) return -1;
+            if (!isYesterdayA && isYesterdayB) return 1;
+            if (isYesterdayA && isYesterdayB) return eventA.time.localeCompare(eventB.time);
+
+            const dateA = parseDateString(eventA.date, today);
+            const dateB = parseDateString(eventB.date, today);
+            
+            if (dateA.getTime() !== dateB.getTime()) {
+                return dateA.getTime() - dateB.getTime();
+            }
+            return eventA.time.localeCompare(eventB.time);
+        }
+
+        function parseDateString(dateString, today) {
+            const normalizedDate = dateString.toLowerCase();
+            if (normalizedDate === 'mañana') {
+                const tomorrow = new Date(today);
+                tomorrow.setDate(today.getDate() + 1);
+                return tomorrow;
+            }
+            if (normalizedDate === 'ayer') {
+                const yesterday = new Date(today);
+                yesterday.setDate(today.getDate() - 1);
+                return yesterday;
+            }
+            const parts = dateString.split('/');
+            if (parts.length >= 2 && parts.length <= 3) {
+                // Asume formato DD/MM/YY o DD/MM/YYYY
+                const day = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10) - 1; // Mes es 0-indexado
+                let year = parts[2] ? parseInt(parts[2], 10) : today.getFullYear();
+                
+                if (parts.length === 2) {
+                     year = today.getFullYear(); // Si falta el año, usa el actual
+                }
+                
+                if (year < 100) {
+                     year = year + 2000;
+                }
+                
+                const date = new Date(year, month, day);
+                
+                // Validación básica para evitar fechas inválidas que JS pueda interpretar
+                if (date.getDate() !== day || date.getMonth() !== month || date.getFullYear() !== year) {
+                    return today;
+                }
+
+                return date;
+            }
+            return today;
+        }
+
+        function isChannelLive(channel, allEventChannels) {
+            if (channel.source !== 'events' || !channel.event) {
+                return false;
+            }
+            const now = new Date().getTime();
+            const event = channel.event;
+            const liveStartTime = event.startTime - (15 * 60 * 1000);
+            const liveEndTime = event.endTime;
+            const isTimeframeLive = now >= liveStartTime && now <= liveEndTime;
+            if (!isTimeframeLive) {
+                return false;
+            }
+            const isConflicted = findConflictingSiblings(channel, allEventChannels);
+            if (isConflicted) {
+                return false;
+            }
+            return true;
+        }
+
+        function findConflictingSiblings(currentChannel, allEventChannels) {
+            const currentChannelName = normalizeText(currentChannel.name);
+            const currentStartTime = currentChannel.event.startTime;
+            const conflictingSibling = allEventChannels.find(sibling => {
+                if (sibling.id === currentChannel.id || sibling.source !== 'events' || !sibling.event) {
+                    return false;
+                }
+                const siblingChannelName = normalizeText(sibling.name);
+                const siblingStartTime = sibling.event.startTime;
+                const isSameChannelName = siblingChannelName === currentChannelName;
+                const isScheduledLater = siblingStartTime > currentStartTime;
+                if (isSameChannelName && isScheduledLater) {
+                    const now = new Date().getTime();
+                    const siblingLiveStartTime = siblingStartTime - (15 * 60 * 1000);
+                    if (now >= siblingLiveStartTime) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+            return !!conflictingSibling;
+        }
+        const groupOrder = [
+            'DAZN F1',
+            'DAZN',
+            'DAZN La Liga',
+            'DAZN Baloncesto',
+            'M+ La Liga',
+            'Liga de Campeones',
+            'La Liga Hypermotion',
+            'M+ Vamos',
+            'M+ Deportes',
+            'M+ Plus',
+            'M+ Golf',
+            'M+ Cine y Series',
+            '★EUROSPORT'
+        ];
+        const groupRegexes = {
+            'DAZN F1': /DAZN F1/i,
+            'DAZN Baloncesto': /DAZN Baloncesto/i,
+            'DAZN La Liga': /DAZN La Liga/i,
+            'DAZN': /DAZN(?!.*F1|.*La Liga|.*Baloncesto)/i,
+            'Liga de Campeones': /Liga de Campeones/i,
+            'La Liga Hypermotion': /La Liga Hypermotion/i,
+            'M+ La Liga': /M\+ La Liga/i,
+            'M+ Vamos': /M\+ Vamos/i,
+            'M+ Deportes': /M\+ Deportes/i,
+            'M+ Plus': /M\+ Plus/i,
+            'M+ Golf': /M\+ Golf/i,
+            'M+ Cine y Series': /M\+(?!.*La Liga|.*Vamos|.*Deportes|.*Plus|.*Golf|.*Liga de Campeones)/i,
+            '★EUROSPORT': /★EUROSPORT/i,
+        };
+
+        function determineBrandGroup(channel) {
+            const channelName = channel.name;
+            const normalizedName = normalizeText(channelName);
+            
+                        if (channelName.includes('Ellas')) {
+                return 'M+ Vamos';
+            }
+                        
+            if (channelName.includes('★EUROSPORT') && channelName.includes('(')) {
+                return 'Otros';
+            }
+            if (groupRegexes['DAZN'] && groupRegexes['DAZN'].test(channelName)) {
+                if (normalizedName.includes('eventos') || normalizedName.includes('eleven')) {
+                    return 'Otros';
+                }
+            }
+            for (const groupName of groupOrder) {
+                if (groupRegexes[groupName] && groupRegexes[groupName].test(channelName)) {
+                    return groupName;
+                }
+            }
+            return 'Otros';
+        }
+
+        function playChannel(acestreamId) {
+            const acestreamUrl = `acestream://${acestreamId}`;
+            const newWindow = window.open(acestreamUrl, '_blank');
+            setTimeout(() => {
+                if (newWindow && newWindow.closed) {} else {}
+            }, 500);
+        }
+
+        function handleChannelPlay(channelToPlay) {
+            if (state.lastChannelPlay) {
+                updateChannelRating(state.lastChannelPlay.channelId, channelToPlay.id);
+            }
+            
+            const now = new Date().getTime();
+            state.lastChannelPlay = {
+                channelId: channelToPlay.id,
+                timestamp: now
+            };
+            localStorage.setItem('lastChannelPlay', JSON.stringify(state.lastChannelPlay));
+            
+            state.lastPlayedByChannel[channelToPlay.name.trim().toLowerCase()] = channelToPlay.id;
+            localStorage.setItem('lastPlayedByChannel', JSON.stringify(state.lastPlayedByChannel));
+
+            playChannel(channelToPlay.id);
+        }
+
+        function updateChannelRating(previousChannelId, currentChannelId) {
+            const now = new Date().getTime();
+            const previousChannelData = state.channelsData.find(c => c.id === previousChannelId);
+            
+            if (!previousChannelData) return;
+
+            const duration = (now - state.lastChannelPlay.timestamp) / 1000;
+            let rating = state.channelRatings[previousChannelId] !== undefined ? state.channelRatings[previousChannelId] : 2.5;
+            let newRating = rating;
+            
+            const previousName = previousChannelData.name.toLowerCase().trim();
+            const currentChannelData = state.channelsData.find(c => c.id === currentChannelId);
+            const currentName = currentChannelData ? currentChannelData.name.toLowerCase().trim() : '';
+
+            if (previousChannelId !== currentChannelId && previousName === currentName) {
+                if (duration >= (30 * 60)) {
+                    newRating += 1.5;
+                } else if (duration >= (15 * 60)) {
+                    newRating += 0.5;
+                } else if (duration >= (5 * 60)) {
+                    newRating -= 1;
+                } else if (duration >= 10) {
+                    newRating -= 1.5;
+                } else {
+                    newRating -= 2;
+                }
+            } else if (previousChannelId !== currentChannelId && previousName !== currentName) {
+                if (duration >= (30 * 60)) {
+                    newRating += 1.5;
+                } else {
+                    newRating = rating;
+                }
+            } else if (previousChannelId === currentChannelId) {
+                return;
+            }
+            
+            state.channelRatings[previousChannelId] = Math.max(1, Math.min(5, newRating));
+            saveRatings();
+            
+            renderTVChannels();
+        }
+
+        function showCopyModal(acestreamId) {
+            const acestreamUrl = `acestream://${acestreamId}`;
+            const copyModal = document.getElementById('copyModal');
+            const copyAceStreamBtn = document.getElementById('copyAceStreamBtn');
+            const urlDisplayAceStream = document.getElementById('copyUrlDisplayAceStream');
+            urlDisplayAceStream.textContent = acestreamUrl;
+            copyAceStreamBtn.onclick = () => copyUrlToClipboard(acestreamUrl, 'AceStream');
+            copyModal.classList.add('active');
+        }
+
+        async function copyAcestreamDirectly(acestreamId) {
+            const acestreamUrl = `acestream://${acestreamId}`;
+            try {
+                await navigator.clipboard.writeText(acestreamUrl);
+                showCopySuccessMessage('AceStream');
+            } catch (err) {
+                console.error('Error al copiar el texto: ', err);
+                alert('No se pudo copiar la URL. Por favor, hazlo manualmente.');
+            }
+        }
+
+        function hideCopyModal() {
+            document.getElementById('copyModal').classList.remove('active');
+        }
+
+        function showCopySuccessMessage(format = 'AceStream') {
+            const messageElement = document.getElementById('copyMessage');
+            messageElement.textContent = `${format} URL copiada con éxito!`;
+            messageElement.classList.add('show');
+            setTimeout(() => {
+                messageElement.classList.remove('show');
+            }, 2000);
+        }
+
+        async function copyUrlToClipboard(urlToCopy, format) {
+            try {
+                await navigator.clipboard.writeText(urlToCopy);
+                hideCopyModal();
+                showCopySuccessMessage(format);
+            } catch (err) {
+                console.error('Error al copiar el texto: ', err);
+                alert('No se pudo copiar la URL. Por favor, hazlo manualmente.');
+            }
+        }
+
+        function changePrimaryColor(color) {
+            state.primaryColor = color;
+            const rgb = hexToRgb(color);
+            document.documentElement.style.setProperty('--primary-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);
+            document.documentElement.style.setProperty('--primary', color);
+            document.documentElement.style.setProperty('--primary-dark', color === '#2563eb' ? '#1e50c7' : color);
+            updatePrimaryLightColor();
+            document.querySelectorAll('.color-option').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.color-option[data-color="${color}"]`).classList.add('active');
+            localStorage.setItem('primaryColor', color);
+            renderTVChannels();
+        }
+
+        function hexToRgb(hex) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return {
+                r,
+                g,
+                b
+            };
+        }        function updatePrimaryLightColor() {
+            const rgb = hexToRgb(state.primaryColor);
+            const isDarkMode = true;
+            document.documentElement.style.setProperty('--primary-light', isDarkMode ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)` : `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`);
+        }
+
+        function cleanObsoleteRatings() {
+const activeChannelIds = new Set(state.channelsData.map(c => c.id));
+            const ratingsToKeep = {};
+            for (const channelId in state.channelRatings) {
+                if (activeChannelIds.has(channelId)) {
+                    ratingsToKeep[channelId] = state.channelRatings[channelId];
+                }
+            }
+            state.channelRatings = ratingsToKeep;
+            saveRatings();
+            console.log("Puntuaciones de canales obsoletas limpiadas.");
+        }
+
+        function saveRatings() {
+            localStorage.setItem('channelRatings', JSON.stringify(state.channelRatings));
+        }
+
+        function resetRatings() {
+            if (confirm('¿Estás seguro de que quieres restablecer todas las puntuaciones de los canales?')) {
+                localStorage.removeItem('channelRatings');
+                state.channelRatings = {};
+                renderTVChannels();
+                showStatusMessage("Puntuaciones de canales restablecidas.", "success");
+                document.getElementById('settingsModal').classList.remove('modal--active');
+            }
+        }
+
+        function getStarRating(score) {
+            const fullStars = Math.floor(score);
+            const hasHalfStar = score % 1 >= 0.5;
+            let stars = '★'.repeat(fullStars);
+            if (hasHalfStar) {
+                stars += '<span class="half-star">★</span>';
+            }
+            const emptyStars = '☆'.repeat(5 - fullStars - (hasHalfStar ? 1 : 0));
+            return `<span style="color: var(--primary);">${stars}</span><span style="color: gray;">${emptyStars}</span>`;
+        }
+
+        function restoreTVFilterUI() {
+            clearAllTVFilterVisuals();
+
+            if (state.tvSportFilter !== 'all') {
+                const sportBtn = document.querySelector(`.tv-nav-link[data-sport-key="${state.tvSportFilter}"]`);
+                if (sportBtn) {
+                    sportBtn.classList.add('tv-sidebar-link-focused');
+                }
+            } else {
+                const brandLink = document.querySelector(`.tv-nav-link[data-filter="${state.tvCurrentFilter}"]`);
+                if (brandLink) {
+                    brandLink.classList.add('tv-sidebar-link-focused');
+                }
+            }
+        }
+        
+        const createTVChannelCard = (channel, allOptionsJson = '[]') => {
+            const placeholderInfo = getPlaceholderInfo(channel.name.toUpperCase());
+            const logoUrl = placeholderInfo ? placeholderInfo.logo : null;
+            
+            const isLiveClass = channel.isLive ? 'tv-card-live' : '';
+            let bgColor = '#2d2d2d'; 
+            let nameStyle = 'white';
+            let backgroundStyle = '';
+
+            // 1. Asignar color de fondo por marca (simplificado para texto)
+            if (channel.name.includes('DAZN') && !channel.name.includes('F1')) bgColor = '#353535';
+            else if (channel.name.includes('DAZN F1')) bgColor = '#353535';
+            else if (channel.name.includes('M+')) bgColor = '#0085C1';
+            else if (channel.name.includes('EUROSPORT')) bgColor = '#5e17eb';
+            
+            // 2. Aplicar el logo si está disponible
+            if (logoUrl) {
+                // Si hay logo, el fondo es el logo con un degradado oscuro para que el texto sea legible
+                backgroundStyle = `background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.2) 100%), url('${logoUrl}') center center / contain no-repeat, ${bgColor};`;
+            } else {
+                // Si no hay logo, el fondo es solo el color de marca con un degradado simple para uniformidad
+                backgroundStyle = `background: linear-gradient(to top, rgba(0,0,0,0.6) 100%, rgba(0,0,0,0) 100%), ${bgColor};`;
+            }
+
+            let channelNameHTML = `<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 5px;"><h3 style="font-size: 0.6rem; font-weight: 700; color: ${nameStyle}; white-space: normal; margin: 0; text-align: center;">${channel.displayableName}</h3></div>`;
+
+            let liveIndicator = '';
+            if (channel.isLive) {
+                liveIndicator = `<span style="color: var(--primary); font-weight: 700; animation: soft-blink 1.5s infinite ease-in-out; position: absolute; top: 5px; left: 5px; font-size: 0.45rem;">🔴 EN VIVO</span>`;
+            }
+
+            const rating = state.channelRatings[channel.id] !== undefined ? state.channelRatings[channel.id] : 2.5;
+            const ratingStars = getStarRating(rating);
+            const optionsButton = `<button class="tv-link-button" data-channel-id="${channel.id}" title="Ver opciones alternativas">+</button>`;
+
+            return ` <div class="tv-card ${isLiveClass}" data-channel-id="${channel.id}" data-all-options='${allOptionsJson}' style="${backgroundStyle}" tabindex="0" role="button" aria-label="Ver canal ${channel.name}"> ${liveIndicator} ${optionsButton} ${channelNameHTML}</div> `;
+        };
+
+        function createTVChannelsHTML(groups, sortedGroupKeys) {
+            if (sortedGroupKeys.length === 0) {
+                // Nuevo HTML para el mensaje de no resultados, envuelto en el nuevo div para centrar
+                return `
+                    <div class="no-results-container">
+                        <div class="no-results">
+                            <div class="no-results-icon">📡</div>
+                            <div class="no-results-text">No se encontraron canales</div>
+                            <div class="no-results-hint">Prueba con otros filtros o términos de búsqueda</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            let html = '';
+            let lastDateRendered = null;
+            const isEventMode = state.tvCurrentFilter === 'events_only';
+            const isAllMode = state.tvCurrentFilter === 'all';
+            
+            for (const groupKey of sortedGroupKeys) {
+                const group = groups[groupKey];
+                const subGroups = group.subGroups;                if (group.isEvent) {
+    const formattedDate = formatEventDate(group.date);
+if (formattedDate !== lastDateRendered) {
+        
+        let prefix = 'Eventos del ';
+        let coloredDateHtml = formattedDate;
+        const parts = formattedDate.split(' ');
+        const firstWord = parts[0].toLowerCase();
+        
+        if (firstWord === 'hoy' || firstWord === 'mañana' || firstWord === 'ayer' || firstWord === 'el') {
+            prefix = 'Eventos de ';
+
+            // Si empieza con 'el', la estructura es "el [Día] [fecha]". Coloreamos el día y la fecha.
+            if (firstWord === 'el') {
+                const dayOfWeek = parts[1]; // Ejemplo: "Sábado"
+                const datePart = parts.slice(2).join(' '); // Ejemplo: "13/7/25"
+                coloredDateHtml = `el <span style="color: var(--primary);">${dayOfWeek} ${datePart}</span>`;
+            } 
+            // Si es 'Hoy', 'Mañana', o 'Ayer', coloreamos solo esa palabra
+            else {
+                coloredDateHtml = `<span style="color: var(--primary);">${formattedDate}</span>`;
+            }
+        } else {
+            // Caso donde formattedDate es solo la fecha (ej. "13/7/25"). Coloreamos la fecha completa.
+            coloredDateHtml = `<span style="color: var(--primary);">${formattedDate}</span>`;
+        }
+
+        // Construimos el encabezado con el prefijo y la fecha coloreada
+        html += `<h2 class="tv-date-header">${prefix}${coloredDateHtml}</h2>`;
+        lastDateRendered = formattedDate;
+    }
+} else {
+    lastDateRendered = null;
+}                let groupTitle = group.name;
+                let groupTitleStyle = '';
+                
+                if (group.isEvent) {
+                    // Esta sección se ejecuta para CUALQUIER grupo de evento (isEvent: true)
+                    const liveTimeClass = group.hasLive ? 'live-time-blink' : '';
+                    
+                    // MODIFICACIÓN CLAVE: Aplicar estilo al nombre de la competición (group.competition)
+                    const competitionHtml = `<span style="color: var(--primary);">${group.competition}</span>`;
+                    
+                    groupTitle = `<span class="${liveTimeClass}" style="margin-right: 7.5px;">${group.time}</span> ${group.sportEmoji} ${competitionHtml} - ${group.match}`;
+                    
+                    const isFirstGroupAfterDateHeader = !lastDateRendered || (group.date && formatEventDate(group.date) === lastDateRendered);
+                    if(isFirstGroupAfterDateHeader) {
+                        groupTitleStyle = 'margin-top: 0;';
+                    }                } else if (group.name.includes('###')) {
+                    // Si el nombre del grupo contiene '###' (grupo de evento renderizado bajo filtro de marca o All)
+                    if (isAllMode) {
+                        // En modo 'all', omitimos los grupos de evento para evitar duplicidad de canales
+                        continue;
+                    }
+                    
+                    // Lógica para mostrar eventos con formato completo (independientemente del filtro)
+                    const parts = group.name.split('###');
+                    if (parts.length >= 3) {
+                         // El formato es: Date###Competition###Match
+                         const competition = parts[1];
+                         const match = parts[2];
+                         const eventInfo = group.channels[0]?.event; 
+                         const sportEmoji = eventInfo?.sportEmoji || '❓';
+                         const time = eventInfo?.time || ''; // <--- Hora del evento
+                         const competitionHtml = `<span style="color: var(--primary);">${competition}</span>`;
+                         
+                         // Se muestra la hora, emoji, competición y el partido
+                         groupTitle = `<span style="margin-right: 7.5px;">${time}</span> ${sportEmoji} ${competitionHtml} - ${match}`;
+                    } else {
+                        // Fallback por si el formato es inesperado
+                        groupTitle = group.name.replace(/###/g, ' - ');
+                    }
+                }
+html += ` <div class="tv-group"><header class="tv-group-header"><h2 class="tv-group-title" style="${groupTitleStyle}">${groupTitle}</h2></header> `;
+let cardsHTML = '';
+                const sortedSubGroupNames = Object.keys(subGroups).sort((a, b) => {
+                    const aHasLive = subGroups[a].some(c => c.isLive);
+                    const bHasLive = subGroups[b].some(c => c.isLive);
+                    if (aHasLive && !bHasLive) return -1;
+                    if (!aHasLive && bHasLive) return 1;
+                    return a.localeCompare(b);
+                });
+
+                sortedSubGroupNames.forEach(subGroupName => {
+                    const channels = subGroups[subGroupName];
+                    const bestChannel = getBestChannelInSubgroup(channels);
+                    if (!bestChannel) return;
+
+                    const allOptions = channels.map(c => ({
+                        id: c.id,
+                        name: c.displayableName,
+                        quality: standardizeQuality(c.quality),
+                        multiAudio: c.multiAudio,
+                        source: c.source,
+                        rating: state.channelRatings[c.id] !== undefined ? state.channelRatings[c.id] : 2.5
+                    }));
+                    const allOptionsJson = JSON.stringify(allOptions);
+
+                    cardsHTML += createTVChannelCard(bestChannel, allOptionsJson);
+                });
+
+                if (cardsHTML) {
+                    html += `<div class="tv-subgroup-content">${cardsHTML}</div>`;
+                }
+
+                html += `</div>`;
+            }
+            return html;
+        }        function renderTVChannels() {
+            const tvGrid = document.getElementById('tvChannelsGrid');
+            if (!tvGrid) return;
+
+            const statusContainer = document.getElementById('tvStatusMessageContainer');
+            if (statusContainer) {
+                statusContainer.innerHTML = ''; 
+            }
+
+            const previouslyFocusedElement = state.tvFocusManager ? state.tvFocusManager.currentFocus : null;
+
+            restoreTVFilterUI();
+
+            const {
+                groups,
+                sortedGroupKeys
+            } = getGroupedChannels();
+            tvGrid.innerHTML = createTVChannelsHTML(groups, sortedGroupKeys);
+            
+            // Añadir/eliminar la clase de centrado si no hay canales
+            if (sortedGroupKeys.length === 0) {
+                tvGrid.classList.add('no-channels');
+            } else {
+                tvGrid.classList.remove('no-channels');
+            }
+            
+            attachTVCardEvents();
+
+            if (state.tvFocusManager) {
+                state.tvFocusManager.updateFocusableElements();
+
+                const tvSearch = document.getElementById('tvSearch');
+                
+                // Prioridad 1: Mantener el foco si el usuario estaba escribiendo en la búsqueda.
+                if (previouslyFocusedElement === tvSearch || (tvSearch && document.activeElement === tvSearch)) {
+                    state.tvFocusManager.setFocus(tvSearch);
+                    return;
+                }
+
+                // Prioridad 2: Mantener el foco si estaba en un elemento aún presente (e.g., botón de ajustes).
+                if (previouslyFocusedElement && document.body.contains(previouslyFocusedElement)) {
+                    state.tvFocusManager.setFocus(previouslyFocusedElement);
+                    return;
+                }
+
+                // Prioridad 3 (NUEVO): Enfocar el filtro activo en la barra lateral.
+                let elementToFocus = null;
+                const activeSportFilterLink = document.querySelector(`.tv-nav-link.sport-filter.tv-sidebar-link-focused`);
+                const activeBrandLink = document.querySelector(`.tv-nav-link[data-filter="${state.tvCurrentFilter}"].tv-sidebar-link-focused`);
+
+                elementToFocus = activeSportFilterLink || activeBrandLink;
+                
+                if (elementToFocus) {
+                    state.tvFocusManager.setFocus(elementToFocus);
+                    return;
+                }
+                
+                // Fallback: Enfocar 'Todos'
+                state.tvFocusManager.setFocus(document.querySelector('.tv-nav-link[data-filter="all"]'));
+            }
+        }
+const attachTVCardEvents = () => {
+            const cards = document.querySelectorAll('.tv-card');
+            cards.forEach(card => {
+                card.removeEventListener('click', handleTVCardPlay);
+                card.addEventListener('click', handleTVCardPlay);
+                const optionsButton = card.querySelector('.tv-link-button');
+                // IMPORTANTE: Aseguramos que el evento del botón SIEMPRE esté asociado
+                if (optionsButton) {
+                    optionsButton.removeEventListener('click', handleTVCardOptionsClick);
+                    optionsButton.addEventListener('click', handleTVCardOptionsClick);
+                }
+                
+                // Si el botón está oculto, asociamos el evento de opciones al clic de la tarjeta, 
+                // pero SÓLO si el clic no es un "play" normal (e.g., el clic en la esquina inferior derecha)
+                if (state.hideOptionsButton) {
+                    card.removeEventListener('auxiliaryclick', handleTVCardOptionsClick);
+                    // Usamos un nombre de evento auxiliar o una comprobación de coordenadas, 
+                    // pero para simplificar y cumplir con el requisito de "sigue funcionando si pulsas" en el área del botón:
+                    // Dejamos que el clic principal dispare play (handleTVCardPlay)
+                    // y la funcionalidad del botón la asociamos con un clic secundario (por ejemplo, doble clic o clic derecho, si no usáramos un control remoto).
+                    // Para el propósito del TV-Mode (navegación con flechas/Enter), el botón sigue siendo seleccionable, y el clic principal de la tarjeta es para "Play".
+                    
+                    // Si el requisito es que la tarjeta haga Play en cualquier lado, pero el clic **en el área del botón** abra las opciones:
+                    // Necesitaríamos una lógica de coordenadas. Para el modo TV, lo más sencillo es que el **Enter** en la tarjeta haga Play, y un **botón dedicado** haga Opciones.
+                    // Ya que el botón existe (`.tv-link-button`), y se hace invisible con CSS, si el botón tiene un `click` listener, este se disparará si el usuario logra hacer clic exactamente en el área *invisible* del botón.
+
+                    // La solución más simple y robusta para este caso de uso (botón invisible con funcionalidad) es dejar que el evento del botón se capture *solamente* por el botón.
+                    // Si el usuario hace clic en el área visible de la tarjeta, se dispara `handleTVCardPlay`.
+                    // Si el usuario logra hacer clic exactamente en el área invisible del botón, se dispara `handleTVCardOptionsClick` (porque el botón tiene `visibility: hidden`, no `display: none`).
+
+                    // Ya que `handleTVCardPlay` tiene `if (e.target.closest('.tv-link-button')) { return; }`, 
+                    // si el botón es clicado, el evento se propaga al botón, se dispara `handleTVCardOptionsClick`, y `handleTVCardPlay` se detiene.
+                    
+                    // Con `visibility: hidden` aplicado por CSS, la funcionalidad es correcta sin más cambios en JS.
+                }
+            });
+        };
+        
+        const handleTVCardPlay = (e) => {
+            if (e.target.closest('.tv-link-button')) {
+                // Si se hace clic en el botón de opciones, no hacer play
+                return;
+            }
+            const card = e.currentTarget;
+            const channelId = card.getAttribute('data-channel-id');
+            const channel = state.channelsData.find(c => c.id === channelId);
+            
+            if (!channel) return;
+            
+            const optionsJson = card.getAttribute('data-all-options');
+            let allOptions = [];
+            try {
+                allOptions = JSON.parse(optionsJson);
+            } catch (error) {
+                console.error("Error al parsear opciones para TV Card:", error);
+                handleChannelPlay(channel);
+                return;
+            }
+            
+            const now = new Date().getTime();
+            const RECENT_FAILURE_THRESHOLD_MS = 40 * 60 * 1000; 
+            let channelToPlay = channel;
+            let statusMessage = '';
+            
+            if (state.lastChannelPlay && 
+                state.lastChannelPlay.channelId === channel.id && 
+                (now - state.lastChannelPlay.timestamp) < RECENT_FAILURE_THRESHOLD_MS) {
+                
+                const sortedOptions = allOptions
+                    .map(opt => state.channelsData.find(c => c.id === opt.id))
+                    .filter(c => c)
+                    .sort(compareChannelsForSort);
+                
+                const alternativeChannel = sortedOptions[1]; 
+                
+                if (alternativeChannel) {
+                    channelToPlay = alternativeChannel;
+                    
+                    statusMessage = `❌ Fallo detectado en ${channel.name}. Abriendo alternativa: ${alternativeChannel.name} (${standardizeQuality(alternativeChannel.quality)}).`;
+                    showStatusMessage(statusMessage, 'error');
+                    
+                } else {
+                    statusMessage = `⚠️ ${channel.name} ha fallado de nuevo. Sin alternativas. Reintentando...`;
+                    showStatusMessage(statusMessage, 'warning');
+                }
+            } 
+
+            handleChannelPlay(channelToPlay);
+        }
+        
+        const handleTVCardOptionsClick = (e) => {
+            e.stopPropagation();
+            const card = e.currentTarget.closest('.tv-card');
+            const channelId = card.getAttribute('data-channel-id');
+            const optionsJson = card.getAttribute('data-all-options');
+            const channel = state.channelsData.find(c => c.id === channelId);
+            if (channel && optionsJson) {
+                try {
+                    const allOptions = JSON.parse(optionsJson);
+                    showTvOptionsModal(channel.name, allOptions);
+                } catch (error) {
+                    console.error("Error al parsear las opciones del canal:", error);
+                    handleChannelPlay(channel);
+                }
+            }
+        };
+
+        function showTvOptionsModal(mainChannelName, optionsList) {
+            const modal = document.getElementById('tvChannelOptionsModal');
+            const nameSpan = document.getElementById('tvModalChannelName');
+            const listDiv = document.getElementById('tvModalChannelList');
+            nameSpan.innerHTML = state.channelsData.find(c => c.name === mainChannelName)?.displayableName || mainChannelName;
+            listDiv.innerHTML = '';
+            
+            const lastPlayedId = state.lastPlayedByChannel[mainChannelName.trim().toLowerCase()];
+
+            const renderOptionItem = (option) => {
+                const isFavorite = state.favorites.includes(option.id);
+                const favoriteIcon = isFavorite ? '★' : '☆';
+                const favoriteClass = isFavorite ? 'is-favorite' : 'is-not-favorite';
+                
+                const isLastViewed = option.id === lastPlayedId;
+                const lastViewedIndicator = isLastViewed ? '<span class="last-viewed-indicator" title="Último AceStream reproducido para este canal">👁️</span>' : '';
+                
+                const ratingStars = getStarRating(option.rating);
+                let sourceBadgeText = '';
+                let sourceBadgeClass = '';
+                switch (option.source) {
+                    case 'gist':
+                        sourceBadgeText = 'Gist';
+                        sourceBadgeClass = 'gist-source-color';
+                        break;
+                    case 'elcano':
+                        sourceBadgeText = 'Elcano';
+                        sourceBadgeClass = 'elcano-source-color';
+                        break;
+                    case 'events':
+                        sourceBadgeText = 'Eventos';
+                        sourceBadgeClass = 'events-source-color';
+                        break;
+                    case 'shickat':
+                        sourceBadgeText = 'Shickat';
+                        sourceBadgeClass = 'shickat-badge';
+                        break;
+                    case 'era':
+                        sourceBadgeText = 'Era';
+                        sourceBadgeClass = 'era-source-color';
+                        break;
+                    default:
+                        sourceBadgeText = 'Desconocido';
+                        sourceBadgeClass = 'channel-name-color';
+                }
+                
+                return `
+                    <div class="channel-option-item" data-id="${option.id}" onclick="handleChannelPlay({ id: '${option.id}', name: '${mainChannelName.replace(/'/g, "\\'")}' })">
+                        <div class="channel-option-name-container">
+                            <button class="favorite-toggle-btn ${favoriteClass}" onclick="event.stopPropagation(); toggleFavorite('${option.id}')" title="${isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}">${favoriteIcon}</button>
+                            ${lastViewedIndicator}
+                            <span class="channel-option-name" style="max-width: 60%;">${option.name}</span>
+                        </div>
+                        <div class="channel-option-details">
+                            <span style="font-weight: 700; color: var(--primary);">${option.quality}</span>
+                            ${option.multiAudio ? '<span style="color: var(--success); font-weight: 700;">MA</span>' : ''}
+                            <span style="color: var(--${sourceBadgeClass}); font-weight: 700; border-left: 1px solid #444; padding-left: 3px;">${sourceBadgeText.toUpperCase()}</span>
+                            <span style="margin-left: 3px;">${ratingStars}</span>
+                        </div>
+                    </div>
+                `;
+            };
+
+            // Ordenar opciones: 1. Última vista (si puntúa bien) 2. Puntuación 3. Calidad 4. Nombre
+            const sortedOptions = [...optionsList].sort((a, b) => {
+                const aIsLastPlayed = a.id === lastPlayedId;
+                const bIsLastPlayed = b.id === lastPlayedId;
+                
+                if (aIsLastPlayed && !bIsLastPlayed && a.rating >= 3) return -1;
+                if (!aIsLastPlayed && bIsLastPlayed && b.rating >= 3) return 1;
+                
+                const ratingComparison = b.rating - a.rating;
+                if (ratingComparison !== 0) return ratingComparison;
+                
+                const qualityMap = { 'UHD': 6, '4K': 5, 'FHD': 4, 'HD': 3, 'SD': 2, 'N/A': 1 };
+                const qualityComparison = (qualityMap[b.quality] || 0) - (qualityMap[a.quality] || 0);
+                if (qualityComparison !== 0) return qualityComparison;
+                
+                return a.name.localeCompare(b.name);
+            });
+            
+            listDiv.innerHTML = sortedOptions.map(renderOptionItem).join('');
+
+            modal.classList.add('modal--active');
+        }
+
+        function closeTvOptionsModal() {
+            document.getElementById('tvChannelOptionsModal').classList.remove('modal--active');
+        }
+
+        function initializeTVMode() {
+            // Asignar eventos de la barra lateral
+            document.querySelectorAll('#tvSidebar .tv-nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const filter = link.getAttribute('data-filter');
+                    const sportKey = link.getAttribute('data-sport-key');
+                    if (filter) {
+                        applyTVFilter(filter, 'brand');
+                    } else if (sportKey) {
+                        applyTVFilter(sportKey, 'sport');
+                    }
+                });
+            });
+            document.getElementById('tvSearch').addEventListener('input', (e) => {
+                state.tvSearchTerm = e.target.value;
+                state.tvCurrentFilter = 'all'; // Desactiva el filtro de marca si se busca
+                state.tvSportFilter = 'all'; // Desactiva el filtro de deporte si se busca
+                localStorage.setItem('tvCurrentFilter', 'all');
+                localStorage.setItem('tvSportFilter', 'all');
+                renderTVChannels();
+            });
+            
+            // Asignar eventos del modal de ajustes y copiado
+            document.getElementById('settingsModeBtn').addEventListener('click', () => {
+                document.getElementById('settingsModal').classList.add('modal--active');
+            });
+            document.getElementById('closeSettingsBtn').addEventListener('click', () => {
+                document.getElementById('settingsModal').classList.remove('modal--active');
+            });
+            document.getElementById('cancelCopyBtn').addEventListener('click', hideCopyModal);
+            document.getElementById('closeTvOptionsBtn').addEventListener('click', closeTvOptionsModal);
+
+            // Inicializar checkboxes de ajustes
+            document.getElementById('fullScreenOnClickCheckbox').checked = state.fullScreenOnClick;
+            document.getElementById('hideOptionsButtonCheckbox').checked = state.hideOptionsButton;
+            document.body.classList.toggle('hide-options-button-active', state.hideOptionsButton);
+            
+            // Asignar eventos a los ajustes
+            document.getElementById('fullScreenOnClickCheckbox').addEventListener('change', toggleFullScreenOnClick);
+            document.getElementById('hideOptionsButtonCheckbox').addEventListener('change', toggleHideOptionsButton);
+            
+            // Asignar eventos de los botones de color
+            document.querySelectorAll('.color-picker .color-option').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    changePrimaryColor(btn.getAttribute('data-color'));
+                });
+            });
+
+            // Aplicar color principal inicial
+            changePrimaryColor(state.primaryColor);
+
+            // Cargar datos y renderizar
+            loadInitialChannels();
+            
+            // Limpieza de historial y focus manager (si lo estás usando)
+            cleanupOldFirstSeenRecords();
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeTVMode);
+</script></body></html>
