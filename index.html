@@ -949,9 +949,14 @@
                 </div>
                 <div class="settings-item">
                     <div class="settings-item__info"><span class="settings-icon">📋</span>
-                        <div><span class="settings-label">Copiar enlace en vez de abrir</span><span
-                                class="settings-description">Al hacer clic en un canal, copia el ID de AceStream al portapapeles en lugar de intentar abrirlo.</span></div>
+                        <div><span class="settings-label">Copiar enlace en vez de abrir</span><span class="settings-description">Al hacer clic en un canal, copia el ID de AceStream al portapapeles en lugar de intentar abrirlo.</span></div>
                     </div><label class="settings-switch"><input type="checkbox" id="copyLinkModeCheckbox"><span
+                            class="settings-slider"></span></label>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-item__info"><span class="settings-icon">👻</span>
+                        <div><span class="settings-label">Ocultar Canales de Agenda</span><span class="settings-description">Oculta visualmente los canales sin ID de AceStream (usados para metadata) pero manteniéndolos activos internamente.</span></div>
+                    </div><label class="settings-switch"><input type="checkbox" id="hideFakeChannelsCheckbox"><span
                             class="settings-slider"></span></label>
                 </div>
             </div>
@@ -1045,6 +1050,7 @@
             fullScreenOnClick: localStorage.getItem('fullScreenOnClick') === 'true',
             hideOptionsButton: localStorage.getItem('hideOptionsButton') === 'true',
             copyLinkMode: localStorage.getItem('copyLinkMode') === 'true',
+            hideFakeChannels: localStorage.getItem('hideFakeChannels') !== 'false',
             calibrationQueue: [],
             isCalibrating: false
         };
@@ -1160,6 +1166,13 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             localStorage.setItem('copyLinkMode', state.copyLinkMode);
             document.getElementById('copyLinkModeCheckbox').checked = state.copyLinkMode;
             showStatusMessage(state.copyLinkMode ? "Modo Copiar Enlace activado" : "Modo Reproducción directa activado", "info");
+        }
+
+        function toggleHideFakeChannels() {
+            state.hideFakeChannels = !state.hideFakeChannels;
+            localStorage.setItem('hideFakeChannels', state.hideFakeChannels);
+            document.getElementById('hideFakeChannelsCheckbox').checked = state.hideFakeChannels;
+            renderTVChannels();
         }
 
         function requestFullScreen() {
@@ -2329,6 +2342,13 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                 filteredChannels = filteredChannels.filter(c => normalizeText(c.name).includes(normalizeText(currentFilter.replace('+', ''))));
             }
 
+            if (state.hideFakeChannels) {
+                filteredChannels = filteredChannels.filter(channel => {
+                    // Un ID real de AceStream tiene 40 caracteres. Los virtuales empiezan por 'v-id-'
+                    return channel.id && channel.id.length === 40 && !channel.id.startsWith('v-id-');
+                });
+            }
+
             if (currentSportFilter !== 'all') {
                 const normalizedSportFilter = normalizeText(currentSportFilter);
                 const sportSearchTerms = {};
@@ -3352,6 +3372,8 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             document.getElementById('fullScreenOnClickCheckbox').addEventListener('change', toggleFullScreenOnClick);
             document.getElementById('hideOptionsButtonCheckbox').addEventListener('change', toggleHideOptionsButton);
             document.getElementById('copyLinkModeCheckbox').addEventListener('change', toggleCopyLinkMode);
+            document.getElementById('hideFakeChannelsCheckbox').checked = state.hideFakeChannels;
+            document.getElementById('hideFakeChannelsCheckbox').addEventListener('change', toggleHideFakeChannels);
 
             // Nuevo: Activar pantalla completa al hacer clic en cualquier parte del cuerpo, si la opción está activa
             document.body.addEventListener('click', (e) => {
