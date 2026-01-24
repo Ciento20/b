@@ -1891,35 +1891,29 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
 
         function getEventTime(dateString, timeString) {
             const now = new Date();
+            // Forzamos el año de referencia a 2026 según el contexto del sistema
+            const currentYear = 2026;
             const date = parseDateString(dateString, now);
-            if (date.getTime() === now.getTime()) {
-                date.setHours(now.getHours());
-                date.setMinutes(now.getMinutes());
-            }
+            
             const [hours, minutes] = timeString.split(':').map(Number);
             const eventTime = new Date(date);
+            eventTime.setFullYear(currentYear);
             eventTime.setHours(hours, minutes, 0, 0);
-            const todayYear = now.getFullYear();
-            const todayMonth = now.getMonth();
-            const todayDate = now.getDate();
-            if (dateString.toLowerCase() === 'hoy' || (eventTime.getDate() === todayDate && eventTime.getMonth() === todayMonth && eventTime.getFullYear() === todayYear)) {
-                return eventTime;
-            }
+
+            // Si el evento aparece como "Hoy" pero la hora ya pasó por poco (margen de 2h),
+            // podría referirse a un evento de madrugada del día siguiente en listas mal formadas,
+            // pero lo estándar es mantener la fecha calculada por parseDateString.
             return eventTime;
         }        function processEventsData(htmlContent) {
     const numberedChannels = [];
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContent, 'text/html');
-    let fechaActual = "Hoy";
-    const rows = doc.querySelectorAll('tr');
-
-    // --- Mapeos específicos de EVENTOS ---
+    const rows = doc.querySelectorAll('tr');    // --- Mapeos específicos de EVENTOS ---
     const channelMappings = {
           'MOVISTAR': 'M+',
           'LA LIGA 1': 'La Liga',
           'LALIGA': 'La Liga',
           'Premier': 'Premier League',
-          'EUROSPORT': '★EUROSPORT',
           'La Liga TV La Liga Hypermotion': 'La Liga Hypermotion',
           'ACCION': 'Acción',
           'CLASICOS': 'Clásicos',
@@ -1927,15 +1921,21 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
           'GOLF': 'Golf',
           'VAMOS': 'Vamos',
           'BALONCESTO 1': 'Baloncesto',
-          'M. DEPORTES ES': 'M+ Deportes'
+          'M. DEPORTES ES': 'M+ Deportes',
+          'Eurosport': '★EUROSPORT'
 };
     // ------------------------------------
 
     rows.forEach(row => {
         const dayParent = row.closest('.events-day');
+        let fechaActual = "Hoy";
         if (dayParent) {
             const h2Text = dayParent.querySelector('h2')?.innerText.trim();
-            if (h2Text && h2Text.includes(' - ')) fechaActual = h2Text.split(' - ')[1].trim();
+            if (h2Text) {
+                // Extrae la fecha numérica (DD/MM/YYYY) del final del texto del H2
+                const dateMatch = h2Text.match(/(\d{2}\/\d{2}\/\d{4})/);
+                if (dateMatch) fechaActual = dateMatch[1];
+            }
         }
 
         if (row.classList.contains('event-row')) {
@@ -1968,18 +1968,29 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                 if (!rawName || rawName.includes('---')) return;
                 let cleanedName = rawName.replace(/\s*\(.*?\)/g, '').replace(/:\s*VER PARTIDO/gi, '').replace(/\s*HDR/gi, '').trim();
                 
-                // Aplicar mapeo de nombre específico de EVENTOS
+                // Mapeo Inteligente (DAZN -> DAZN 1, EUROSPORT -> EUROSPORT 1) sin duplicar números
+                if (/^DAZN$/i.test(cleanedName)) cleanedName = 'DAZN 1';
+                if (/^EUROSPORT$/i.test(cleanedName)) cleanedName = '★EUROSPORT 1';
+
+                // Aplicar mapeo de nombre específico de EVENTOS con límites de palabra
                 for (const key in channelMappings) {
-                    const regex = new RegExp(key, 'gi');
+                    const regex = new RegExp(`\\b${key}\\b`, 'gi');
                     if (regex.test(cleanedName)) {
-                        cleanedName = cleanedName.replace(new RegExp(key, 'gi'), channelMappings[key]);
+                        cleanedName = cleanedName.replace(regex, channelMappings[key]);
                     }
                 }
+// Lógica mejorada para IDs: Extraer real si existe, o generar único robusto
+                let finalId = '';
+                if (el.href && el.href.includes('acestream://')) {
+                    finalId = el.href.split('acestream://')[1];
+                }
+                if (!finalId) {
+                    // ID aleatorio más largo y único para evitar que mergeChannels los elimine como duplicados
+                    finalId = `no-id-${Math.random().toString(36).substr(2, 9)}-${Date.now()}`;
+                }
 
-                const virtualId = `v-id-${Math.random().toString(36).substr(2, 5)}`;
-                
                 numberedChannels.push({
-                    id: virtualId,
+                    id: finalId,
                     name: cleanedName,
                     quality: 'EVENTO',
                     source: 'events',
@@ -2176,6 +2187,7 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             // 1. SINCRONIZACIÓN LÓGICA (Herencia de ADN)
             const allData = state.channelsData;
             const eventMetadataMap = new Map();
+            const eventChannels = allData.filter(x => x.source === 'events');
             
             // Mapeamos eventos actuales
             allData.forEach(c => {
@@ -2184,15 +2196,18 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                 }
             });
 
-            // Inyectamos el evento a todos los canales fijos
+            // Inyectamos el evento y VALIDAMOS el directo real
             allData.forEach(c => {
-                const metadata = eventMetadataMap.get(normalizeText(c.name));
-                if (metadata) {
-                    c.event = metadata;
-                    c.isLive = true;
-                } else {
-                    c.isLive = isChannelLive(c, allData.filter(x => x.source === 'events'));
+                // FIX CRÍTICO: No sobrescribir metadata si el canal ya viene de la fuente 'events'
+                // Esto evita que eventos distintos con el mismo nombre de canal se fusionen y desaparezcan
+                if (c.source !== 'events') {
+                    const metadata = eventMetadataMap.get(normalizeText(c.name));
+                    if (metadata) {
+                        c.event = metadata;
+                    }
                 }
+                // La validación de directo ahora es universal y depende del tiempo real
+                c.isLive = isChannelLive(c, eventChannels);
             });
 
             const filteredChannels = filterChannels();
@@ -2434,39 +2449,37 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
 
         function parseDateString(dateString, today) {
             const normalizedDate = dateString.toLowerCase();
+            const referenceYear = 2026;
+            
+            if (normalizedDate === 'hoy') {
+                const d = new Date(today);
+                d.setFullYear(referenceYear);
+                return d;
+            }
             if (normalizedDate === 'mañana') {
                 const tomorrow = new Date(today);
                 tomorrow.setDate(today.getDate() + 1);
+                tomorrow.setFullYear(referenceYear);
                 return tomorrow;
             }
             if (normalizedDate === 'ayer') {
                 const yesterday = new Date(today);
                 yesterday.setDate(today.getDate() - 1);
+                yesterday.setFullYear(referenceYear);
                 return yesterday;
             }
-            const parts = dateString.split('/');
-            if (parts.length >= 2 && parts.length <= 3) {
-                // Asume formato DD/MM/YY o DD/MM/YYYY
-                const day = parseInt(parts[0], 10);
-                const month = parseInt(parts[1], 10) - 1; // Mes es 0-indexado
-                let year = parts[2] ? parseInt(parts[2], 10) : today.getFullYear();
 
-                if (parts.length === 2) {
-                    year = today.getFullYear(); // Si falta el año, usa el actual
-                }
+            const parts = dateString.match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/);
+            if (parts) {
+                const day = parseInt(parts[1], 10);
+                const month = parseInt(parts[2], 10) - 1;
+                let year = parts[3] ? parseInt(parts[3], 10) : referenceYear;
 
-                if (year < 100) {
-                    year = year + 2000;
-                }
-
+                if (year < 100) year += 2000;
+                
                 const date = new Date(year, month, day);
-
-                // Validación básica para evitar fechas inválidas que JS pueda interpretar
-                if (date.getDate() !== day || date.getMonth() !== month || date.getFullYear() !== year) {
-                    return today;
-                }
-
-                return date;
+                // Si la fecha es inválida, devolvemos hoy como fallback seguro
+                return isNaN(date.getTime()) ? today : date;
             }
             return today;
         }
@@ -2482,6 +2495,13 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             const isTimeframeLive = now >= liveStartTime && now <= liveEndTime;
             if (!isTimeframeLive) {
                 return false;
+            }
+            
+            // Si es un canal de fuente fija pero tiene evento asignado, validamos su tiempo
+            if (channel.source !== 'events' && channel.event) {
+                const evStart = channel.event.startTime - (15 * 60 * 1000);
+                const evEnd = channel.event.endTime;
+                if (now < evStart || now > evEnd) return false;
             }
             const isConflicted = findConflictingSiblings(channel, allEventChannels);
             if (isConflicted) {
