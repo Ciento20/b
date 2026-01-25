@@ -954,13 +954,6 @@
                     </div><label class="settings-switch"><input type="checkbox" id="copyLinkModeCheckbox"><span
                             class="settings-slider"></span></label>
                 </div>
-                <div class="settings-item">
-                    <div class="settings-item__info"><span class="settings-icon">👁️</span>
-                        <div><span class="settings-label">Ocultar canales sin señal</span><span
-                                class="settings-description">Oculta los eventos que no tienen un ID de AceStream (pero mantiene su información en los canales fijos).</span></div>
-                    </div><label class="settings-switch"><input type="checkbox" id="hideNoIdChannelsCheckbox"><span
-                            class="settings-slider"></span></label>
-                </div>
             </div>
             <div class="settings-section">
                 <h4 class="settings-section__title">🎨 Apariencia</h4>
@@ -1052,7 +1045,6 @@
             fullScreenOnClick: localStorage.getItem('fullScreenOnClick') === 'true',
             hideOptionsButton: localStorage.getItem('hideOptionsButton') === 'true',
             copyLinkMode: localStorage.getItem('copyLinkMode') === 'true',
-            hideNoIdChannels: localStorage.getItem('hideNoIdChannels') !== 'false',
             calibrationQueue: [],
             isCalibrating: false
         };
@@ -1159,7 +1151,6 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             localStorage.setItem('hideOptionsButton', state.hideOptionsButton);
             document.getElementById('hideOptionsButtonCheckbox').checked = state.hideOptionsButton;
             document.getElementById('copyLinkModeCheckbox').checked = state.copyLinkMode;
-            document.getElementById('hideNoIdChannelsCheckbox').checked = state.hideNoIdChannels;
             document.body.classList.toggle('hide-options-button-active', state.hideOptionsButton);
             renderTVChannels();
         }
@@ -1169,13 +1160,6 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             localStorage.setItem('copyLinkMode', state.copyLinkMode);
             document.getElementById('copyLinkModeCheckbox').checked = state.copyLinkMode;
             showStatusMessage(state.copyLinkMode ? "Modo Copiar Enlace activado" : "Modo Reproducción directa activado", "info");
-        }
-
-        function toggleHideNoIdChannels() {
-            state.hideNoIdChannels = !state.hideNoIdChannels;
-            localStorage.setItem('hideNoIdChannels', state.hideNoIdChannels);
-            document.getElementById('hideNoIdChannelsCheckbox').checked = state.hideNoIdChannels;
-            renderTVChannels();
         }
 
         function requestFullScreen() {
@@ -1960,63 +1944,38 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             let competicion = row.querySelector('.competition-name')?.innerText.trim() || "";
             let matchName = "";
             const teamNames = row.querySelectorAll('.team-name');
-            const eventoNameElem = row.querySelector('.evento-name');            if (teamNames.length >= 2) {
+            const eventoNameElem = row.querySelector('.evento-name');
+
+            if (teamNames.length >= 2) {
                 matchName = teamNames[0].innerText.trim() + " vs " + teamNames[1].innerText.trim();
             } else if (eventoNameElem) {
-                const textoFull = eventoNameElem.innerText.trim();
-                if (textoFull.toLowerCase().includes('jornada')) {
-                    // Dividimos por la palabra Jornada y su número
-                    const trozos = textoFull.split(/(Jornada\s*\d+)/i).filter(t => t.trim() !== '');
-                    if (trozos.length >= 2) {
-                        // Buscamos cuál es la jornada y cuál es el torneo
-                        const esJornada = /jornada/i.test(trozos[0]);
-                        matchName = esJornada ? trozos[0].trim() : trozos[1].trim();
-                        competicion = esJornada ? trozos[1].trim() : trozos[0].trim();
+                const eventoText = eventoNameElem.innerText.trim();
+                // Caso específico: "Jornada 3 PGA Tour"
+                if (eventoText.toLowerCase().includes('jornada')) {
+                    const parts = eventoText.match(/^(Jornada\s+\d+)\s+(.*)$/i);
+                    if (parts) {
+                        matchName = parts[1]; // "Jornada 3"
+                        competicion = parts[2]; // "PGA Tour"
                     } else {
-                        matchName = textoFull;
+                        matchName = eventoText;
                     }
                 } else {
-                    matchName = textoFull;
+                    matchName = eventoText;
                 }
-            }            // Limpieza: Si la competición es igual a la jornada, buscamos el original o lo dejamos vacío
-            if (!competicion || (competicion === matchName && matchName.toLowerCase().includes('jornada'))) {
-                competicion = row.querySelector('.competition-name')?.innerText.trim() || '';
             }
+            
+            // Si después de todo no hay competición definida, evitamos poner "Evento"
+            if (!competicion) competicion = matchName;
 
             const t1_logo = row.querySelectorAll('.team-logo')[0]?.src || '';
             const t2_logo = row.querySelectorAll('.team-logo')[1]?.src || '';
-
-            const emojiMap = {
-                'Open Australia': '🎾', 'Roland Garros': '🎾', 'Wimbledon': '🎾', 'US Open': '🎾', 'ATP': '🎾', 'WTA': '🎾',
-                'Primera Federación Femenina': '⚽', 'FA Women\'s Super League': '⚽', 'Liga F': '⚽', 'Champions Femenina': '⚽',
-                'Premier League': '⚽', 'La Liga EA Sports': '⚽', 'Primera Federación': '⚽', 'Serie A Italiana': '⚽',
-                'Saudi Pro League': '⚽', 'Bundesliga': '⚽', 'Ligue 1': '⚽', 'Eredivisie': '⚽', 'Copa del Rey': '⚽',
-                'Champions League': '⚽', 'Europa League': '⚽', 'Conference League': '⚽', 'MLS': '⚽',
-                'Liga Endesa': '🏀', 'NBA': '🏀', 'Liga ACB': '🏀', 'Euroliga': '🏀', 'Eurocup': '🏀',
-                'NFL': '🏈', 'NCAA': '🏈',
-                'Rugby': '🏉', 'Gallagher Premiership': '🏉', 'Six Nations': '🏉',
-                'LVBP': '⚾', 'MLB': '⚾',
-                'Moto': '🏍️', 'MotoGP': '🏍️', 'WorldSBK': '🏍️',
-                'F1': '🏎️', 'Formula 1': '🏎️',
-                'UFC': '🥊', 'Boxeo': '🥊', 'PFL': '🥊',
-                'Ciclismo': '🚴', 'Tour de Francia': '🚴', 'Giro de Italia': '🚴', 'Vuelta a España': '🚴',
-                'Golf': '⛳', 'Masters': '⛳', 'PGA': '⛳'
-            };
-
-            let detectedEmoji = '🏆';
-            for (const key in emojiMap) {
-                if (competicion.includes(key)) {
-                    detectedEmoji = emojiMap[key];
-                    break;
-                }
-            }
 
             const eventInfo = {
                 time: hora,
                 competition: competicion,
                 match: matchName,
                 date: fechaActual,
-                sportEmoji: detectedEmoji,
+                sportEmoji: '🏆',
                 imga: t1_logo,
                 imgb: t2_logo,
                 startTime: getEventTime(fechaActual, hora).getTime(),
@@ -2292,10 +2251,9 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                         time: isEventGroup ? channel.event.time : null,
                         date: isEventGroup ? channel.event.date : null,
                         sportEmoji: isEventGroup ? channel.event.sportEmoji : null,
-                        sportName: isEventGroup ? channel.event.sportName : null,                        competition: isEventGroup ? channel.event.competition : null,
+                        sportName: isEventGroup ? channel.event.sportName : null,
+                        competition: isEventGroup ? channel.event.competition : null,
                         match: isEventGroup ? channel.event.match : null,
-                        imga: isEventGroup ? channel.event.imga : null,
-                        imgb: isEventGroup ? channel.event.imgb : null,
                         hasLive: channel.isLive
                     };
                 } else {
@@ -2385,10 +2343,6 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                 filteredChannels = filteredChannels.filter(c => c.isLive);
             } else if (currentFilter !== 'all' && !['events_only', 'live', 'search'].includes(currentFilter)) {
                 filteredChannels = filteredChannels.filter(c => normalizeText(c.name).includes(normalizeText(currentFilter.replace('+', ''))));
-            }
-
-            if (state.hideNoIdChannels) {
-                filteredChannels = filteredChannels.filter(channel => !channel.id.startsWith('v-id-'));
             }
 
             if (currentSportFilter !== 'all') {
@@ -2538,7 +2492,7 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
         }
 
         function isChannelLive(channel, allEventChannels) {
-            if (!channel.event) {
+            if (channel.source !== 'events' || !channel.event) {
                 return false;
             }
             const now = new Date().getTime();
@@ -3002,7 +2956,9 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                     const liveTimeClass = group.hasLive ? 'live-time-blink' : '';
 
                     // MODIFICACIÓN CLAVE: Aplicar estilo al nombre de la competición (group.competition)
-                    const competitionHtml = `<span style="color: var(--primary);">${group.competition}</span>`;                    const matchParts = group.match.split(' vs ');
+                    const competitionHtml = `<span style="color: var(--primary);">${group.competition}</span>`;
+
+                    const matchParts = group.match.split(' vs ');
                     const team1 = matchParts[0] || '';
                     const team2 = matchParts[1] || '';
                     
@@ -3010,7 +2966,7 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                     const t1_logo = eventChannel?.event?.imga || '';
                     const t2_logo = eventChannel?.event?.imgb || '';
 
-                    const logoStyle = "width:24px; height:24px; object-fit:contain; vertical-align:middle; margin:0 6px; background:#aaa; border-radius:50%; padding:2px;";
+                    const logoStyle = "width:18px; height:18px; object-fit:contain; vertical-align:middle; margin:0 4px; background:#333; border-radius:50%; padding:2px;";
                     
                     const team1Html = `<span><img src="${t1_logo}" style="${logoStyle}" onerror="this.style.display='none'">${team1}</span>`;
                     const team2Html = `<span>${team2}<img src="${t2_logo}" style="${logoStyle}" onerror="this.style.display='none'"></span>`;                    const isVsMatch = group.match.toLowerCase().includes(' vs ');
@@ -3269,8 +3225,6 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             const lastPlayedId = state.lastPlayedByChannel[mainChannelName.trim().toLowerCase()];
 
             const renderOptionItem = (option) => {
-                if (option.source === 'events') return '';
-                
                 const isLastViewed = option.id === lastPlayedId;
                 const lastViewedIndicator = isLastViewed ? '<span class="last-viewed-indicator" title="Último AceStream reproducido para este canal">👁️</span>' : '';
                 const ratingStars = getStarRating(option.rating);
@@ -3279,9 +3233,10 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                 switch (option.source) {
                     case 'gist': sourceBadgeText = 'Gist'; sourceBadgeClass = 'gist-source-color'; break;
                     case 'elcano': sourceBadgeText = 'Elcano'; sourceBadgeClass = 'elcano-source-color'; break;
+                    case 'events': sourceBadgeText = 'Eventos'; sourceBadgeClass = 'events-source-color'; break;
                     case 'shickat': sourceBadgeText = 'Shickat'; sourceBadgeClass = 'shickat-badge'; break;
                     case 'era': sourceBadgeText = 'Era'; sourceBadgeClass = 'era-source-color'; break;
-                    default: sourceBadgeText = 'Fijo'; sourceBadgeClass = 'channel-name-color';
+                    default: sourceBadgeText = 'Desconocido'; sourceBadgeClass = 'channel-name-color';
                 }
 
                 const clickAction = state.copyLinkMode 
@@ -3408,14 +3363,12 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             document.getElementById('fullScreenOnClickCheckbox').checked = state.fullScreenOnClick;
             document.getElementById('hideOptionsButtonCheckbox').checked = state.hideOptionsButton;
             document.getElementById('copyLinkModeCheckbox').checked = state.copyLinkMode;
-            document.getElementById('hideNoIdChannelsCheckbox').checked = state.hideNoIdChannels;
             document.body.classList.toggle('hide-options-button-active', state.hideOptionsButton);
 
             // Asignar eventos a los ajustes
             document.getElementById('fullScreenOnClickCheckbox').addEventListener('change', toggleFullScreenOnClick);
             document.getElementById('hideOptionsButtonCheckbox').addEventListener('change', toggleHideOptionsButton);
             document.getElementById('copyLinkModeCheckbox').addEventListener('change', toggleCopyLinkMode);
-            document.getElementById('hideNoIdChannelsCheckbox').addEventListener('change', toggleHideNoIdChannels);
 
             // Nuevo: Activar pantalla completa al hacer clic en cualquier parte del cuerpo, si la opción está activa
             document.body.addEventListener('click', (e) => {
