@@ -949,14 +949,16 @@
                 </div>
                 <div class="settings-item">
                     <div class="settings-item__info"><span class="settings-icon">📋</span>
-                        <div><span class="settings-label">Copiar enlace en vez de abrir</span><span class="settings-description">Al hacer clic en un canal, copia el ID de AceStream al portapapeles en lugar de intentar abrirlo.</span></div>
+                        <div><span class="settings-label">Copiar enlace en vez de abrir</span><span
+                                class="settings-description">Al hacer clic en un canal, copia el ID de AceStream al portapapeles en lugar de intentar abrirlo.</span></div>
                     </div><label class="settings-switch"><input type="checkbox" id="copyLinkModeCheckbox"><span
                             class="settings-slider"></span></label>
                 </div>
                 <div class="settings-item">
-                    <div class="settings-item__info"><span class="settings-icon">👻</span>
-                        <div><span class="settings-label">Ocultar Canales de Agenda</span><span class="settings-description">Oculta visualmente los canales sin ID de AceStream (usados para metadata) pero manteniéndolos activos internamente.</span></div>
-                    </div><label class="settings-switch"><input type="checkbox" id="hideFakeChannelsCheckbox"><span
+                    <div class="settings-item__info"><span class="settings-icon">👁️</span>
+                        <div><span class="settings-label">Ocultar canales sin señal</span><span
+                                class="settings-description">Oculta los eventos que no tienen un ID de AceStream (pero mantiene su información en los canales fijos).</span></div>
+                    </div><label class="settings-switch"><input type="checkbox" id="hideNoIdChannelsCheckbox"><span
                             class="settings-slider"></span></label>
                 </div>
             </div>
@@ -1050,7 +1052,7 @@
             fullScreenOnClick: localStorage.getItem('fullScreenOnClick') === 'true',
             hideOptionsButton: localStorage.getItem('hideOptionsButton') === 'true',
             copyLinkMode: localStorage.getItem('copyLinkMode') === 'true',
-            hideFakeChannels: localStorage.getItem('hideFakeChannels') !== 'false',
+            hideNoIdChannels: localStorage.getItem('hideNoIdChannels') !== 'false',
             calibrationQueue: [],
             isCalibrating: false
         };
@@ -1157,6 +1159,7 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             localStorage.setItem('hideOptionsButton', state.hideOptionsButton);
             document.getElementById('hideOptionsButtonCheckbox').checked = state.hideOptionsButton;
             document.getElementById('copyLinkModeCheckbox').checked = state.copyLinkMode;
+            document.getElementById('hideNoIdChannelsCheckbox').checked = state.hideNoIdChannels;
             document.body.classList.toggle('hide-options-button-active', state.hideOptionsButton);
             renderTVChannels();
         }
@@ -1168,10 +1171,10 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             showStatusMessage(state.copyLinkMode ? "Modo Copiar Enlace activado" : "Modo Reproducción directa activado", "info");
         }
 
-        function toggleHideFakeChannels() {
-            state.hideFakeChannels = !state.hideFakeChannels;
-            localStorage.setItem('hideFakeChannels', state.hideFakeChannels);
-            document.getElementById('hideFakeChannelsCheckbox').checked = state.hideFakeChannels;
+        function toggleHideNoIdChannels() {
+            state.hideNoIdChannels = !state.hideNoIdChannels;
+            localStorage.setItem('hideNoIdChannels', state.hideNoIdChannels);
+            document.getElementById('hideNoIdChannelsCheckbox').checked = state.hideNoIdChannels;
             renderTVChannels();
         }
 
@@ -2248,9 +2251,10 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                         time: isEventGroup ? channel.event.time : null,
                         date: isEventGroup ? channel.event.date : null,
                         sportEmoji: isEventGroup ? channel.event.sportEmoji : null,
-                        sportName: isEventGroup ? channel.event.sportName : null,
-                        competition: isEventGroup ? channel.event.competition : null,
+                        sportName: isEventGroup ? channel.event.sportName : null,                        competition: isEventGroup ? channel.event.competition : null,
                         match: isEventGroup ? channel.event.match : null,
+                        imga: isEventGroup ? channel.event.imga : null,
+                        imgb: isEventGroup ? channel.event.imgb : null,
                         hasLive: channel.isLive
                     };
                 } else {
@@ -2342,11 +2346,8 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                 filteredChannels = filteredChannels.filter(c => normalizeText(c.name).includes(normalizeText(currentFilter.replace('+', ''))));
             }
 
-            if (state.hideFakeChannels) {
-                filteredChannels = filteredChannels.filter(channel => {
-                    // Un ID real de AceStream tiene 40 caracteres. Los virtuales empiezan por 'v-id-'
-                    return channel.id && channel.id.length === 40 && !channel.id.startsWith('v-id-');
-                });
+            if (state.hideNoIdChannels) {
+                filteredChannels = filteredChannels.filter(channel => !channel.id.startsWith('v-id-'));
             }
 
             if (currentSportFilter !== 'all') {
@@ -2964,11 +2965,8 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
 
                     const matchParts = group.match.split(' vs ');
                     const team1 = matchParts[0] || '';
-                    const team2 = matchParts[1] || '';
-                    
-                    const eventChannel = group.channels.find(c => c.source === 'events' && c.event);
-                    const t1_logo = eventChannel?.event?.imga || '';
-                    const t2_logo = eventChannel?.event?.imgb || '';
+                    const team2 = matchParts[1] || '';                    const t1_logo = group.imga || '';
+                    const t2_logo = group.imgb || '';
 
                     const logoStyle = "width:18px; height:18px; object-fit:contain; vertical-align:middle; margin:0 4px; background:#333; border-radius:50%; padding:2px;";
                     
@@ -3228,6 +3226,8 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             const lastPlayedId = state.lastPlayedByChannel[mainChannelName.trim().toLowerCase()];
 
             const renderOptionItem = (option) => {
+                if (option.source === 'events') return '';
+                
                 const isLastViewed = option.id === lastPlayedId;
                 const lastViewedIndicator = isLastViewed ? '<span class="last-viewed-indicator" title="Último AceStream reproducido para este canal">👁️</span>' : '';
                 const ratingStars = getStarRating(option.rating);
@@ -3236,10 +3236,9 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                 switch (option.source) {
                     case 'gist': sourceBadgeText = 'Gist'; sourceBadgeClass = 'gist-source-color'; break;
                     case 'elcano': sourceBadgeText = 'Elcano'; sourceBadgeClass = 'elcano-source-color'; break;
-                    case 'events': sourceBadgeText = 'Eventos'; sourceBadgeClass = 'events-source-color'; break;
                     case 'shickat': sourceBadgeText = 'Shickat'; sourceBadgeClass = 'shickat-badge'; break;
                     case 'era': sourceBadgeText = 'Era'; sourceBadgeClass = 'era-source-color'; break;
-                    default: sourceBadgeText = 'Desconocido'; sourceBadgeClass = 'channel-name-color';
+                    default: sourceBadgeText = 'Fijo'; sourceBadgeClass = 'channel-name-color';
                 }
 
                 const clickAction = state.copyLinkMode 
@@ -3366,14 +3365,14 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             document.getElementById('fullScreenOnClickCheckbox').checked = state.fullScreenOnClick;
             document.getElementById('hideOptionsButtonCheckbox').checked = state.hideOptionsButton;
             document.getElementById('copyLinkModeCheckbox').checked = state.copyLinkMode;
+            document.getElementById('hideNoIdChannelsCheckbox').checked = state.hideNoIdChannels;
             document.body.classList.toggle('hide-options-button-active', state.hideOptionsButton);
 
             // Asignar eventos a los ajustes
             document.getElementById('fullScreenOnClickCheckbox').addEventListener('change', toggleFullScreenOnClick);
             document.getElementById('hideOptionsButtonCheckbox').addEventListener('change', toggleHideOptionsButton);
             document.getElementById('copyLinkModeCheckbox').addEventListener('change', toggleCopyLinkMode);
-            document.getElementById('hideFakeChannelsCheckbox').checked = state.hideFakeChannels;
-            document.getElementById('hideFakeChannelsCheckbox').addEventListener('change', toggleHideFakeChannels);
+            document.getElementById('hideNoIdChannelsCheckbox').addEventListener('change', toggleHideNoIdChannels);
 
             // Nuevo: Activar pantalla completa al hacer clic en cualquier parte del cuerpo, si la opción está activa
             document.body.addEventListener('click', (e) => {
