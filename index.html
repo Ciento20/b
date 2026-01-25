@@ -953,13 +953,21 @@
                                 class="settings-description">Al hacer clic en un canal, copia el ID de AceStream al portapapeles en lugar de intentar abrirlo.</span></div>
                     </div><label class="settings-switch"><input type="checkbox" id="copyLinkModeCheckbox"><span
                             class="settings-slider"></span></label>
-                </div>
-                <div class="settings-item">
+                </div>                <div class="settings-item">
                     <div class="settings-item__info"><span class="settings-icon">👁️</span>
                         <div><span class="settings-label">Ocultar canales sin señal</span><span
-                                class="settings-description">Oculta los eventos que no tienen un ID de AceStream (pero mantiene su información en los canales fijos).</span></div>
+                                class="settings-description">Oculta los eventos que no tienen un ID de AceStream.</span></div>
                     </div><label class="settings-switch"><input type="checkbox" id="hideNoIdChannelsCheckbox"><span
                             class="settings-slider"></span></label>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-item__info"><span class="settings-icon">🌐</span>
+                        <div><span class="settings-label">Fuente de Eventos</span><span class="settings-description">Elige entre IPFS (Original) o Vercel (Backup).</span></div>
+                    </div>
+                    <select id="eventsSourceSelect" style="background: #383838; color: white; border: 1px solid #555; border-radius: 4px; font-size: 0.4rem; padding: 2px;">
+                        <option value="ipfs">IPFS</option>
+                        <option value="vercel">Vercel</option>
+                    </select>
                 </div>
             </div>
             <div class="settings-section">
@@ -1051,8 +1059,8 @@
             channelLogos: JSON.parse(localStorage.getItem('channelLogos')) || {},
             fullScreenOnClick: localStorage.getItem('fullScreenOnClick') === 'true',
             hideOptionsButton: localStorage.getItem('hideOptionsButton') === 'true',
-            copyLinkMode: localStorage.getItem('copyLinkMode') === 'true',
-            hideNoIdChannels: localStorage.getItem('hideNoIdChannels') !== 'false',
+            copyLinkMode: localStorage.getItem('copyLinkMode') === 'true',            hideNoIdChannels: localStorage.getItem('hideNoIdChannels') !== 'false',
+            eventsSource: localStorage.getItem('eventsSource') || 'ipfs',
             calibrationQueue: [],
             isCalibrating: false
         };
@@ -1500,7 +1508,11 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                 message
             };
         }
-        async function loadInitialChannels() {
+        async function processVercelData(htmlContent) {
+    return processEventsData(htmlContent);
+}
+
+async function loadInitialChannels() {
             document.body.classList.remove('loading-finished');
             const tvChannelsGrid = document.getElementById("tvChannelsGrid");
             document.getElementById('tvStatusMessageContainer').innerHTML = '';
@@ -1508,10 +1520,10 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             await loadChannelLogos();
 
             const isShowingBackup = loadAndRenderBackupChannels();
-            showStatusMessage("Cargando agenda deportiva...", "info");
-
+            showStatusMessage("Cargando agenda deportiva...", "info");            const activeEventsUrl = state.eventsSource === 'vercel' ? EVENTS_URL_BACKUP : EVENTS_URL;
+            
             const results = await Promise.allSettled([
-                fetchAndProcessSource('events', EVENTS_URL, processEventsData, BACKUP_KEYS.events),
+                fetchAndProcessSource('events', activeEventsUrl, processEventsData, BACKUP_KEYS.events),
                 fetchAndProcessSource('era', ERA_URL, processEraData, BACKUP_KEYS.era),
                 fetchProxyContentAndProcess('shickat', SHICKAT_URL, processShickatData, BACKUP_KEYS.shickat),
                 fetchProxyContentAndProcess('elcano', ELCANO_URL, processElcanoDataFromHtml, BACKUP_KEYS.elcano)
@@ -3366,13 +3378,21 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             document.getElementById('hideOptionsButtonCheckbox').checked = state.hideOptionsButton;
             document.getElementById('copyLinkModeCheckbox').checked = state.copyLinkMode;
             document.getElementById('hideNoIdChannelsCheckbox').checked = state.hideNoIdChannels;
-            document.body.classList.toggle('hide-options-button-active', state.hideOptionsButton);
-
-            // Asignar eventos a los ajustes
+            document.body.classList.toggle('hide-options-button-active', state.hideOptionsButton);            // Asignar eventos a los ajustes
             document.getElementById('fullScreenOnClickCheckbox').addEventListener('change', toggleFullScreenOnClick);
             document.getElementById('hideOptionsButtonCheckbox').addEventListener('change', toggleHideOptionsButton);
             document.getElementById('copyLinkModeCheckbox').addEventListener('change', toggleCopyLinkMode);
             document.getElementById('hideNoIdChannelsCheckbox').addEventListener('change', toggleHideNoIdChannels);
+            
+            const sourceSelect = document.getElementById('eventsSourceSelect');
+            sourceSelect.value = state.eventsSource;
+            sourceSelect.addEventListener('change', (e) => {
+                state.eventsSource = e.target.value;
+                localStorage.setItem('eventsSource', state.eventsSource);
+                // Limpiar grid y recargar
+                document.getElementById('tvChannelsGrid').innerHTML = '';
+                loadInitialChannels();
+            });
 
             // Nuevo: Activar pantalla completa al hacer clic en cualquier parte del cuerpo, si la opción está activa
             document.body.addEventListener('click', (e) => {
