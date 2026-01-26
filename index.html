@@ -2898,9 +2898,11 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             // Indicador EN VIVO eliminado por solicitud
             let liveIndicator = '';
 
-            const optionsButton = `<button class="tv-link-button" data-channel-id="${channel.id}" title="Ver opciones alternativas">+</button>`;
+            const isEventSource = channel.source === 'events';
+            const optionsButton = isEventSource ? '' : `<button class="tv-link-button" data-channel-id="${channel.id}" title="Ver opciones alternativas">+</button>`;
 
-            return ` <div class="tv-card ${isLiveClass}" data-channel-id="${channel.id}" data-all-options='${allOptionsJson}' style="${backgroundStyle}" tabindex="0" role="button" aria-label="Ver canal ${channel.name}"> ${optionsButton} ${channelNameHTML}</div> `;
+            const pointerEvents = isEventSource ? 'pointer-events: none; cursor: default;' : '';
+            return ` <div class="tv-card ${isLiveClass}" data-channel-id="${channel.id}" data-all-options='${allOptionsJson}' style="${backgroundStyle} ${pointerEvents}" ${isEventSource ? '' : 'tabindex="0" role="button"'} aria-label="Ver canal ${channel.name}"> ${optionsButton} ${channelNameHTML}</div> `;
         };
 
         function createTVChannelsHTML(groups, sortedGroupKeys) {
@@ -3236,6 +3238,7 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             const lastPlayedId = state.lastPlayedByChannel[mainChannelName.trim().toLowerCase()];
 
             const renderOptionItem = (option) => {
+                if (option.source === 'events') return '';
                 const isLastViewed = option.id === lastPlayedId;
                 const lastViewedIndicator = isLastViewed ? '<span class="last-viewed-indicator" title="Último AceStream reproducido para este canal">👁️</span>' : '';
                 const ratingStars = getStarRating(option.rating);
