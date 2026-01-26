@@ -1589,7 +1589,7 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             // --- Mapeos específicos de ERA (anteriormente Gist) ---
             const channelMappings = {
           'MOVISTAR': 'M+',
-          'LA LIGA 1': 'La Liga',
+          'LA LIGA': 'La Liga',
           'LALIGA': 'La Liga',
           'Premier': 'Premier League',
           'EUROSPORT': '★EUROSPORT',
@@ -1604,7 +1604,9 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
           'M. DEPORTES ES': 'M+ Deportes',
           'DEPORTES': 'Deportes ',
           'TELEDEPORTE': 'Teledeporte',
-          'ELLAS': 'Ellas Vamos'
+          'ELLAS': 'Ellas Vamos',
+          'BALONCESTO': 'Baloncesto',
+          'LA LIGA 1': 'La Liga'
 };
             // ----------------------------------------------------
 
@@ -1813,11 +1815,11 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
           'LALIGA TV HYPERMOTION': 'La Liga Hypermotion',
           'DAZN F1': 'DAZN F1',
           'EUROSPORT': '★EUROSPORT',
-          'DAZN': 'DAZN',
-          'M. LALIGA': 'M+ La Liga',
-          'M. DEPORTES': 'M+ Deportes',
-          'VAMOS': 'M+ Vamos',
-          'LALIGA TV': 'M+ La Liga'
+          'DAZN Laliga': 'DAZN La Liga',
+          'LaLiga': 'La Liga',
+          'ACB 1': 'ACB',
+          'BUNDESLIGA 1': 'BUNDESLIGA',
+          'LALIGA': 'La Liga'
 };
             // ------------------------------------
 
@@ -1914,9 +1916,8 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
 
     // --- Mapeos específicos de EVENTOS ---
     const channelMappings = {
-          'MOVISTAR': 'M+',
           'LA LIGA 1': 'La Liga',
-          'LALIGA': 'La Liga',
+          'MOVISTAR': 'M+',
           'Premier': 'Premier League',
           'EUROSPORT': '★EUROSPORT',
           'La Liga TV La Liga Hypermotion': 'La Liga Hypermotion',
@@ -1926,7 +1927,10 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
           'GOLF': 'Golf',
           'VAMOS': 'Vamos',
           'BALONCESTO 1': 'Baloncesto',
-          'M. DEPORTES ES': 'M+ Deportes'
+          'M. DEPORTES ES': 'M+ Deportes',
+          'LALIGA': 'La Liga',
+          'LA LIGA': 'La Liga',
+          'EUROSPORT 4K': 'EUROSPORT 1'
 };
     // ------------------------------------
 
@@ -3150,7 +3154,7 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             const channelId = card.getAttribute('data-channel-id');
             const channel = state.channelsData.find(c => c.id === channelId);
 
-            if (!channel) return;
+            if (!channel || channel.source === 'events') return;
 
             const optionsJson = card.getAttribute('data-all-options');
             let allOptions = [];
@@ -3259,7 +3263,7 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             };
 
             // Ordenar opciones: 1. Última vista (si puntúa bien) 2. Puntuación 3. Calidad 4. Nombre
-            const sortedOptions = [...optionsList].sort((a, b) => {
+            const sortedOptions = [...optionsList].filter(opt => opt.source !== 'events').sort((a, b) => {
                 const aIsLastPlayed = a.id === lastPlayedId;
                 const bIsLastPlayed = b.id === lastPlayedId;
 
