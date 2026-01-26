@@ -2237,16 +2237,29 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
 
             // Inyectamos el evento SOLO a canales fijos (evitamos sobreescribir los canales 'events' individuales)
             allData.forEach(c => {
-                if (c.source !== 'events') {
-                    const metadata = eventMetadataMap.get(normalizeText(c.name));
-                    if (metadata) {
-                        c.event = metadata;
-                        c.isLive = true;
+        if (c.source !== 'events') {
+            const channelNameNormalized = normalizeText(c.name);
+            const matchingEvents = allData.filter(e => e.source === 'events' && normalizeText(e.name) === channelNameNormalized);
+
+            if (matchingEvents.length > 0) {
+                // Si hay eventos para este canal fijo, creamos copias del canal para cada evento
+                matchingEvents.forEach((eventChannel, index) => {
+                    if (index === 0) {
+                        // El canal original toma el primer evento
+                        c.event = eventChannel.event;
+                        c.isLive = isChannelLive(c, [eventChannel]);
                     } else {
-                        c.isLive = isChannelLive(c, allData.filter(x => x.source === 'events'));
+                        // Creamos clones para los eventos adicionales del mismo canal
+                        const clone = { ...c, id: `${c.id}_evt${index}`, event: eventChannel.event };
+                        clone.isLive = isChannelLive(clone, [eventChannel]);
+                        state.channelsData.push(clone);
                     }
-                }
-            });
+                });
+            } else {
+                c.isLive = isChannelLive(c, []);
+            }
+        }
+    });
 
             const filteredChannels = filterChannels();
             
@@ -2316,7 +2329,7 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                     }
                     
                     // MODIFICACIÓN: La clave del subgrupo incluye match/time para no colapsar distintos eventos del mismo canal
-                    const subGroupKey = channel.event ? `${subGroupName}_${channel.event.match}_${channel.event.time}` : subGroupName;
+                    const subGroupKey = channel.event ? `${subGroupName}_${channel.event.match}_${channel.event.time}_${channel.event.date}` : subGroupName;
 
                     if (!subGroups[subGroupKey]) {
                         subGroups[subGroupKey] = [];
@@ -3251,9 +3264,7 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                     handleChannelPlay(channel);
                 }
             }
-        };
-
-        function showTvOptionsModal(mainChannelName, optionsList) {
+        };        function showTvOptionsModal(mainChannelName, optionsList) {
             const modal = document.getElementById('tvChannelOptionsModal');
             const nameSpan = document.getElementById('tvModalChannelName');
             const listDiv = document.getElementById('tvModalChannelList');
@@ -3298,8 +3309,18 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                 `;
             };
 
+            // Eliminar IDs de AceStream duplicados solo para la visualización del usuario
+            const filteredOptions = [];
+            const idsSet = new Set();
+            optionsList.forEach(opt => {
+                if (!idsSet.has(opt.id)) {
+                    idsSet.add(opt.id);
+                    filteredOptions.push(opt);
+                }
+            });
+
             // Ordenar opciones: 1. Última vista (si puntúa bien) 2. Puntuación 3. Calidad 4. Nombre
-            const sortedOptions = [...optionsList].filter(opt => opt.source !== 'events').sort((a, b) => {
+            const sortedOptions = filteredOptions.filter(opt => opt.source !== 'events').sort((a, b) => {
                 const aIsLastPlayed = a.id === lastPlayedId;
                 const bIsLastPlayed = b.id === lastPlayedId;
 
