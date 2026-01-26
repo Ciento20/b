@@ -1079,6 +1079,7 @@
         const ELCANO_URL = 'https://acestream-ids.vercel.app/';
         const EVENTS_URL = 'https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/';
 const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
+const CIRIACO_URL = 'https://ciriaco.netlify.app/';
         const SHICKAT_URL = 'https://shickat.me/';
         const BACKUP_KEYS = {
             
@@ -1496,6 +1497,7 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
 
             const results = await Promise.allSettled([
                 fetchAndProcessSource('events', EVENTS_URL, processEventsData, BACKUP_KEYS.events),
+                fetchProxyContentAndProcess('ciriaco', CIRIACO_URL, processCiriacoData, 'ciriaco_backup'),
                 fetchAndProcessSource('era', ERA_URL, processEraData, BACKUP_KEYS.era),
                 fetchProxyContentAndProcess('shickat', SHICKAT_URL, processShickatData, BACKUP_KEYS.shickat),
                 fetchProxyContentAndProcess('elcano', ELCANO_URL, processElcanoDataFromHtml, BACKUP_KEYS.elcano)
@@ -1907,7 +1909,76 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                 return eventTime;
             }
             return eventTime;
-        }        function processEventsData(htmlContent) {
+        }        function processCiriacoData(htmlContent) {
+    const numberedChannels = [];
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
+    let fechaActual = "Hoy";
+    const rows = doc.querySelectorAll('.tabla-eventos tbody tr');
+
+    rows.forEach(row => {
+        // Buscar la fecha en el h2 anterior a la tabla
+        let prevH2 = row.closest('.tabla-eventos').previousElementSibling;
+        while (prevH2 && prevH2.tagName !== 'H2') {
+            prevH2 = prevH2.previousElementSibling;
+        }
+        if (prevH2 && prevH2.classList.contains('fecha')) {
+            fechaActual = prevH2.innerText.split(' (')[0].trim();
+        }
+
+        const cells = row.querySelectorAll('td');
+        if (cells.length < 5) return;
+
+        const hora = cells[0].innerText.trim();
+        const competicion = cells[2].innerText.trim();
+        const matchName = cells[3].innerText.replace(/vs/gi, ' vs ').replace(/\s+/g, ' ').trim();
+        const sportText = cells[1].querySelector('.deporte')?.innerText.trim() || "";
+        
+        const logos = cells[3].querySelectorAll('img');
+        const t1_logo = logos[0]?.src || '';
+        const t2_logo = logos[1]?.src || '';
+
+        const eventInfo = {
+            time: hora,
+            competition: competicion,
+            match: matchName,
+            date: fechaActual,
+            sportEmoji: getEmojiBySportName(sportText),
+            imga: t1_logo,
+            imgb: t2_logo,
+            startTime: getEventTime(fechaActual, hora).getTime(),
+            endTime: getEventTime(fechaActual, hora).getTime() + (120 * 60000)
+        };
+
+        const canalesText = cells[4].innerText;
+        const canalNombres = canalesText.split(',').map(c => c.trim());
+
+        canalNombres.forEach(nombre => {
+            if (!nombre || nombre.toLowerCase().includes('app')) return;
+            const uniqueId = `ciriaco-${nombre}-${fechaActual}-${hora}`.replace(/\s+/g, '_');
+            numberedChannels.push({
+                id: uniqueId,
+                name: nombre,
+                quality: 'EVENTO',
+                source: 'events',
+                event: eventInfo
+            });
+        });
+    });
+    return numberedChannels;
+}
+
+function getEmojiBySportName(sport) {
+    const s = sport.toLowerCase();
+    if (s.includes('fútbol') || s.includes('futbol')) return '⚽';
+    if (s.includes('baloncesto')) return '🏀';
+    if (s.includes('tenis')) return '🎾';
+    if (s.includes('motor') || s.includes('f1')) return '🏎️';
+    if (s.includes('ciclismo')) return '🚴';
+    return '🏆';
+}
+
+function processEventsData(htmlContent) {
     const numberedChannels = [];
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContent, 'text/html');
