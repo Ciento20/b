@@ -1076,7 +1076,7 @@
             'https://corsproxy.io/?'
         ];
         const GIST_URL = "https://gist.githubusercontent.com/Ciento20/f7847e86d06e5011706fa76f2dab90be/raw";
-        const ELCANO_URL = 'https://ipfs.io/ipns/elcano.top';
+        const ELCANO_URL = 'https://acestream-ids.vercel.app/';
         const EVENTS_URL = 'https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/';
 const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
         const SHICKAT_URL = 'https://shickat.me/';
@@ -1562,7 +1562,7 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             const multiAudio = name.toUpperCase().includes('MULTI');
 
             name = name
-                .replace(/1080P|1080|720|UHD|FHD|HD|SD|MultiAudio|Multi Audio|Multi|multi|4K/gi, '')
+                .replace(/1080P|1080|720P|720|UHD|FHD|HD|SD|MultiAudio|Multi Audio|Multi|multi|4K/gi, '')
                 .replace(/\(ES\)|\(Es\)|(Estable|New Era II|New Loop|New Era VI|Fórmula 1|BAR|eleven|eventos)/gi, '')
                 .replace(/\s+/g, ' ')
                 .trim();            if (name.includes('Eurosport 1')) {
@@ -1601,7 +1601,10 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
           'GOLF': 'Golf',
           'VAMOS': 'Vamos',
           'BALONCESTO 1': 'Baloncesto',
-          'M. DEPORTES ES': 'M+ Deportes'
+          'M. DEPORTES ES': 'M+ Deportes',
+          'DEPORTES': 'Deportes ',
+          'TELEDEPORTE': 'Teledeporte',
+          'ELLAS': 'Ellas Vamos'
 };
             // ----------------------------------------------------
 
@@ -1716,17 +1719,15 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
         
 
         function processElcanoDataFromHtml(htmlContent) {
-            const jsonMatch = htmlContent.match(/const linksData\s*=\s*({[\s\S]*?});/);
-            if (!jsonMatch) throw new Error("No se encontró linksData o el formato HTML ha cambiado.");
-            let jsonString = jsonMatch[1];
-            jsonString = jsonString.replace(/\s*\/\/.*(?:\n|$)/g, '');
-            jsonString = jsonString.replace(/,\s*}/g, '}')
-                .replace(/,\s*]/g, ']');
-            const linksData = JSON.parse(jsonString);
-            if (!linksData || !linksData.links || !Array.isArray(linksData.links)) {
-                throw new Error("Estructura de linksData incorrecta o falta el array 'links'.");
+            const jsonMatch = htmlContent.match(/const links\s*=\s*(\[[\s\S]*?\]);/);
+            if (!jsonMatch) throw new Error("No se encontró el array 'links' en el nuevo formato de Elcano.");
+            try {
+                const links = JSON.parse(jsonMatch[1]);
+                return processElcanoData(links);
+            } catch (e) {
+                console.error("Error al parsear links de Elcano:", e);
+                throw e;
             }
-            return processElcanoData(linksData.links);
         }
 
         
@@ -1809,16 +1810,14 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
 
             // --- Mapeos específicos de Elcano ---
             const nameMap = {
-          'M. LaLiga': 'M+ La Liga',
-          'LaLiga Smartbank': 'La Liga Hypermotion',
-          'M.': 'M.',
-          'MovistarPlus': 'M+ Plus',
-          'Vamos': 'M+ Vamos',
-          'Deporte': 'M+ Deportes',
-          'Dedporte': 'M+ Deportes',
-          'Dazn LaLiga': 'DAZN LA Liga',
-          'Campeones': 'M+ Liga de Campeones',
-          'Dazn': 'DAZN'
+          'LALIGA TV HYPERMOTION': 'La Liga Hypermotion',
+          'DAZN F1': 'DAZN F1',
+          'EUROSPORT': '★EUROSPORT',
+          'DAZN': 'DAZN',
+          'M. LALIGA': 'M+ La Liga',
+          'M. DEPORTES': 'M+ Deportes',
+          'VAMOS': 'M+ Vamos',
+          'LALIGA TV': 'M+ La Liga'
 };
             // ------------------------------------
 
