@@ -37,9 +37,9 @@
         }
 
         body.dark-mode {
-            --bg-light: #131313;
-            --card-bg: #282828;
-            --text: #f8fafc;
+            --bg-light: #f1f5f9;
+            --card-bg: #ffffff;
+            --text: #1e293b;
             --border-color: #555555;
             --shadow-sm: 0 0.5px 1.5px rgba(0, 0, 0, 0.3);
             --primary-light: rgba(var(--primary-rgb), 0.2);
@@ -1076,7 +1076,7 @@
             'https://corsproxy.io/?'
         ];
         const GIST_URL = "https://gist.githubusercontent.com/Ciento20/f7847e86d06e5011706fa76f2dab90be/raw";
-        const ELCANO_URL = 'https://ipfs.io/ipns/elcano.top';
+        const ELCANO_URL = 'https://acestream-ids.vercel.app/';
         const EVENTS_URL = 'https://eventos-eight-dun.vercel.app/';
         const SHICKAT_URL = 'https://shickat.me/';
         const BACKUP_KEYS = {
@@ -1566,7 +1566,7 @@
             const multiAudio = name.toUpperCase().includes('MULTI');
 
             name = name
-                .replace(/1080P|1080|720|UHD|FHD|HD|SD|MultiAudio|Multi Audio|Multi|multi|4K/gi, '')
+                .replace(/1080P|1080|720P|720|UHD|FHD|HD|SD|MultiAudio|Multi Audio|Multi|multi|4K/gi, '')
                 .replace(/\(ES\)|\(Es\)|(Estable|New Era II|New Loop|New Era VI|Fórmula 1|BAR|eleven|eventos)/gi, '')
                 .replace(/\s+/g, ' ')
                 .trim();            if (name.includes('Eurosport 1')) {
@@ -1720,17 +1720,10 @@
         
 
         function processElcanoDataFromHtml(htmlContent) {
-            const jsonMatch = htmlContent.match(/const linksData\s*=\s*({[\s\S]*?});/);
-            if (!jsonMatch) throw new Error("No se encontró linksData o el formato HTML ha cambiado.");
-            let jsonString = jsonMatch[1];
-            jsonString = jsonString.replace(/\s*\/\/.*(?:\n|$)/g, '');
-            jsonString = jsonString.replace(/,\s*}/g, '}')
-                .replace(/,\s*]/g, ']');
-            const linksData = JSON.parse(jsonString);
-            if (!linksData || !linksData.links || !Array.isArray(linksData.links)) {
-                throw new Error("Estructura de linksData incorrecta o falta el array 'links'.");
-            }
-            return processElcanoData(linksData.links);
+            const jsonMatch = htmlContent.match(/const links\s*=\s*(\[[\s\S]*?\]);/);
+            if (!jsonMatch) throw new Error("No se encontró el array de links en la nueva fuente de Elcano.");
+            const links = JSON.parse(jsonMatch[1]);
+            return processElcanoData(links);
         }
 
         
@@ -1813,15 +1806,9 @@
 
             // --- Mapeos específicos de Elcano ---
             const nameMap = {
-          'M. LaLiga': 'M+ La Liga',
+          'LaLiga': 'La Liga',
           'LaLiga Smartbank': 'La Liga Hypermotion',
-          'M.': 'M.',
           'MovistarPlus': 'M+ Plus',
-          'Vamos': 'M+ Vamos',
-          'Deporte': 'M+ Deportes',
-          'Dedporte': 'M+ Deportes',
-          'Dazn LaLiga': 'DAZN LA Liga',
-          'Campeones': 'M+ Liga de Campeones',
           'Dazn': 'DAZN'
 };
             // ------------------------------------
@@ -1955,60 +1942,12 @@
                         const durationMinutes = calculateDuration(durationString);
                         let sportEmoji = '🏆';
                         const normalizedSport = normalizeText(sportName);
-                        if (normalizedSport.includes('americano')) {
-                            sportEmoji = '🏈';
-                        } else if (normalizedSport.includes('tenis')) {
-                            sportEmoji = '🎾';
-                        } else if (normalizedSport.includes('golf')) {
-                            sportEmoji = '⛳';
-                        } else if (normalizedSport.includes('hockey')) {
-                            sportEmoji = '🏑 ';
-                        } else if (normalizedSport.includes('rugby')) {
-                            sportEmoji = '🏉';
-                        } else if (normalizedSport.includes('gimnasia')) {
-                            sportEmoji = '🤸';
-                        } else if (normalizedSport.includes('surf')) {
-                            sportEmoji = '🏄 ';
-                        } else if (normalizedSport.includes('ajedrez')) {
-                            sportEmoji = '♟️';
-                        } else if (normalizedSport.includes('dardos')) {
-                            sportEmoji = '🎯';
-                        } else if (normalizedSport.includes('futbol')) {
-                            sportEmoji = '⚽';
-                        } else if (normalizedSport.includes('handball') || normalizedSport.includes('handball')) {
-                            sportEmoji = '🤾‍♂️';
-                        } else if (normalizedSport.includes('baloncesto') || normalizedSport.includes('basket') || normalizedSport.includes('nba')) {
-                            sportEmoji = '🏀';
-                        } else if (normalizedSport.includes('motogp') || normalizedSport.includes('motos')) {
-                            sportEmoji = '🏍️';
-                        } else if (normalizedSport.includes('paddle') || normalizedSport.includes('padel')) {
-                            sportEmoji = '🥎';
-                        } else if (normalizedSport.includes('triatlon') || normalizedSport.includes('triathlon')) {
-                            sportEmoji = '🏊🚴🏃';
-                        } else if (normalizedSport.includes('motor') || normalizedSport.includes('rally')) {
-                            sportEmoji = '🚗';
-                        } else if (normalizedSport.includes('f1') || normalizedSport.includes('formula')) {
-                            sportEmoji = '🏎️';
-                        } else if (normalizedSport.includes('boxeo') || normalizedSport.includes('lucha')) {
-                            sportEmoji = '🥊';
-                        } else if (normalizedSport.includes('ciclismo') || normalizedSport.includes('tour')) {
-                            sportEmoji = '🚴';
-                        } else if (normalizedSport.includes('beisbol') || normalizedSport.includes('baseball')) {
-                            sportEmoji = '⚾';
-                        } else if (normalizedSport.includes('voleibol') || normalizedSport.includes('voley')) {
-                            sportEmoji = '🏐';
-                        } else if (normalizedSport.includes('natacion') || normalizedSport.includes('agua')) {
-                            sportEmoji = '🏊';
-                        } else if (normalizedSport.includes('atletismo') || normalizedSport.includes('pista')) {
-                            sportEmoji = '🏃';
-                        } else if (normalizedSport.includes('gimnasia')) {
-                            sportEmoji = '🤸';
-                        } else if (normalizedSport.includes('esqui') || normalizedSport.includes('nieve')) {
-                            sportEmoji = '⛷️';
-                        } else if (normalizedSport.includes('e-sports') || normalizedSport.includes('esports')) {
-                            sportEmoji = '🎮';
-                        } else if (normalizedSport.includes('billares') || normalizedSport.includes('pool')) {
+                        if (normalizedSport.includes('pool')) {
                             sportEmoji = '🎱 -';
+                        } else if (normalizedSport.includes('roller')) {
+                            sportEmoji = '⛸️ -';
+                        } else if (normalizedSport.includes('cricket')) {
+                            sportEmoji = '🏏 -';
                         } else if (normalizedSport.includes('patinaje') || normalizedSport.includes('roller')) {
                             sportEmoji = '⛸️ -';
                         } else if (normalizedSport.includes('criquet') || normalizedSport.includes('cricket')) {
