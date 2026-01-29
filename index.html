@@ -946,13 +946,27 @@
                                 invisible.</span></div>
                     </div><label class="settings-switch"><input type="checkbox" id="hideOptionsButtonCheckbox"><span
                             class="settings-slider"></span></label>
-                </div>
-                <div class="settings-item">
+                </div>                <div class="settings-item">
                     <div class="settings-item__info"><span class="settings-icon">📋</span>
                         <div><span class="settings-label">Copiar enlace en vez de abrir</span><span
                                 class="settings-description">Al hacer clic en un canal, copia el ID de AceStream al portapapeles en lugar de intentar abrirlo.</span></div>
                     </div><label class="settings-switch"><input type="checkbox" id="copyLinkModeCheckbox"><span
                             class="settings-slider"></span></label>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-item__info"><span class="settings-icon">🚫</span>
+                        <div><span class="settings-label">Ocultar Canales sin Link</span><span class="settings-description">Oculta tarjetas sin señal.</span></div>
+                    </div><label class="settings-switch"><input type="checkbox" id="hideNoLinksCheckbox"><span class="settings-slider"></span></label>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-item__info"><span class="settings-icon">📡</span>
+                        <div><span class="settings-label">Motor de Eventos</span><span class="settings-description">Fuente de la agenda deportiva.</span></div>
+                    </div>
+                    <select id="eventSourceSelect" onchange="setEventSource(this.value)" style="background:#333; color:white; border:1px solid #555; font-size:0.45rem; border-radius:4px;">
+                        <option value="vercel">Vercel (Alternativo)</option>
+                        <option value="ciriaco">Ciriaco (Tabla)</option>
+                        <option value="ipfs">IPFS (Directo)</option>
+                    </select>
                 </div>
             </div>
             <div class="settings-section">
@@ -1037,6 +1051,7 @@
             hideEventDetails: localStorage.getItem('hideEventDetails') === 'true',
             tvCurrentFilter: localStorage.getItem('tvCurrentFilter') || 'all',
             tvSportFilter: localStorage.getItem('tvSportFilter') || 'all',
+            tvEventSource: localStorage.getItem('tvEventSource') || 'vercel', // 'vercel', 'ciriaco', 'ipfs'
             tvSearchTerm: '',
             tvFocusManager: null,
             playerActive: false,
@@ -1044,7 +1059,7 @@
             channelLogos: JSON.parse(localStorage.getItem('channelLogos')) || {},
             fullScreenOnClick: localStorage.getItem('fullScreenOnClick') === 'true',
             hideOptionsButton: localStorage.getItem('hideOptionsButton') === 'true',
-            copyLinkMode: localStorage.getItem('copyLinkMode') === 'true',
+            copyLinkMode: localStorage.getItem('copyLinkMode') === 'true', hideNoLinks: localStorage.getItem('hideNoLinks') !== 'false',
             calibrationQueue: [],
             isCalibrating: false
         };
@@ -1077,7 +1092,12 @@
         ];
         const GIST_URL = "https://gist.githubusercontent.com/Ciento20/f7847e86d06e5011706fa76f2dab90be/raw";
         const ELCANO_URL = 'https://acestream-ids.vercel.app/';
-        const EVENTS_URL = 'https://eventos-eight-dun.vercel.app/';
+        const EVENTS_SOURCES = {
+            vercel: 'https://eventos-eight-dun.vercel.app/',
+            ciriaco: 'https://ciriaco.netlify.app/',
+            ipfs: 'https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/'
+        };
+const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
         const SHICKAT_URL = 'https://shickat.me/';
         const BACKUP_KEYS = {
             
@@ -1152,13 +1172,26 @@
             document.getElementById('copyLinkModeCheckbox').checked = state.copyLinkMode;
             document.body.classList.toggle('hide-options-button-active', state.hideOptionsButton);
             renderTVChannels();
-        }
-
-        function toggleCopyLinkMode() {
+        }        function toggleCopyLinkMode() {
             state.copyLinkMode = !state.copyLinkMode;
             localStorage.setItem('copyLinkMode', state.copyLinkMode);
             document.getElementById('copyLinkModeCheckbox').checked = state.copyLinkMode;
             showStatusMessage(state.copyLinkMode ? "Modo Copiar Enlace activado" : "Modo Reproducción directa activado", "info");
+        }
+
+        function setEventSource(source) {
+            state.tvEventSource = source;
+            localStorage.setItem('tvEventSource', source);
+            showStatusMessage(`Motor de eventos cambiado a: ${source.toUpperCase()}`, "success");
+            loadInitialChannels();
+        }
+
+        function toggleHideNoLinks() {
+            state.hideNoLinks = !state.hideNoLinks;
+            localStorage.setItem('hideNoLinks', state.hideNoLinks);
+            document.getElementById('hideNoLinksCheckbox').checked = state.hideNoLinks;
+            document.getElementById('eventSourceSelect').value = state.tvEventSource;
+            renderTVChannels();
         }
 
         function requestFullScreen() {
@@ -1488,19 +1521,23 @@
             const tvChannelsGrid = document.getElementById("tvChannelsGrid");
             document.getElementById('tvStatusMessageContainer').innerHTML = '';
 
-            // PASO 1: Cargar Logos de Gist (ahora tiene su propia función)
             await loadChannelLogos();
 
-            // PASO 2: Cargar y Renderizar Canales de Backup (sin el Gist)
             const isShowingBackup = loadAndRenderBackupChannels();
-            const temporaryLoadMessage = isShowingBackup ? "Mostrando historial. Obteniendo datos en tiempo real..." : "Cargando datos en tiempo real...";
-            showStatusMessage(temporaryLoadMessage, "warning");
+            showStatusMessage("Cargando agenda deportiva...", "info");
 
-            // PASO 3: Cargar Canales en Tiempo Real
+            let eventTask;
+            if (state.tvEventSource === 'ciriaco') {
+                eventTask = fetchProxyContentAndProcess('events', EVENTS_SOURCES.ciriaco, processCiriacoData, BACKUP_KEYS.events);
+            } else if (state.tvEventSource === 'ipfs') {
+                eventTask = fetchAndProcessSource('events', EVENTS_SOURCES.ipfs, processEventsData, BACKUP_KEYS.events);
+            } else {
+                eventTask = fetchAndProcessSource('events', EVENTS_SOURCES.vercel, processVercelEventsData, BACKUP_KEYS.events);
+            }
+
             const results = await Promise.allSettled([
-                fetchAndProcessSource('events', EVENTS_URL, processEventsData, BACKUP_KEYS.events),
+                eventTask,
                 fetchAndProcessSource('era', ERA_URL, processEraData, BACKUP_KEYS.era),
-                //  // ELIMINADO: Gist ya no es fuente de canales
                 fetchProxyContentAndProcess('shickat', SHICKAT_URL, processShickatData, BACKUP_KEYS.shickat),
                 fetchProxyContentAndProcess('elcano', ELCANO_URL, processElcanoDataFromHtml, BACKUP_KEYS.elcano)
             ]);
@@ -1593,7 +1630,7 @@
             // --- Mapeos específicos de ERA (anteriormente Gist) ---
             const channelMappings = {
           'MOVISTAR': 'M+',
-          'LA LIGA 1': 'La Liga',
+          'LA LIGA': 'La Liga',
           'LALIGA': 'La Liga',
           'Premier': 'Premier League',
           'EUROSPORT': '★EUROSPORT',
@@ -1605,7 +1642,12 @@
           'GOLF': 'Golf',
           'VAMOS': 'Vamos',
           'BALONCESTO 1': 'Baloncesto',
-          'M. DEPORTES ES': 'M+ Deportes'
+          'M. DEPORTES ES': 'M+ Deportes',
+          'DEPORTES': 'Deportes ',
+          'TELEDEPORTE': 'Teledeporte',
+          'ELLAS': 'Ellas Vamos',
+          'BALONCESTO': 'Baloncesto',
+          'LA LIGA 1': 'La Liga'
 };
             // ----------------------------------------------------
 
@@ -1721,9 +1763,14 @@
 
         function processElcanoDataFromHtml(htmlContent) {
             const jsonMatch = htmlContent.match(/const links\s*=\s*(\[[\s\S]*?\]);/);
-            if (!jsonMatch) throw new Error("No se encontró el array de links en la nueva fuente de Elcano.");
-            const links = JSON.parse(jsonMatch[1]);
-            return processElcanoData(links);
+            if (!jsonMatch) throw new Error("No se encontró el array 'links' en el nuevo formato de Elcano.");
+            try {
+                const links = JSON.parse(jsonMatch[1]);
+                return processElcanoData(links);
+            } catch (e) {
+                console.error("Error al parsear links de Elcano:", e);
+                throw e;
+            }
         }
 
         
@@ -1806,10 +1853,14 @@
 
             // --- Mapeos específicos de Elcano ---
             const nameMap = {
+          'LALIGA TV HYPERMOTION': 'La Liga Hypermotion',
+          'DAZN F1': 'DAZN F1',
+          'EUROSPORT': '★EUROSPORT',
+          'DAZN Laliga': 'DAZN La Liga',
           'LaLiga': 'La Liga',
-          'LaLiga Smartbank': 'La Liga Hypermotion',
-          'MovistarPlus': 'M+ Plus',
-          'Dazn': 'DAZN'
+          'ACB 1': 'ACB',
+          'BUNDESLIGA 1': 'BUNDESLIGA',
+          'LALIGA': 'La Liga'
 };
             // ------------------------------------
 
@@ -1897,106 +1948,209 @@
                 return eventTime;
             }
             return eventTime;
-        }
-
-        function processEventsData(htmlContent) {
+        }        function processVercelEventsData(htmlContent) {
             const numberedChannels = [];
             const parser = new DOMParser();
             const doc = parser.parseFromString(htmlContent, 'text/html');
-            const table = doc.querySelector('table');
-            if (!table) {
-                console.warn("No se encontró la tabla de eventos");
-                return numberedChannels;
-            }
-            const rows = table.querySelectorAll('tbody tr');
-
-            // --- Mapeos específicos de Eventos ---
+            const rows = doc.querySelectorAll('table tbody tr');
             const channelMappings = {
-          'Movistar': 'M+',
+          'MOVISTAR': 'M+',
           'DAZN LA LIGA 1': 'DAZN La Liga',
           'LALIGA': 'La Liga',
           'Premier': 'Premier League',
-          'Eurosport': '★EUROSPORT',
+          'EUROSPORT': '★EUROSPORT',
           'HYPERMOTION': 'La Liga Hypermotion',
           'LIGA DE CAMPEONES': 'M+ Liga de Campeones',
           'PLUS': 'Plus',
           'VAMOS': 'Vamos',
           'Deportes': 'Deportes'
-};
-            // ------------------------------------
-
+        };
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
                 if (cells.length >= 6) {
-                    const date = cells[0].textContent.trim();
-                    const time = cells[1].textContent.trim();
-                    const sportName = cells[2].textContent.trim();
-                    const competition = cells[3].textContent.trim();
-                    const match = cells[4].textContent.trim();
-                    const canalesCell = cells[5];
-                    const links = canalesCell.querySelectorAll('a[href^="acestream://"]');
-                    if (links.length > 0) {
-                        // Concatenamos el nombre del deporte, competición y partido para un cálculo de duración más robusto
-                        const durationString = `${sportName} ${competition} ${match}`;
-                        const eventStartTime = getEventTime(date, time);
-                        const durationMinutes = calculateDuration(durationString);
-                        let sportEmoji = '🏆';
-                        const normalizedSport = normalizeText(sportName);
-                        if (normalizedSport.includes('pool')) {
-                            sportEmoji = '🎱 -';
-                        } else if (normalizedSport.includes('roller')) {
-                            sportEmoji = '⛸️ -';
-                        } else if (normalizedSport.includes('cricket')) {
-                            sportEmoji = '🏏 -';
-                        } else if (normalizedSport.includes('patinaje') || normalizedSport.includes('roller')) {
-                            sportEmoji = '⛸️ -';
-                        } else if (normalizedSport.includes('criquet') || normalizedSport.includes('cricket')) {
-                            sportEmoji = '🏏 -';
-                        }
-                        const eventEndTime = new Date(eventStartTime.getTime() + durationMinutes * 60000);
-                        links.forEach(link => {
-                            const acestreamId = link.href.split('://')[1];
-                            let channelName = link.textContent.trim();
-
-                            // 1. Aplicar mapeo de nombre específico de Eventos
-                            for (const key in channelMappings) {
-                                const regex = new RegExp(key, 'gi');
-                                channelName = channelName.replace(regex, channelMappings[key]);
-                            }
-
-                            // 2. Limpiar calidad/multi-audio y normalizar
-                            const {
-                                name,
-                                quality,
-                                multiAudio
-                            } = cleanNameAndExtractQuality(channelName);
-
-                            numberedChannels.push({
-                                id: acestreamId,
-                                number: acestreamId.substring(0, 3),
-                                name: name,
-                                quality: quality,
-                                multiAudio: multiAudio,
-                                isKnown: true,
-                                source: 'events',
-                                event: {
-                                    time,
-                                    competition,
-                                    match,
-                                    date,
-                                    sportEmoji,
-                                    sportName,
-                                    startTime: eventStartTime.getTime(),
-                                    endTime: eventEndTime.getTime()
-                                }
-                            });
-                            trackFirstSeen(acestreamId);
-                        });
-                    }
+                    const date = cells[0].textContent.trim(), time = cells[1].textContent.trim(), sport = cells[2].textContent.trim(), comp = cells[3].textContent.trim(), match = cells[4].textContent.trim();
+                    const links = cells[5].querySelectorAll('a[href^="acestream://"]');
+                    links.forEach(link => {
+                        const id = link.href.split('://')[1];
+                        let name = link.textContent.trim();
+                        for (const key in channelMappings) name = name.replace(new RegExp(key, 'gi'), channelMappings[key]);
+                        const { name: cName, quality, multiAudio } = cleanNameAndExtractQuality(name);
+                        numberedChannels.push({ id, name: cName, quality, multiAudio, source: 'events', event: { time, competition: comp, match, date, sportEmoji: '🏆', sportName: sport, startTime: getEventTime(date, time).getTime(), endTime: getEventTime(date, time).getTime() + 7200000 } });
+                    });
                 }
             });
             return numberedChannels;
         }
+
+        async function processCiriacoData(html) {
+            const numberedChannels = [];
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const rows = doc.querySelectorAll('table.tabla-eventos tbody tr');
+            const fechaActual = doc.querySelector('.fecha')?.innerText.trim() || 'Hoy';
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length < 5) return;
+                const hora = cells[0].innerText.trim(), comp = cells[2].innerText.trim(), match = cells[3].innerText.trim();
+                const t1 = cells[3].querySelectorAll('img')[0]?.src || '', t2 = cells[3].querySelectorAll('img')[1]?.src || '';
+                const channelMappings = {
+          'LA LIGA 1': 'La Liga',
+          'MOVISTAR': 'M+',
+          'EUROSPORT': '★EUROSPORT',
+          'La Liga TV La Liga Hypermotion': 'La Liga Hypermotion',
+          'ACCION': 'Acción',
+          'CLASICOS': 'Clásicos',
+          'Plus\\:': 'Plus',
+          'GOLF': 'Golf',
+          'VAMOS': 'Vamos',
+          'BALONCESTO 1': 'Baloncesto',
+          'M. DEPORTES ES': 'M+ Deportes',
+          'LALIGA': 'La Liga',
+          'LA LIGA': 'La Liga',
+          'EUROSPORT 4K': 'EUROSPORT 1'
+        };
+        const eventInfo = { time: hora, competition: comp, match, date: fechaActual, sportEmoji: '🏆', imga: t1, imgb: t2, startTime: getEventTime(fechaActual, hora).getTime(), endTime: getEventTime(fechaActual, hora).getTime() + 7200000 };
+        row.querySelectorAll('a[href^="acestream://"]').forEach(link => {
+          const id = link.href.split('://')[1];
+          let rawName = link.innerText.trim();
+          for (const key in channelMappings) { rawName = rawName.replace(new RegExp(key, 'gi'), channelMappings[key]); }
+          const { name, quality, multiAudio } = cleanNameAndExtractQuality(rawName);
+          numberedChannels.push({ id, name, quality, multiAudio, source: 'events', event: eventInfo });
+        });
+            });
+            return numberedChannels;
+        }
+
+        function processEventsData(htmlContent) {
+    const numberedChannels = [];
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
+    let fechaActual = "Hoy";
+    const rows = doc.querySelectorAll('tr');
+
+    // --- Mapeos específicos de EVENTOS ---
+    const channelMappings = {
+          'LA LIGA 1': 'La Liga',
+          'MOVISTAR': 'M+',
+          'EUROSPORT': '★EUROSPORT',
+          'La Liga TV La Liga Hypermotion': 'La Liga Hypermotion',
+          'ACCION': 'Acción',
+          'CLASICOS': 'Clásicos',
+          'Plus\\:': 'Plus',
+          'GOLF': 'Golf',
+          'VAMOS': 'Vamos',
+          'BALONCESTO 1': 'Baloncesto',
+          'M. DEPORTES ES': 'M+ Deportes',
+          'LALIGA': 'La Liga',
+          'LA LIGA': 'La Liga',
+          'EUROSPORT 4K': 'EUROSPORT 1'
+};
+    // ------------------------------------
+
+    rows.forEach(row => {
+        const dayParent = row.closest('.events-day');
+        if (dayParent) {
+            const h2Text = dayParent.querySelector('h2')?.innerText.trim();
+            if (h2Text && h2Text.includes(' - ')) fechaActual = h2Text.split(' - ')[1].trim();
+        }
+
+        if (row.classList.contains('event-row')) {
+            const cells = row.querySelectorAll('td');
+            if (cells.length < 3) return;            const hora = cells[0].innerText.trim();
+            let competicion = row.querySelector('.competition-name')?.innerText.trim() || "";
+            let matchName = "";
+            const teamNames = row.querySelectorAll('.team-name');
+            const eventoNameElem = row.querySelector('.evento-name');
+
+            if (teamNames.length >= 2) {
+                matchName = teamNames[0].innerText.trim() + " vs " + teamNames[1].innerText.trim();
+            } else if (eventoNameElem) {
+                const eventoText = eventoNameElem.innerText.trim();
+                // Caso específico: "Jornada 3 PGA Tour"
+                if (eventoText.toLowerCase().includes('jornada')) {
+                    const parts = eventoText.match(/^(Jornada\s+\d+)\s+(.*)$/i);
+                    if (parts) {
+                        matchName = parts[1]; // "Jornada 3"
+                        competicion = parts[2]; // "PGA Tour"
+                    } else {
+                        matchName = eventoText;
+                    }
+                } else {
+                    matchName = eventoText;
+                }
+            }
+            
+            // Si después de todo no hay competición definida, evitamos poner "Evento"
+            if (!competicion) competicion = matchName;
+
+            const t1_logo = row.querySelectorAll('.team-logo')[0]?.src || '';
+            const t2_logo = row.querySelectorAll('.team-logo')[1]?.src || '';            const emojiMap = {
+                '🎾': ['Open Australia', 'Roland Garros', 'Wimbledon', 'US Open', 'ATP', 'WTA', 'Hexagon Cup', 'Grand Slam', 'Davis Cup', 'United Cup', 'Copa Davis'],
+                '⚽': ['Primera Federación Femenina', 'FA Women\'s Super League', 'Liga F', 'Champions Femenina', 'Premier League', 'La Liga EA Sports', 'Primera Federación', 'Serie A Italiana', 'Saudi Pro League', 'Bundesliga', 'Ligue 1', 'Eredivisie', 'Copa del Rey', 'Champions League', 'Europa League', 'Conference League', 'MLS', 'Eurocopa', 'Coppa Italia', 'Primera División Argentina', 'Serie A Brasil', 'Copa Libertadores', 'Concacaf', 'FA Cup', 'Carabao Cup', 'Copa Alemania', 'Copa Francia'],
+                '🏀': ['Liga Endesa', 'NBA', 'Liga ACB', 'Euroliga', 'Eurocup', 'NCAA Basketball', 'FIBA', 'Copa del Rey Baloncesto'],
+                '🏈': ['NFL', 'NCAA Football', 'Super Bowl'],
+                '🏉': ['Rugby', 'Gallagher Premiership', 'Six Nations', 'Super Rugby', 'Top 14'],
+                '⚾': ['LVBP', 'MLB', 'World Baseball Classic'],
+                '🏍️': ['Moto', 'MotoGP', 'WorldSBK', 'Motocross', 'MXGP', 'Supercross'],
+                '🏎️': ['F1', 'Formula 1', 'IndyCar', 'Nascar', 'Rally', 'WRC', 'Dakar', 'Extreme E'],
+                '🥊': ['UFC', 'Boxeo', 'PFL', 'Bellator', 'MMA', 'K-1', 'Bare Knuckle'],
+                '🚴': ['Ciclismo', 'Tour de Francia', 'Giro de Italia', 'Vuelta a España', 'AlUla Tour', 'Almanshiyah Train Station', 'Trofeo Calvia', 'Winter Park', 'Paris-Roubaix', 'Liege-Bastogne-Liege', 'Milano-Sanremo', 'Trofeo Felanitx', 'Trofeo Ses Salines', 'Trofeo Pollença', 'Trofeo Palma', 'Trofeo Andratx', 'Challenge Mallorca', 'Volta a Catalunya', 'Itzulia', 'Clásica San Sebastián'],
+                '⛳': ['Golf', 'Masters', 'PGA', 'Bahrain Championship', 'Ryder Cup', 'US Open Golf', 'The Open', 'LIV Golf'],
+                '🤾': ['EHF Europeo', 'Champions League Handball', 'Asobal', 'Liga Guerreras'],
+                '🏐': ['Voleibol', 'Superliga', 'VNL', 'Voley'],
+                '🏒': ['NHL', 'Hockey'],
+                '🎯': ['Darts', 'Dardos'],
+                '🎱': ['Snooker', 'Billar'],
+                '⛵': ['America\'s Cup', 'Vela', 'SailGP']
+            };
+
+            let detectedEmoji = '🏆';
+            for (const [emoji, keywords] of Object.entries(emojiMap)) {
+                if (keywords.some(key => competicion.includes(key))) {
+                    detectedEmoji = emoji;
+                    break;
+                }
+            }
+
+            const eventInfo = {
+                time: hora,
+                competition: competicion,
+                match: matchName,
+                date: fechaActual,
+                sportEmoji: detectedEmoji,
+                imga: t1_logo,
+                imgb: t2_logo,
+                startTime: getEventTime(fechaActual, hora).getTime(),
+                endTime: getEventTime(fechaActual, hora).getTime() + (120 * 60000)
+            };
+
+            const channelElements = row.querySelectorAll('.channel-link');
+            channelElements.forEach(el => {
+                const rawName = el.innerText.trim();
+                if (!rawName || rawName.includes('---')) return;
+                let cleanedName = rawName.replace(/\s*\(.*?\)/g, '').replace(/:\s*VER PARTIDO/gi, '').replace(/\s*HDR/gi, '').trim();
+                
+                // Aplicar mapeo de nombre específico de EVENTOS
+                for (const key in channelMappings) {
+                    const regex = new RegExp(key, 'gi');
+                    if (regex.test(cleanedName)) {
+                        cleanedName = cleanedName.replace(new RegExp(key, 'gi'), channelMappings[key]);
+                    }
+                }                // Generar una ID única basada en el nombre, fecha y hora para evitar colisiones en el merge y el filtrado
+                const uniqueEventId = `event-${cleanedName}-${fechaActual}-${hora}`.replace(/\s+/g, '_');
+                
+                numberedChannels.push({
+                    id: uniqueEventId,
+                    name: cleanedName,
+                    quality: 'EVENTO',
+                    source: 'events',
+                    event: eventInfo
+                });
+            });
+        }
+    });
+    return numberedChannels;
+}
 
         function processChannelNames() {
             const brands = [{
@@ -2179,100 +2333,64 @@
                 return a.name.localeCompare(b.name);
             });
             return sortedChannels[0];
-        }
+        }        function getGroupedChannels() {
+            // 1. TRABAJO SOBRE COPIA LOCAL PARA EL GRID
+            const allData = state.channelsData;
+            const eventChannels = allData.filter(c => c.source === 'events');
+            let gridData = [];
 
-        function getGroupedChannels() {
-            const filteredChannels = filterChannels();
-            const allEventChannels = state.channelsData.filter(c => c.source === 'events');
-            filteredChannels.forEach(channel => {
-                channel.isLive = isChannelLive(channel, allEventChannels);
+            // Procesamos la duplicación SOLO para el array del grid
+            allData.forEach(c => {
+                if (c.source === 'events') {
+                    gridData.push({ ...c, isLive: isChannelLive(c, []) });
+                    return;
+                }
+
+                const channelNameNormalized = normalizeText(c.name);
+                const matchingEvents = eventChannels.filter(e => normalizeText(e.name) === channelNameNormalized);
+
+                if (matchingEvents.length > 0) {
+                    // Duplicamos el canal para que aparezca en cada evento correspondiente en el grid
+                    matchingEvents.forEach(eventChannel => {
+                        gridData.push({
+                            ...c,
+                            event: eventChannel.event,
+                            isLive: isChannelLive(c, [eventChannel])
+                        });
+                    });
+                } else {
+                    // Si no tiene eventos, aparece una sola vez como canal fijo
+                    gridData.push({ ...c, isLive: isChannelLive(c, []) });
+                }
             });
+
+            // Filtramos la data local procesada para el grid
+            const filteredChannels = filterChannels(gridData);
+            
+            // Ordenación de calidad y fuente
             const sortedChannels = [...filteredChannels].sort((a, b) => {
                 if (a.isLive && !b.isLive) return -1;
                 if (!a.isLive && b.isLive) return 1;
-                const aIsOff = a.name.includes('(OFF)');
-                const bIsOff = b.name.includes('(OFF)');
-                if (aIsOff && !bIsOff) return 1;
-                if (!aIsOff && bIsOff) return -1;
-                const nameNumberA = getChannelNumberFromName(a.name);
-                const nameNumberB = getChannelNumberFromName(b.name);
-                if (nameNumberA !== nameNumberB) {
-                    return nameNumberA - nameNumberB;
-                }
-                const qualityMap = {
-                    '4K': 5,
-                    'FHD': 4,
-                    'HD': 3,
-                    'SD': 2,
-                    'N/A': 1,
-                    'UHD': 6
-                };
-                const qualityA = qualityMap[standardizeQuality(a.quality)] || 0;
-                const qualityB = qualityMap[standardizeQuality(b.quality)] || 0;
-                if (qualityB !== qualityA) {
-                    return qualityB - qualityA;
-                }
-                const sourcePriorityMap = {
-                    'gist': 4,
-                    'era': 3,
-                    'events': 2,
-                    'shickat': 1,
-                    'elcano': 0,
-                    'history': -1
-                };
-                const sourceA = sourcePriorityMap[a.source] || 0;
-                const sourceB = sourcePriorityMap[b.source] || 0;
-                if (sourceB !== sourceA) {
-                    return sourceB - sourceA;
-                }
-                return a.name.localeCompare(b.name);
+                const qMap = { 'UHD': 6, '4K': 5, 'FHD': 4, 'HD': 3, 'SD': 2, 'N/A': 1 };
+                const qDiff = (qMap[standardizeQuality(b.quality)] || 0) - (qMap[standardizeQuality(a.quality)] || 0);
+                if (qDiff !== 0) return qDiff;
+                const sMap = { 'gist': 4, 'era': 3, 'events': 2, 'shickat': 1, 'elcano': 0 };
+                return (sMap[b.source] || 0) - (sMap[a.source] || 0) || a.name.localeCompare(b.name);
             });
+
             const groups = {};
-            const eventGroupKeysByChannelName = new Map();
             sortedChannels.forEach(channel => {
                 let groupName;
-                let isEventGroup = false; // Nueva Lógica de Agrupación: Si el filtro es 'all' O ('search' Y NO es evento), agrupamos por marca y forzamos ocultar detalles de evento
-                if (state.tvCurrentFilter === 'all' || (state.tvCurrentFilter === 'search' && state.tvSearchTerm.trim() === '')) {
-                    groupName = determineBrandGroup(channel);
-                    isEventGroup = false;
-                }
-                else if (state.tvCurrentFilter === 'search' && channel.source === 'events' && channel.event) {
+                let isEventGroup = false;
+                const mode = state.tvCurrentFilter;
+
+                // AGRUPACIÓN UNIFICADA: Si tiene evento y el filtro lo pide, van juntos sí o sí
+                if (channel.event && (mode === 'events_only' || mode === 'live' || (mode === 'search' && state.tvSearchTerm.trim() !== ''))) {
                     groupName = `${channel.event.date}###${channel.event.competition}###${channel.event.match}`;
                     isEventGroup = true;
-                }
-                // Si el filtro es 'events_only', agrupamos por evento y mostramos detalles
-                else if (state.tvCurrentFilter === 'events_only' && channel.source === 'events' && channel.event) {
-                    groupName = `${channel.event.date}###${channel.event.competition}###${channel.event.match}`;
-                    isEventGroup = true;
-                }
-                // Lógica original para otros filtros (incluyendo Live, Marcas, y Eventos fuera del filtro 'events_only' o 'all')
-                else if (channel.source === 'events' && channel.event) {
-                    groupName = `${channel.event.date}###${channel.event.competition}###${channel.event.match}`;
-                    isEventGroup = true;
-                    const normalizedChannelName = normalizeText(channel.name);
-                    if (!state.hideEventDetails && eventGroupKeysByChannelName.has(normalizedChannelName)) {
-                        const eventGroupKeys = eventGroupKeysByChannelName.get(normalizedChannelName);
-                        for (const eventGroupKey of eventGroupKeys) {
-                            const eventGroup = groups[eventGroupKey];
-                            if (eventGroup) {
-                                eventGroup.channels.push(channel);
-                                return;
-                            }
-                        }
-                    }
                 } else {
                     groupName = determineBrandGroup(channel);
-                    const normalizedChannelName = normalizeText(channel.name);
-                    if (!state.hideEventDetails && eventGroupKeysByChannelName.has(normalizedChannelName)) {
-                        const eventGroupKeys = eventGroupKeysByChannelName.get(normalizedChannelName);
-                        for (const eventGroupKey of eventGroupKeys) {
-                            const eventGroup = groups[eventGroupKey];
-                            if (eventGroup) {
-                                eventGroup.channels.push(channel);
-                                return;
-                            }
-                        }
-                    }
+                    isEventGroup = false;
                 }
 
                 if (!groups[groupName]) {
@@ -2296,8 +2414,7 @@
                 groups[groupName].channels.push(channel);
             });
             Object.values(groups).forEach(group => {
-                const subGroups = {};
-                group.channels.forEach(channel => {
+                const subGroups = {};                group.channels.forEach(channel => {
                     let subGroupName = channel.name.trim();
                     if (group.name === 'Otros') {
                         const normalizedChannelName = normalizeText(channel.name);
@@ -2314,10 +2431,18 @@
                     if (subGroupName.includes('DAZN') && subGroupName.includes('BAR')) {
                         subGroupName = subGroupName.replace(' BAR', '').trim();
                     }
-                    if (!subGroups[subGroupName]) {
-                        subGroups[subGroupName] = [];
+                    
+                    // CLAVE DE UNICIDAD: Si no estamos en modo eventos/live, la clave es SOLO el nombre del canal.
+                    // Esto evita que un mismo canal aparezca varias veces por tener varios eventos.
+                    const isEventPriority = (state.tvCurrentFilter === 'events_only' || state.tvCurrentFilter === 'live');
+                    const subGroupKey = (channel.event && isEventPriority) 
+                        ? `${subGroupName}_${channel.event.match}_${channel.event.time}` 
+                        : subGroupName;
+
+                    if (!subGroups[subGroupKey]) {
+                        subGroups[subGroupKey] = [];
                     }
-                    subGroups[subGroupName].push(channel);
+                    subGroups[subGroupKey].push(channel);
                 });
                 group.subGroups = subGroups;
             });
@@ -2351,60 +2476,30 @@
                 groups,
                 sortedGroupKeys
             };
-        }
-
-        function filterChannels() {
-            let filteredChannels = state.channelsData;
+        }        function filterChannels(dataToFilter = state.channelsData) {
+            let filteredChannels = [...dataToFilter];
             const searchTerm = state.tvSearchTerm.trim().toLowerCase();
-            state.searchTerm = state.tvSearchTerm.trim();
-
             let currentFilter = state.tvCurrentFilter;
             let currentSportFilter = state.tvSportFilter;
-            let isSearching = false;
 
-            // Si el filtro activo es 'search', o si hay un término de búsqueda, forzar búsqueda.
-            if (currentFilter === 'search' || searchTerm) {
-                isSearching = true;
-                currentFilter = 'all'; // Aplicar búsqueda sobre todos los canales
-            }
-
-            if (currentSportFilter !== 'all') {
-                currentFilter = 'all'; // El filtro de deporte prevalece si no hay búsqueda explícita
-            }
-            if (isSearching) {
+            if (currentFilter === 'search' || searchTerm !== '') {
                 filteredChannels = filteredChannels.filter(channel => {
-                    // Si el filtro de búsqueda está activo pero el término está vacío,
-                    // solo mostramos canales que NO sean de eventos.
-                    if (searchTerm === '') {
-                        return true;
-                    }
-
-                    // Lógica de búsqueda normal si hay un término
-                    const normalizedSearchTerm = normalizeText(searchTerm);
-                    const nameMatches = normalizeText(channel.name).includes(normalizedSearchTerm);
-                    const idMatches = channel.id && channel.id.toLowerCase().includes(normalizedSearchTerm.replace('#', ''));
-                    let eventDetailsMatch = false;
+                    if (searchTerm === '') return true;
+                    const term = normalizeText(searchTerm);
+                    const nameMatch = normalizeText(channel.name).includes(term);
+                    let eventMatch = false;
                     if (channel.event) {
-                        const {
-                            time,
-                            competition,
-                            match,
-                            date,
-                            sportName
-                        } = channel.event;
-                        eventDetailsMatch = normalizeText(time || '').includes(normalizedSearchTerm) || normalizeText(sportName || '').includes(normalizedSearchTerm) || normalizeText(competition || '').includes(normalizedSearchTerm) || normalizeText(match || '').includes(normalizedSearchTerm) || normalizeText(date || '').includes(normalizedSearchTerm);
+                        eventMatch = Object.values(channel.event).some(v => typeof v === 'string' && normalizeText(v).includes(term));
                     }
-                    return nameMatches || idMatches || eventDetailsMatch;
+                    return nameMatch || eventMatch || (channel.id && channel.id.toLowerCase().includes(term));
                 });
             } else if (currentFilter === 'events_only') {
-                filteredChannels = filteredChannels.filter(c => c.source === 'events');
+                // FILTRADO POR EVENTO (No por fuente)
+                filteredChannels = filteredChannels.filter(c => c.event);
             } else if (currentFilter === 'live') {
-                filteredChannels = filteredChannels.filter(c => {
-                    const allEventChannels = state.channelsData.filter(ch => ch.source === 'events');
-                    return isChannelLive(c, allEventChannels);
-                });
-            } else if (currentFilter !== 'all' && currentFilter !== 'events_only' && currentFilter !== 'live' && currentFilter !== 'search') {
-                filteredChannels = filteredChannels.filter(channel => normalizeText(channel.name).includes(normalizeText(currentFilter.replace('+', ''))));
+                filteredChannels = filteredChannels.filter(c => c.isLive);
+            } else if (currentFilter !== 'all' && !['events_only', 'live', 'search'].includes(currentFilter)) {
+                filteredChannels = filteredChannels.filter(c => normalizeText(c.name).includes(normalizeText(currentFilter.replace('+', ''))));
             }
 
             if (currentSportFilter !== 'all') {
@@ -2919,6 +3014,7 @@
         const createTVChannelCard = (channel, allOptionsJson = '[]') => {
             const placeholderInfo = getPlaceholderInfo(channel.name.toUpperCase());
             const logoUrl = placeholderInfo ? placeholderInfo.logo : null;
+            const channelNumber = channel.id && channel.source !== 'events' ? `<span style="position:absolute; top:2px; left:5px; font-size:0.4rem; color:var(--channel-number-color); font-weight:bold; z-index:10;">${channel.id.substring(0, 3).toUpperCase()}</span>` : '';
 
             const isLiveClass = channel.isLive ? 'tv-card-live' : '';
             let bgColor = '#2d2d2d';
@@ -2949,9 +3045,11 @@
             // Indicador EN VIVO eliminado por solicitud
             let liveIndicator = '';
 
-            const optionsButton = `<button class="tv-link-button" data-channel-id="${channel.id}" title="Ver opciones alternativas">+</button>`;
+            const isEventSource = channel.source === 'events';
+            const optionsButton = isEventSource ? '' : `<button class="tv-link-button" data-channel-id="${channel.id}" title="Ver opciones alternativas">+</button>`;
 
-            return ` <div class="tv-card ${isLiveClass}" data-channel-id="${channel.id}" data-all-options='${allOptionsJson}' style="${backgroundStyle}" tabindex="0" role="button" aria-label="Ver canal ${channel.name}"> ${optionsButton} ${channelNameHTML}</div> `;
+            const pointerEvents = isEventSource ? 'pointer-events: none; cursor: default;' : '';
+            return ` <div class="tv-card ${isLiveClass}" data-channel-id="${channel.id}" data-all-options='${allOptionsJson}' style="${backgroundStyle} ${pointerEvents}" ${isEventSource ? '' : 'tabindex="0" role="button"'} aria-label="Ver canal ${channel.name}"> ${channelNumber} ${optionsButton} ${channelNameHTML}</div> `;
         };
 
         function createTVChannelsHTML(groups, sortedGroupKeys) {
@@ -2971,87 +3069,10 @@
             let html = '';
             let lastDateRendered = null;
             const isEventMode = state.tvCurrentFilter === 'events_only';
-            const isAllMode = state.tvCurrentFilter === 'all';
-
-            for (const groupKey of sortedGroupKeys) {
+            const isAllMode = state.tvCurrentFilter === 'all';            for (const groupKey of sortedGroupKeys) {
                 const group = groups[groupKey];
                 const subGroups = group.subGroups;
-                if (group.isEvent) {
-                    const formattedDate = formatEventDate(group.date);
-                    if (formattedDate !== lastDateRendered) {
 
-                        let prefix = 'Eventos del ';
-                        let coloredDateHtml = formattedDate;
-                        const parts = formattedDate.split(' ');
-                        const firstWord = parts[0].toLowerCase();
-
-                        if (firstWord === 'hoy' || firstWord === 'mañana' || firstWord === 'ayer' || firstWord === 'el') {
-                            prefix = 'Eventos de ';
-
-                            // Si empieza con 'el', la estructura es "el [Día] [fecha]". Coloreamos el día y la fecha.
-                            if (firstWord === 'el') {
-                                const dayOfWeek = parts[1]; // Ejemplo: "Sábado"
-                                const datePart = parts.slice(2).join(' '); // Ejemplo: "13/7/25"
-                                coloredDateHtml = `el <span style="color: var(--primary);">${dayOfWeek} ${datePart}</span>`;
-                            }
-                            // Si es 'Hoy', 'Mañana', o 'Ayer', coloreamos solo esa palabra
-                            else {
-                                coloredDateHtml = `<span style="color: var(--primary);">${formattedDate}</span>`;
-                            }
-                        } else {
-                            // Caso donde formattedDate es solo la fecha (ej: "13/7/25"). Coloreamos la fecha completa.
-                            coloredDateHtml = `<span style="color: var(--primary);">${formattedDate}</span>`;
-                        }
-
-                        // Construimos el encabezado con el prefijo y la fecha coloreada
-                        html += `<h2 class="tv-date-header">${prefix}${coloredDateHtml}</h2>`;
-                        lastDateRendered = formattedDate;
-                    }
-                } else {
-                    lastDateRendered = null;
-                }
-                let groupTitle = group.name;
-                let groupTitleStyle = '';
-
-                if (group.isEvent) {
-                    // Esta sección se ejecuta para CUALQUIER grupo de evento (isEvent: true)
-                    const liveTimeClass = group.hasLive ? 'live-time-blink' : '';
-
-                    // MODIFICACIÓN CLAVE: Aplicar estilo al nombre de la competición (group.competition)
-                    const competitionHtml = `<span style="color: var(--primary);">${group.competition}</span>`;
-
-                    groupTitle = `<div style="display: flex; flex-direction: column; align-items: flex-start;"><div style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 0.75rem; line-height: 1;">${group.sportEmoji}</span> ${competitionHtml}</div><div style="display: flex; align-items: center;"><span class="${liveTimeClass}" style="margin-right: 7.5px; border-right: 2px solid var(--primary); padding-right: 7.5px; display: inline-block; line-height: 0.8; height: 0.5rem; font-size: 0.55rem;">${group.time}</span> ${group.match}</div></div>`;
-
-                    const isFirstGroupAfterDateHeader = !lastDateRendered || (group.date && formatEventDate(group.date) === lastDateRendered);
-                    if (isFirstGroupAfterDateHeader) {
-                        groupTitleStyle = 'margin-top: 0;';
-                    }
-                } else if (group.name.includes('###')) {
-                    // Si el nombre del grupo contiene '###' (grupo de evento renderizado bajo filtro de marca o All)
-                    if (isAllMode || state.tvCurrentFilter === 'search') {
-                        // En modo 'all' o 'search', omitimos los grupos de evento para evitar duplicidad de canales
-                        continue;
-                    }
-
-                    // Lógica para mostrar eventos con formato completo (independientemente del filtro)
-                    const parts = group.name.split('###');
-                    if (parts.length >= 3) {
-                        // El formato es: Date###Competition###Match
-                        const competition = parts[1];
-                        const match = parts[2];
-                        const eventInfo = group.channels[0]?.event;
-                        const sportEmoji = eventInfo?.sportEmoji || '❓';
-                        const time = eventInfo?.time || ''; // <--- Hora del evento
-                        const competitionHtml = `<span style="color: var(--primary);">${competition}</span>`;
-
-                        // Se muestra la hora, emoji, competición y el partido
-                        groupTitle = `<div style="display: flex; flex-direction: column; align-items: flex-start;"><div style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 1.1rem; line-height: 1;">${sportEmoji}</span> ${competitionHtml}</div><div style="display: flex; align-items: center;"><span style="margin-right: 7.5px; border-right: 2px solid var(--primary); padding-right: 7.5px; display: inline-block; line-height: 0.8; height: 0.5rem; font-size: 0.55rem;">${time}</span> ${match}</div></div>`;
-                    } else {
-                        // Fallback por si el formato es inesperado
-                        groupTitle = group.name.replace(/###/g, ' - ');
-                    }
-                }
-                html += ` <div class="tv-group"><header class="tv-group-header"><h2 class="tv-group-title" style="${groupTitleStyle}">${groupTitle}</h2></header> `;
                 let cardsHTML = '';
                 const sortedSubGroupNames = Object.keys(subGroups).sort((a, b) => {
                     const aHasLive = subGroups[a].some(c => c.isLive);
@@ -3062,11 +3083,20 @@
                 });
 
                 sortedSubGroupNames.forEach(subGroupName => {
-                    const channels = subGroups[subGroupName];
-                    const bestChannel = getBestChannelInSubgroup(channels);
-                    if (!bestChannel) return;
+                    let channels = subGroups[subGroupName];
+                    if (state.hideNoLinks) {
+                        channels = channels.filter(c => c.source !== 'events');
+                    }
+                    if (channels.length === 0) return;
 
-                    const allOptions = channels.map(c => ({
+                    const bestChannel = getBestChannelInSubgroup(channels);
+                    if (!bestChannel) return;                    // Buscamos todos los links físicos que coincidan con el nombre del canal seleccionado
+                    const allPhysicalLinks = state.channelsData.filter(c => 
+                        c.source !== 'events' && 
+                        normalizeText(c.name) === normalizeText(bestChannel.name)
+                    );
+
+                    const allOptions = allPhysicalLinks.map(c => ({
                         id: c.id,
                         name: c.displayableName,
                         quality: standardizeQuality(c.quality),
@@ -3075,15 +3105,70 @@
                         rating: state.channelRatings[c.id] !== undefined ? state.channelRatings[c.id] : 2.5
                     }));
                     const allOptionsJson = JSON.stringify(allOptions);
-
                     cardsHTML += createTVChannelCard(bestChannel, allOptionsJson);
                 });
 
-                if (cardsHTML) {
-                    html += `<div class="tv-subgroup-content">${cardsHTML}</div>`;
+                if (!cardsHTML) continue;
+
+                if (group.isEvent) {
+                    const formattedDate = formatEventDate(group.date);
+                    if (formattedDate !== lastDateRendered) {
+                        let prefix = 'Eventos del ';
+                        let coloredDateHtml = formattedDate;
+                        const parts = formattedDate.split(' ');
+                        const firstWord = parts[0].toLowerCase();
+
+                        if (firstWord === 'hoy' || firstWord === 'mañana' || firstWord === 'ayer' || firstWord === 'el') {
+                            prefix = 'Eventos de ';
+                            if (firstWord === 'el') {
+                                const dayOfWeek = parts[1];
+                                const datePart = parts.slice(2).join(' ');
+                                coloredDateHtml = `el <span style="color: var(--primary);">${dayOfWeek} ${datePart}</span>`;
+                            } else {
+                                coloredDateHtml = `<span style="color: var(--primary);">${formattedDate}</span>`;
+                            }
+                        } else {
+                            coloredDateHtml = `<span style="color: var(--primary);">${formattedDate}</span>`;
+                        }
+                        html += `<h2 class="tv-date-header">${prefix}${coloredDateHtml}</h2>`;
+                        lastDateRendered = formattedDate;
+                    }
+                } else {
+                    lastDateRendered = null;
                 }
 
-                html += `</div>`;
+                let groupTitle = group.name;
+                let groupTitleStyle = '';
+
+                if (group.isEvent) {
+                    const liveTimeClass = group.hasLive ? 'live-time-blink' : '';
+                    const competitionHtml = `<span style="color: var(--primary);">${group.competition}</span>`;
+                    const matchParts = group.match.split(' vs ');
+                    const team1 = matchParts[0] || '';
+                    const team2 = matchParts[1] || '';
+                    const eventChannel = group.channels.find(c => c.source === 'events' && c.event);
+                    const t1_logo = eventChannel?.event?.imga || '';
+                    const t2_logo = eventChannel?.event?.imgb || '';
+                    const logoStyle = "width:18px; height:18px; object-fit:contain; vertical-align:middle; margin:0 4px; background:white; border-radius:50%; padding:2px;";
+                    const team1Html = `<span><img src="${t1_logo}" style="${logoStyle}" onerror="this.style.display='none'">${team1}</span>`;
+                    const team2Html = `<span>${team2}<img src="${t2_logo}" style="${logoStyle}" onerror="this.style.display='none'"></span>`;
+                    const isVsMatch = group.match.toLowerCase().includes(' vs ');
+                    const vsHtml = isVsMatch ? `<span style="color:var(--primary); font-weight:bold; margin:0 5px;">VS</span>` : '';
+                    groupTitle = `<div style="display: flex; flex-direction: column; align-items: flex-start;"><div style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 0.75rem; line-height: 1;">${group.sportEmoji}</span> ${competitionHtml}</div><div style="display: flex; align-items: center;"><span class="${liveTimeClass}" style="margin-right: 7.5px; border-right: 2px solid var(--primary); padding-right: 7.5px; display: inline-block; line-height: 0.8; height: 0.5rem; font-size: 0.55rem;">${group.time}</span> ${team1Html} ${vsHtml} ${team2Html}</div></div>`;
+                    if (!lastDateRendered || (group.date && formatEventDate(group.date) === lastDateRendered)) groupTitleStyle = 'margin-top: 0;';
+                } else if (group.name.includes('###')) {
+                    if (isAllMode || state.tvCurrentFilter === 'search') continue;
+                    const parts = group.name.split('###');
+                    if (parts.length >= 3) {
+                        const competition = parts[1], match = parts[2], eventInfo = group.channels[0]?.event;
+                        const sportEmoji = eventInfo?.sportEmoji || '❓', time = eventInfo?.time || '';
+                        const competitionHtml = `<span style="color: var(--primary);">${competition}</span>`;
+                        groupTitle = `<div style="display: flex; flex-direction: column; align-items: flex-start;"><div style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 1.1rem; line-height: 1;">${sportEmoji}</span> ${competitionHtml}</div><div style="display: flex; align-items: center;"><span style="margin-right: 7.5px; border-right: 2px solid var(--primary); padding-right: 7.5px; display: inline-block; line-height: 0.8; height: 0.5rem; font-size: 0.55rem;">${time}</span> ${match}</div></div>`;
+                    } else groupTitle = group.name.replace(/###/g, ' - ');
+                }
+
+                html += ` <div class="tv-group"><header class="tv-group-header"><h2 class="tv-group-title" style="${groupTitleStyle}">${groupTitle}</h2></header> `; 
+                html += `<div class="tv-subgroup-content">${cardsHTML}</div></div>`;
             }
             return html;
         }
@@ -3199,7 +3284,7 @@
             const channelId = card.getAttribute('data-channel-id');
             const channel = state.channelsData.find(c => c.id === channelId);
 
-            if (!channel) return;
+            if (!channel || channel.source === 'events') return;
 
             const optionsJson = card.getAttribute('data-all-options');
             let allOptions = [];
@@ -3261,79 +3346,62 @@
                     handleChannelPlay(channel);
                 }
             }
-        };
-
-        function showTvOptionsModal(mainChannelName, optionsList) {
+        };        function showTvOptionsModal(mainChannelName, optionsList) {
             const modal = document.getElementById('tvChannelOptionsModal');
             const nameSpan = document.getElementById('tvModalChannelName');
             const listDiv = document.getElementById('tvModalChannelList');
-            nameSpan.innerHTML = state.channelsData.find(c => c.name === mainChannelName)?.displayableName || mainChannelName;
+            
+            const matchedChannel = state.channelsData.find(c => c.name === mainChannelName);
+            nameSpan.innerHTML = matchedChannel ? matchedChannel.displayableName : mainChannelName;
             listDiv.innerHTML = '';
 
             const lastPlayedId = state.lastPlayedByChannel[mainChannelName.trim().toLowerCase()];
 
-            const renderOptionItem = (option) => {
-                const isLastViewed = option.id === lastPlayedId;
-                const lastViewedIndicator = isLastViewed ? '<span class="last-viewed-indicator" title="Último AceStream reproducido para este canal">👁️</span>' : '';
-                const ratingStars = getStarRating(option.rating);
+            // FILTRO ANTIDUPLICADOS INDEPENDIENTE PARA EL MODAL (POR ID DE ACESTREAM)
+            const uniqueOptionsMap = new Map();
+            optionsList.forEach(opt => {
+                if (!opt.id || opt.source === 'events') return;
                 
-                let sourceBadgeText = '', sourceBadgeClass = '';
-                switch (option.source) {
-                    case 'gist': sourceBadgeText = 'Gist'; sourceBadgeClass = 'gist-source-color'; break;
-                    case 'elcano': sourceBadgeText = 'Elcano'; sourceBadgeClass = 'elcano-source-color'; break;
-                    case 'events': sourceBadgeText = 'Eventos'; sourceBadgeClass = 'events-source-color'; break;
-                    case 'shickat': sourceBadgeText = 'Shickat'; sourceBadgeClass = 'shickat-badge'; break;
-                    case 'era': sourceBadgeText = 'Era'; sourceBadgeClass = 'era-source-color'; break;
-                    default: sourceBadgeText = 'Desconocido'; sourceBadgeClass = 'channel-name-color';
+                const cleanId = opt.id.trim().toLowerCase();
+                if (!uniqueOptionsMap.has(cleanId)) {
+                    uniqueOptionsMap.set(cleanId, opt);
+                } else {
+                    const existing = uniqueOptionsMap.get(cleanId);
+                    const lpId = lastPlayedId ? lastPlayedId.trim().toLowerCase() : '';
+                    if (cleanId === lpId || opt.rating > existing.rating) {
+                        uniqueOptionsMap.set(cleanId, opt);
+                    }
                 }
-
-                const clickAction = state.copyLinkMode 
-                    ? `copyAcestreamDirectly('${option.id}')` 
-                    : `handleChannelPlay({ id: '${option.id}', name: '${mainChannelName.replace(/'/g, "\\'")}' })`;
-                
-                return `
-                    <div class="channel-option-item" data-id="${option.id}" onclick="${clickAction}">
-                        <div class="channel-option-name-container">
-                            ${lastViewedIndicator}
-                            <span class="channel-option-name">${option.name}</span>
-                        </div>
-                        <div class="channel-option-details">
-                            ${option.multiAudio ? '<span style="color: var(--success); font-weight: 700;">MA</span>' : ''}
-                            <span style="color: var(--${sourceBadgeClass}); font-weight: 700;">${sourceBadgeText.toUpperCase()}</span>
-                            <span style="font-weight: 700; color: var(--primary); border-left: 1px solid #444; padding-left: 3px; margin-left: 3px;">${option.quality}</span>
-                            <span style="margin-left: 3px;">${ratingStars}</span>
-                        </div>
-                    </div>
-                `;
-            };
-
-            // Ordenar opciones: 1. Última vista (si puntúa bien) 2. Puntuación 3. Calidad 4. Nombre
-            const sortedOptions = [...optionsList].sort((a, b) => {
-                const aIsLastPlayed = a.id === lastPlayedId;
-                const bIsLastPlayed = b.id === lastPlayedId;
-
-                if (aIsLastPlayed && !bIsLastPlayed && a.rating >= 3) return -1;
-                if (!aIsLastPlayed && bIsLastPlayed && b.rating >= 3) return 1;
-
-                const ratingComparison = b.rating - a.rating;
-                if (ratingComparison !== 0) return ratingComparison;
-
-                const qualityMap = {
-                    'UHD': 6,
-                    '4K': 5,
-                    'FHD': 4,
-                    'HD': 3,
-                    'SD': 2,
-                    'N/A': 1
-                };
-                const qualityComparison = (qualityMap[b.quality] || 0) - (qualityMap[a.quality] || 0);
-                if (qualityComparison !== 0) return qualityComparison;
-
-                return a.name.localeCompare(b.name);
             });
 
-            listDiv.innerHTML = sortedOptions.map(renderOptionItem).join('');
+            const finalOptions = Array.from(uniqueOptionsMap.values()).sort((a, b) => {
+                const lpId = lastPlayedId ? lastPlayedId.trim().toLowerCase() : '';
+                const aId = a.id.trim().toLowerCase();
+                const bId = b.id.trim().toLowerCase();
 
+                const aIsLast = aId === lpId && a.rating >= 2.5;
+                const bIsLast = bId === lpId && b.rating >= 2.5;
+                if (aIsLast && !bIsLast) return -1;
+                if (!aIsLast && bIsLast) return 1;
+
+                if (b.rating !== a.rating) return b.rating - a.rating;
+                const qMap = { 'UHD': 6, '4K': 5, 'FHD': 4, 'HD': 3, 'SD': 2, 'N/A': 1 };
+                return (qMap[b.quality] || 0) - (qMap[a.quality] || 0) || a.name.localeCompare(b.name);
+            });
+
+            const renderOptionItem = (option) => {
+                const isLastViewed = option.id === lastPlayedId;
+                const lastViewedIndicator = isLastViewed ? '<span class="last-viewed-indicator">👁️</span>' : '';
+                const ratingStars = getStarRating(option.rating);
+                let bClass = '';
+                switch(option.source){ case 'gist':bClass='gist-source-color';break; case 'elcano':bClass='elcano-source-color';break; case 'shickat':bClass='shickat-badge';break; case 'era':bClass='era-source-color';break; default:bClass='channel-name-color'; }
+
+                const clickAction = state.copyLinkMode ? `copyAcestreamDirectly('${option.id}')` : `handleChannelPlay({ id: '${option.id}', name: '${mainChannelName.replace(/'/g, "\\'")}' })`;
+                
+                return `<div class="channel-option-item" onclick="${clickAction}"><div class="channel-option-name-container">${lastViewedIndicator}<span class="channel-option-name">${option.name}</span></div><div class="channel-option-details"><span style="color: var(--${bClass}); font-weight: 700;">${option.source.toUpperCase()}</span><span style="font-weight: 700; color: var(--primary); border-left: 1px solid #444; padding-left: 3px; margin-left: 3px;">${option.quality}</span><span style="margin-left: 3px;">${ratingStars}</span></div></div>`;
+            };
+
+            listDiv.innerHTML = finalOptions.map(renderOptionItem).join('');
             modal.classList.add('modal--active');
         }
 
@@ -3409,14 +3477,16 @@
 
             // Inicializar checkboxes de ajustes
             document.getElementById('fullScreenOnClickCheckbox').checked = state.fullScreenOnClick;
-            document.getElementById('hideOptionsButtonCheckbox').checked = state.hideOptionsButton;
-            document.getElementById('copyLinkModeCheckbox').checked = state.copyLinkMode;
+            document.getElementById('hideOptionsButtonCheckbox').checked = state.hideOptionsButton;            document.getElementById('copyLinkModeCheckbox').checked = state.copyLinkMode;
+            document.getElementById('hideNoLinksCheckbox').checked = state.hideNoLinks;
+            document.getElementById('eventSourceSelect').value = state.tvEventSource;
             document.body.classList.toggle('hide-options-button-active', state.hideOptionsButton);
 
             // Asignar eventos a los ajustes
             document.getElementById('fullScreenOnClickCheckbox').addEventListener('change', toggleFullScreenOnClick);
             document.getElementById('hideOptionsButtonCheckbox').addEventListener('change', toggleHideOptionsButton);
             document.getElementById('copyLinkModeCheckbox').addEventListener('change', toggleCopyLinkMode);
+            document.getElementById('hideNoLinksCheckbox').addEventListener('change', toggleHideNoLinks);
 
             // Nuevo: Activar pantalla completa al hacer clic en cualquier parte del cuerpo, si la opción está activa
             document.body.addEventListener('click', (e) => {
