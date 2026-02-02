@@ -40,7 +40,7 @@
             --bg-light: #f1f5f9;
             --card-bg: #ffffff;
             --text: #1e293b;
-            --border-color: #555555;
+            --border-color: #383838;
             --shadow-sm: 0 0.5px 1.5px rgba(0, 0, 0, 0.3);
             --primary-light: rgba(var(--primary-rgb), 0.2);
             --channel-name-color: #e2e2ff;
@@ -145,11 +145,12 @@
             height: 100vh;
         }        .modal__content {
             background: var(--card-bg);
-            border-radius: var(--radius-md);
-            padding: 0.6rem;
+            border-radius: 12px;
+            padding: 1rem;
             width: 90%;
-            max-width: 225px;
-            box-shadow: var(--shadow-sm)
+            max-width: 280px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid var(--border-color);
         }
 
         .modal__title {
@@ -219,7 +220,7 @@
         }
 
         .settings-item:hover {
-            background: var(--primary-light)
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .settings-item__info {
@@ -630,14 +631,15 @@
             flex-direction: column;
             justify-content: flex-end;
             align-items: flex-start;
-            padding: 5px 0;
+            padding: 8px; 
             cursor: pointer;
             transition: transform 0.3s ease-in-out, border-color 0.3s ease-in-out;
-            
-            background-size: 80% auto;
-            background-position: center 30px;
+            background-size: contain;
+            background-position: center center;
             background-repeat: no-repeat;
+            background-origin: content-box;
             box-shadow: 0 2px 7.5px rgba(0, 0, 0, 0.4);
+            box-sizing: border-box;
         }
 
         .tv-card-focused {
@@ -676,13 +678,29 @@
         }
 
         .tv-date-header {
-            font-size: 0.9rem;
-            font-weight: 800;
-            color: #e0e0e0;
-            margin-top: 1rem;
-            margin-bottom: 0.25rem;
-            padding-left: 0;
-            width: 100%;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--gray-dark);
+            margin: 2rem 0 1rem 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .tv-date-header::before, .tv-date-header::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tv-date-header:not(:empty)::before {
+            margin-right: 1.5rem;
+        }
+
+        .tv-date-header:not(:empty)::after {
+            margin-left: 1.5rem;
         }
 
         .tv-date-header:first-of-type {
@@ -713,13 +731,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 5px;
-            margin-bottom: 2.5px;
-            border-radius: var(--radius-sm);
-            background: #343434;
+            padding: 8px;
+            margin-bottom: 6px;
+            border-radius: 8px;
+            background: #2a2a2a;
             cursor: pointer;
-            transition: background-color 0.2s;
-            border: 0.5px solid #444444;
+            transition: all 0.2s;
+            border: 1px solid #383838;
         }
 
         .channel-option-item:hover {
@@ -928,10 +946,10 @@
     </main>
     <div class="modal" id="settingsModal">
         <div class="modal__content">
-            <h3 class="modal__title">⚙️ Ajustes</h3>
+            <h3 class="modal__title" id="devModeTrigger" style="cursor:pointer">⚙️ Ajustes</h3>
             <div class="settings-section">
                 <h4 class="settings-section__title">📺 Opciones de Interfaz</h4>
-                <div class="settings-item">
+                <div class="settings-item dev-option" style="display:none">
                     <div class="settings-item__info"><span class="settings-icon">🖥️</span>
                         <div><span class="settings-label">Pantalla Completa al Clic</span><span
                                 class="settings-description">Activa el modo de pantalla completa al hacer clic en
@@ -946,26 +964,28 @@
                                 invisible.</span></div>
                     </div><label class="settings-switch"><input type="checkbox" id="hideOptionsButtonCheckbox"><span
                             class="settings-slider"></span></label>
-                </div>                <div class="settings-item">
+                </div>                <div class="settings-item dev-option" style="display:none">
                     <div class="settings-item__info"><span class="settings-icon">📋</span>
                         <div><span class="settings-label">Copiar enlace en vez de abrir</span><span
                                 class="settings-description">Al hacer clic en un canal, copia el ID de AceStream al portapapeles en lugar de intentar abrirlo.</span></div>
                     </div><label class="settings-switch"><input type="checkbox" id="copyLinkModeCheckbox"><span
                             class="settings-slider"></span></label>
                 </div>
-                <div class="settings-item">
+                <div class="settings-item dev-option" style="display:none">
                     <div class="settings-item__info"><span class="settings-icon">🚫</span>
-                        <div><span class="settings-label">Ocultar Canales sin Link</span><span class="settings-description">Oculta tarjetas sin señal.</span></div>
-                    </div><label class="settings-switch"><input type="checkbox" id="hideNoLinksCheckbox"><span class="settings-slider"></span></label>
+                        <div><span class="settings-label">Ocultar Canales sin Link</span><span
+                                class="settings-description">Hace invisibles las tarjetas que no tienen señal reproducible y oculta eventos vacíos.</span></div>
+                    </div><label class="settings-switch"><input type="checkbox" id="hideNoLinksCheckbox"><span
+                            class="settings-slider"></span></label>
                 </div>
                 <div class="settings-item">
                     <div class="settings-item__info"><span class="settings-icon">📡</span>
                         <div><span class="settings-label">Motor de Eventos</span><span class="settings-description">Fuente de la agenda deportiva.</span></div>
                     </div>
                     <select id="eventSourceSelect" onchange="setEventSource(this.value)" style="background:#333; color:white; border:1px solid #555; font-size:0.45rem; border-radius:4px;">
+                        <option value="ipfs">IPFS (Directo)</option>
                         <option value="vercel">Vercel (Alternativo)</option>
                         <option value="ciriaco">Ciriaco (Tabla)</option>
-                        <option value="ipfs">IPFS (Directo)</option>
                     </select>
                 </div>
             </div>
@@ -985,7 +1005,7 @@
             </div>
             <div class="settings-section">
                 <h4 class="settings-section__title">🔧 Datos</h4>
-                <div class="settings-item">
+                <div class="settings-item dev-option" style="display:none">
                     <div class="settings-item__info"><span class="settings-icon">⭐</span>
                         <div><span class="settings-label">Restablecer puntuaciones</span><span
                                 class="settings-description">Borra la puntuación de estabilidad de todos los
@@ -998,7 +1018,7 @@
                                 class="settings-description">Testea un enlace de cada canal rápidamente.</span></div>
                     </div><button class="modal__btn" onclick="startCalibration()" style="background-color: var(--primary); color: white;">Iniciar Test</button>
                 </div>
-                <div class="settings-item">
+                <div class="settings-item dev-option" style="display:none">
                     <div class="settings-item__info"><span class="settings-icon">🗑️</span>
                         <div><span class="settings-label">Restablecer Web</span><span
                                 class="settings-description">Borra absolutamente todos los datos (Favoritos, historial, ajustes).</span></div>
@@ -1051,7 +1071,7 @@
             hideEventDetails: localStorage.getItem('hideEventDetails') === 'true',
             tvCurrentFilter: localStorage.getItem('tvCurrentFilter') || 'all',
             tvSportFilter: localStorage.getItem('tvSportFilter') || 'all',
-            tvEventSource: localStorage.getItem('tvEventSource') || 'vercel', // 'vercel', 'ciriaco', 'ipfs'
+            tvEventSource: localStorage.getItem('tvEventSource') || 'ipfs', // 'vercel', 'ciriaco', 'ipfs'
             tvSearchTerm: '',
             tvFocusManager: null,
             playerActive: false,
@@ -1061,7 +1081,8 @@
             hideOptionsButton: localStorage.getItem('hideOptionsButton') === 'true',
             copyLinkMode: localStorage.getItem('copyLinkMode') === 'true', hideNoLinks: localStorage.getItem('hideNoLinks') !== 'false',
             calibrationQueue: [],
-            isCalibrating: false
+            isCalibrating: false,
+            devClickCount: 0
         };
         const LOGOPEDIA_BASE_URL = "https://static.wikia.nocookie.net/logopedia/images/";
         const IMAGE_PROXY_URL = "https://images.weserv.nl/?url=";
@@ -1097,7 +1118,6 @@
             ciriaco: 'https://ciriaco.netlify.app/',
             ipfs: 'https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/'
         };
-const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
         const SHICKAT_URL = 'https://shickat.me/';
         const BACKUP_KEYS = {
             
@@ -1179,19 +1199,18 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             showStatusMessage(state.copyLinkMode ? "Modo Copiar Enlace activado" : "Modo Reproducción directa activado", "info");
         }
 
+        function toggleHideNoLinks() {
+            state.hideNoLinks = !state.hideNoLinks;
+            localStorage.setItem('hideNoLinks', state.hideNoLinks);
+            document.getElementById('hideNoLinksCheckbox').checked = state.hideNoLinks;
+            renderTVChannels();
+        }
+
         function setEventSource(source) {
             state.tvEventSource = source;
             localStorage.setItem('tvEventSource', source);
             showStatusMessage(`Motor de eventos cambiado a: ${source.toUpperCase()}`, "success");
             loadInitialChannels();
-        }
-
-        function toggleHideNoLinks() {
-            state.hideNoLinks = !state.hideNoLinks;
-            localStorage.setItem('hideNoLinks', state.hideNoLinks);
-            document.getElementById('hideNoLinksCheckbox').checked = state.hideNoLinks;
-            document.getElementById('eventSourceSelect').value = state.tvEventSource;
-            renderTVChannels();
         }
 
         function requestFullScreen() {
@@ -1647,7 +1666,8 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
           'TELEDEPORTE': 'Teledeporte',
           'ELLAS': 'Ellas Vamos',
           'BALONCESTO': 'Baloncesto',
-          'LA LIGA 1': 'La Liga'
+          'LA LIGA 1': 'La Liga',
+          'CANAL 1 1RFEF SOLO': 'PRIMERA FEDERACIÓN'
 };
             // ----------------------------------------------------
 
@@ -1931,40 +1951,23 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             return 105;
         }
 
-        function getEventTime(dateString, timeString) {
-            const now = new Date();
-            const date = parseDateString(dateString, now);
-            if (date.getTime() === now.getTime()) {
-                date.setHours(now.getHours());
-                date.setMinutes(now.getMinutes());
-            }
-            const [hours, minutes] = timeString.split(':').map(Number);
-            const eventTime = new Date(date);
-            eventTime.setHours(hours, minutes, 0, 0);
-            const todayYear = now.getFullYear();
-            const todayMonth = now.getMonth();
-            const todayDate = now.getDate();
-            if (dateString.toLowerCase() === 'hoy' || (eventTime.getDate() === todayDate && eventTime.getMonth() === todayMonth && eventTime.getFullYear() === todayYear)) {
-                return eventTime;
-            }
-            return eventTime;
-        }        function processVercelEventsData(htmlContent) {
+        function processVercelEventsData(htmlContent) {
             const numberedChannels = [];
             const parser = new DOMParser();
             const doc = parser.parseFromString(htmlContent, 'text/html');
             const rows = doc.querySelectorAll('table tbody tr');
             const channelMappings = {
-          'MOVISTAR': 'M+',
-          'DAZN LA LIGA 1': 'DAZN La Liga',
-          'LALIGA': 'La Liga',
-          'Premier': 'Premier League',
-          'EUROSPORT': '★EUROSPORT',
-          'HYPERMOTION': 'La Liga Hypermotion',
-          'LIGA DE CAMPEONES': 'M+ Liga de Campeones',
-          'PLUS': 'Plus',
-          'VAMOS': 'Vamos',
-          'Deportes': 'Deportes'
-        };
+                'MOVISTAR': 'M+',
+                'DAZN LA LIGA 1': 'DAZN La Liga',
+                'LALIGA': 'La Liga',
+                'Premier': 'Premier League',
+                'EUROSPORT': '★EUROSPORT',
+                'HYPERMOTION': 'La Liga Hypermotion',
+                'LIGA DE CAMPEONES': 'M+ Liga de Campeones',
+                'PLUS': 'Plus',
+                'VAMOS': 'Vamos',
+                'Deportes': 'Deportes'
+            };
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
                 if (cells.length >= 6) {
@@ -1983,45 +1986,107 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
         }
 
         async function processCiriacoData(html) {
-            const numberedChannels = [];
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const rows = doc.querySelectorAll('table.tabla-eventos tbody tr');
-            const fechaActual = doc.querySelector('.fecha')?.innerText.trim() || 'Hoy';
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                if (cells.length < 5) return;
-                const hora = cells[0].innerText.trim(), comp = cells[2].innerText.trim(), match = cells[3].innerText.trim();
-                const t1 = cells[3].querySelectorAll('img')[0]?.src || '', t2 = cells[3].querySelectorAll('img')[1]?.src || '';
-                const channelMappings = {
-          'LA LIGA 1': 'La Liga',
-          'MOVISTAR': 'M+',
-          'EUROSPORT': '★EUROSPORT',
-          'La Liga TV La Liga Hypermotion': 'La Liga Hypermotion',
-          'ACCION': 'Acción',
-          'CLASICOS': 'Clásicos',
-          'Plus\\:': 'Plus',
-          'GOLF': 'Golf',
-          'VAMOS': 'Vamos',
-          'BALONCESTO 1': 'Baloncesto',
-          'M. DEPORTES ES': 'M+ Deportes',
-          'LALIGA': 'La Liga',
-          'LA LIGA': 'La Liga',
-          'EUROSPORT 4K': 'EUROSPORT 1'
+    const numberedChannels = [];
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const rows = doc.querySelectorAll('table.tabla-eventos tbody tr');
+    const fechaActual = doc.querySelector('.fecha')?.innerText.trim() || 'Hoy';
+    
+    const channelMappings = {
+        'LA LIGA 1': 'La Liga', 'MOVISTAR': 'M+', 'EUROSPORT': '★EUROSPORT',
+        'La Liga TV La Liga Hypermotion': 'La Liga Hypermotion', 'ACCION': 'Acción',
+        'CLASICOS': 'Clásicos', 'Plus\\:': 'Plus', 'GOLF': 'Golf', 'VAMOS': 'Vamos',
+        'BALONCESTO 1': 'Baloncesto', 'M. DEPORTES ES': 'M+ Deportes',
+        'LALIGA': 'La Liga', 'LA LIGA': 'La Liga', 'EUROSPORT 4K': 'EUROSPORT 1'
+    };
+
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length < 5) return;
+
+        const hora = cells[0].innerText.trim();
+        const comp = cells[2].innerText.trim();
+        const match = cells[3].innerText.trim();
+        const t1 = cells[3].querySelectorAll('img')[0]?.src || '';
+        const t2 = cells[3].querySelectorAll('img')[1]?.src || '';
+
+        // Sistema de emojis idéntico a IPFS
+        const emojiMap = {
+            '🎾': ['Open Australia', 'Roland Garros', 'Wimbledon', 'US Open', 'ATP', 'WTA', 'Davis Cup', 'Tenis'],
+            '⚽': ['Premier League', 'La Liga', 'Champions League', 'Europa League', 'Serie A', 'Bundesliga', 'Fútbol', 'Futbol', 'Copa del Rey'],
+            '🏀': ['Liga Endesa', 'NBA', 'Liga ACB', 'Euroliga', 'Baloncesto'],
+            '🏎️': ['F1', 'Formula 1', 'IndyCar', 'Carrera', 'GP'],
+            '🏍️': ['MotoGP', 'Moto'],
+            '🚴': ['Ciclismo', 'Tour', 'Giro', 'Vuelta'],
+            '⛳': ['Golf', 'Masters', 'PGA', 'LIV Golf']
         };
-        const eventInfo = { time: hora, competition: comp, match, date: fechaActual, sportEmoji: '🏆', imga: t1, imgb: t2, startTime: getEventTime(fechaActual, hora).getTime(), endTime: getEventTime(fechaActual, hora).getTime() + 7200000 };
-        row.querySelectorAll('a[href^="acestream://"]').forEach(link => {
-          const id = link.href.split('://')[1];
-          let rawName = link.innerText.trim();
-          for (const key in channelMappings) { rawName = rawName.replace(new RegExp(key, 'gi'), channelMappings[key]); }
-          const { name, quality, multiAudio } = cleanNameAndExtractQuality(rawName);
-          numberedChannels.push({ id, name, quality, multiAudio, source: 'events', event: eventInfo });
-        });
-            });
-            return numberedChannels;
+
+        let detectedEmoji = '🏆';
+        for (const [emoji, keywords] of Object.entries(emojiMap)) {
+            if (keywords.some(key => comp.includes(key) || match.includes(key))) {
+                detectedEmoji = emoji;
+                break;
+            }
         }
 
-        function processEventsData(htmlContent) {
+        const eventInfo = {
+            time: hora,
+            competition: comp,
+            match: match,
+            date: fechaActual,
+            sportEmoji: detectedEmoji,
+            imga: t1,
+            imgb: t2,
+            startTime: getEventTime(fechaActual, hora).getTime(),
+            endTime: getEventTime(fechaActual, hora).getTime() + (120 * 60000)
+        };
+
+        row.querySelectorAll('a[href^="acestream://"]').forEach(link => {
+            const id = link.href.split('://')[1];
+            let rawName = link.innerText.trim();
+            if (!rawName || rawName.includes('---')) return;
+
+            // Aplicar mapeos específicos
+            for (const key in channelMappings) {
+                rawName = rawName.replace(new RegExp(key, 'gi'), channelMappings[key]);
+            }
+
+            // Limpieza de calidad y normalización (Paso idéntico a IPFS)
+            const { name, quality, multiAudio } = cleanNameAndExtractQuality(rawName);
+            
+            // Generar ID único para evitar colisiones en el merge
+            const uniqueEventId = `event-ciriaco-${name}-${fechaActual}-${hora}`.replace(/\s+/g, '_');
+
+            numberedChannels.push({
+                id: uniqueEventId,
+                name: name,
+                quality: 'EVENTO',
+                source: 'events',
+                event: eventInfo
+            });
+        });
+    });
+    return numberedChannels;
+}
+
+        function getEventTime(dateString, timeString) {
+            const now = new Date();
+            const date = parseDateString(dateString, now);
+            if (date.getTime() === now.getTime()) {
+                date.setHours(now.getHours());
+                date.setMinutes(now.getMinutes());
+            }
+            const [hours, minutes] = timeString.split(':').map(Number);
+            const eventTime = new Date(date);
+            eventTime.setHours(hours, minutes, 0, 0);
+            const todayYear = now.getFullYear();
+            const todayMonth = now.getMonth();
+            const todayDate = now.getDate();
+            if (dateString.toLowerCase() === 'hoy' || (eventTime.getDate() === todayDate && eventTime.getMonth() === todayMonth && eventTime.getFullYear() === todayYear)) {
+                return eventTime;
+            }
+            return eventTime;
+        }        function processEventsData(htmlContent) {
     const numberedChannels = [];
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContent, 'text/html');
@@ -2032,11 +2097,12 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
     const channelMappings = {
           'LA LIGA 1': 'La Liga',
           'MOVISTAR': 'M+',
+          'Premier': 'Premier League',
           'EUROSPORT': '★EUROSPORT',
           'La Liga TV La Liga Hypermotion': 'La Liga Hypermotion',
           'ACCION': 'Acción',
           'CLASICOS': 'Clásicos',
-          'Plus\\:': 'Plus',
+          'Plus\\+': 'Plus',
           'GOLF': 'Golf',
           'VAMOS': 'Vamos',
           'BALONCESTO 1': 'Baloncesto',
@@ -2483,15 +2549,60 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             let currentSportFilter = state.tvSportFilter;
 
             if (currentFilter === 'search' || searchTerm !== '') {
+                const term = normalizeText(searchTerm);
+                
+                // Mapeo inteligente de términos a Emojis de deporte
+                const searchToEmoji = {
+                    'futbol': '⚽', 'soccer': '⚽', 'balompie': '⚽',
+                    'baloncesto': '🏀', 'basket': '🏀', 'nba': '🏀',
+                    'tenis': '🎾', 'tennis': '🎾',
+                    'f1': '🏎️', 'formula 1': '🏎️', 'motor': '🏎️',
+                    'moto': '🏍️', 'motogp': '🏍️',
+                    'ciclismo': '🚴', 'bici': '🚴',
+                    'golf': '⛳',
+                    'boxeo': '🥊', 'ufc': '🥊', 'mma': '🥊',
+                    'nfl': '🏈', 'futbol americano': '🏈',
+                    'rugby': '🏉',
+                    'beisbol': '⚾', 'baseball': '⚾',
+                    'balonmano': '🤾', 'handball': '🤾',
+                    'voley': '🏐', 'voleibol': '🏐',
+                    'hockey': '🏒',
+                    'dardos': '🎯',
+                    'snooker': '🎱', 'billar': '🎱',
+                    'vela': '⛵'
+                };                // Mapeo dinámico para reconocer términos parciales como 'fut', 'bas', etc.
+                let targetEmoji = null;
+                for (const [key, emoji] of Object.entries(searchToEmoji)) {
+                    if (key.startsWith(term) || term.startsWith(key)) {
+                        targetEmoji = emoji;
+                        break;
+                    }
+                }
+
                 filteredChannels = filteredChannels.filter(channel => {
                     if (searchTerm === '') return true;
-                    const term = normalizeText(searchTerm);
-                    const nameMatch = normalizeText(channel.name).includes(term);
-                    let eventMatch = false;
+
+                    const normalizedName = normalizeText(channel.name);
+                    const normalizedId = channel.id ? channel.id.toLowerCase() : '';
+
+                    // 1. Coincidencia por texto (Nombre e ID)
+                    // Para términos muy cortos como 'F1', buscamos coincidencia más precisa
+                    const nameMatch = term.length <= 2 ? 
+                        normalizedName.split(' ').some(word => word === term) || normalizedName.includes(term) :
+                        normalizedName.includes(term);
+                    
+                    const idMatch = normalizedId.includes(term);
+                    
+                    let eventTextMatch = false;
                     if (channel.event) {
-                        eventMatch = Object.values(channel.event).some(v => typeof v === 'string' && normalizeText(v).includes(term));
+                        eventTextMatch = normalizeText(channel.event.competition || '').includes(term) || 
+                                         normalizeText(channel.event.match || '').includes(term);
                     }
-                    return nameMatch || eventMatch || (channel.id && channel.id.toLowerCase().includes(term));
+
+                    // 2. Coincidencia por deporte (Emoji)
+                    const sportMatch = targetEmoji && channel.event && channel.event.sportEmoji === targetEmoji;
+                    
+                    return nameMatch || idMatch || eventTextMatch || sportMatch;
                 });
             } else if (currentFilter === 'events_only') {
                 // FILTRADO POR EVENTO (No por fuente)
@@ -3014,21 +3125,26 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
         const createTVChannelCard = (channel, allOptionsJson = '[]') => {
             const placeholderInfo = getPlaceholderInfo(channel.name.toUpperCase());
             const logoUrl = placeholderInfo ? placeholderInfo.logo : null;
-            const channelNumber = channel.id && channel.source !== 'events' ? `<span style="position:absolute; top:2px; left:5px; font-size:0.4rem; color:var(--channel-number-color); font-weight:bold; z-index:10;">${channel.id.substring(0, 3).toUpperCase()}</span>` : '';
 
             const isLiveClass = channel.isLive ? 'tv-card-live' : '';
             let bgColor = '#2d2d2d';
             let nameStyle = 'white';
-            let backgroundStyle = '';
-
-            // 1. Asignar color de fondo por marca (simplificado para texto)
+            let backgroundStyle = '';            // 1. Asignar color de fondo por marca (simplificado para texto)
+            const isDaznBaloncesto = channel.name.toUpperCase().includes('DAZN BALONCESTO');
             if (channel.name.includes('DAZN') && !channel.name.includes('F1')) bgColor = '#2d2d2d';
             else if (channel.name.includes('DAZN F1')) bgColor = '#2d2d2d';
             else if (channel.name.includes('M+')) bgColor = '#2d2d2d';
-            else if (channel.name.includes('EUROSPORT')) bgColor = '#2d2d2d'; // 2. Aplicar el logo si está disponible
+            else if (channel.name.includes('EUROSPORT')) bgColor = '#2d2d2d'; 
+            
+            // 2. Aplicar el logo si está disponible
             if (logoUrl) {
-                // Si hay logo, el fondo es el logo y el color de marca.
-                backgroundStyle = `background: ${bgColor} url('${logoUrl}') center center / 80% auto no-repeat;`;
+                if (isDaznBaloncesto) {
+                    // Capa 1: Logotipo (Superior) | Capa 2: Círculo Naranja (Intermedia) | background-color: Fondo oscuro (Inferior)
+                    // Usamos radial-gradient para el círculo y ajustamos el tamaño (45%x80%) para que sea perfectamente redondo
+                    backgroundStyle = `background-image: url('${logoUrl}'), radial-gradient(circle, #ff5500 100%, transparent 100%); background-position: center center, 92% center; background-size: contain, 45% 80%; background-repeat: no-repeat, no-repeat; background-origin: content-box, content-box; background-color: ${bgColor};`;
+                } else {
+                    backgroundStyle = `background: ${bgColor} url('${logoUrl}') center center / contain no-repeat; background-origin: content-box;`;
+                }
             } else {
                 // Si no hay logo, el fondo es solo el color de marca
                 backgroundStyle = `background: ${bgColor};`;
@@ -3049,7 +3165,7 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             const optionsButton = isEventSource ? '' : `<button class="tv-link-button" data-channel-id="${channel.id}" title="Ver opciones alternativas">+</button>`;
 
             const pointerEvents = isEventSource ? 'pointer-events: none; cursor: default;' : '';
-            return ` <div class="tv-card ${isLiveClass}" data-channel-id="${channel.id}" data-all-options='${allOptionsJson}' style="${backgroundStyle} ${pointerEvents}" ${isEventSource ? '' : 'tabindex="0" role="button"'} aria-label="Ver canal ${channel.name}"> ${channelNumber} ${optionsButton} ${channelNameHTML}</div> `;
+            return ` <div class="tv-card ${isLiveClass}" data-channel-id="${channel.id}" data-all-options='${allOptionsJson}' style="${backgroundStyle} ${pointerEvents}" ${isEventSource ? '' : 'tabindex="0" role="button"'} aria-label="Ver canal ${channel.name}"> ${optionsButton} ${channelNameHTML}</div> `;
         };
 
         function createTVChannelsHTML(groups, sortedGroupKeys) {
@@ -3130,7 +3246,7 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
                         } else {
                             coloredDateHtml = `<span style="color: var(--primary);">${formattedDate}</span>`;
                         }
-                        html += `<h2 class="tv-date-header">${prefix}${coloredDateHtml}</h2>`;
+                        html += `<h2 class="tv-date-header">${prefix}${formattedDate}</h2>`;
                         lastDateRendered = formattedDate;
                     }
                 } else {
@@ -3398,7 +3514,7 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
 
                 const clickAction = state.copyLinkMode ? `copyAcestreamDirectly('${option.id}')` : `handleChannelPlay({ id: '${option.id}', name: '${mainChannelName.replace(/'/g, "\\'")}' })`;
                 
-                return `<div class="channel-option-item" onclick="${clickAction}"><div class="channel-option-name-container">${lastViewedIndicator}<span class="channel-option-name">${option.name}</span></div><div class="channel-option-details"><span style="color: var(--${bClass}); font-weight: 700;">${option.source.toUpperCase()}</span><span style="font-weight: 700; color: var(--primary); border-left: 1px solid #444; padding-left: 3px; margin-left: 3px;">${option.quality}</span><span style="margin-left: 3px;">${ratingStars}</span></div></div>`;
+                return `<div class="channel-option-item" onclick="${clickAction}"><div class="channel-option-name-container">${lastViewedIndicator}<span class="channel-option-name" style="font-family: monospace; font-size: 0.45rem; color: var(--primary) !important;">ID: ${option.id.substring(0, 8)}...</span></div><div class="channel-option-details"><span style="color: var(--${bClass}); font-weight: 700;">${option.source.toUpperCase()}</span><span style="font-weight: 700; color: var(--primary); border-left: 1px solid #444; padding-left: 3px; margin-left: 3px;">${option.quality}</span><span style="margin-left: 3px;">${ratingStars}</span></div></div>`;
             };
 
             listDiv.innerHTML = finalOptions.map(renderOptionItem).join('');
@@ -3471,6 +3587,14 @@ const EVENTS_URL_BACKUP = 'https://eventos-eight-dun.vercel.app/';
             });
             document.getElementById('closeSettingsBtn').addEventListener('click', () => {
                 document.getElementById('settingsModal').classList.remove('modal--active');
+            });
+
+            document.getElementById('devModeTrigger').addEventListener('click', () => {
+                state.devClickCount++;
+                if (state.devClickCount === 5) {
+                    document.querySelectorAll('.dev-option').forEach(el => el.style.display = 'flex');
+                    showStatusMessage("Modo desarrollador activado", "success");
+                }
             });
             document.getElementById('cancelCopyBtn').addEventListener('click', hideCopyModal);
             document.getElementById('closeTvOptionsBtn').addEventListener('click', closeTvOptionsModal);
