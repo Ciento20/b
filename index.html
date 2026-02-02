@@ -986,6 +986,7 @@
                         <option value="ipfs">IPFS (Directo)</option>
                         <option value="vercel">Vercel (Alternativo)</option>
                         <option value="ciriaco">Ciriaco (Tabla)</option>
+                        <option value="ftv">Fútbol en la TV (FTV)</option>
                     </select>
                 </div>
             </div>
@@ -1116,7 +1117,8 @@
         const EVENTS_SOURCES = {
             vercel: 'https://eventos-eight-dun.vercel.app/',
             ciriaco: 'https://ciriaco.netlify.app/',
-            ipfs: 'https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/'
+            ipfs: 'https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/',
+            ftv: 'https://www.futbolenlatv.es/deporte'
         };
         const SHICKAT_URL = 'https://shickat.me/';
         const BACKUP_KEYS = {
@@ -1548,6 +1550,8 @@
             let eventTask;
             if (state.tvEventSource === 'ciriaco') {
                 eventTask = fetchProxyContentAndProcess('events', EVENTS_SOURCES.ciriaco, processCiriacoData, BACKUP_KEYS.events);
+            } else if (state.tvEventSource === 'ftv') {
+                eventTask = fetchProxyContentAndProcess('events', EVENTS_SOURCES.ftv, processFutbolEnLaTvData, BACKUP_KEYS.events);
             } else if (state.tvEventSource === 'ipfs') {
                 eventTask = fetchAndProcessSource('events', EVENTS_SOURCES.ipfs, processEventsData, BACKUP_KEYS.events);
             } else {
@@ -2086,7 +2090,64 @@
                 return eventTime;
             }
             return eventTime;
-        }        function processEventsData(htmlContent) {
+        }        async function processFutbolEnLaTvData(htmlContent) {
+    const numberedChannels = [];
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
+
+    const cabeceraTexto = doc.querySelector('.cabeceraTabla td')?.textContent || "";
+    const fechaMatch = cabeceraTexto.match(/(\d{2}\/\d{2}\/\d{4})/);
+    const fechaEvento = fechaMatch ? fechaMatch[1] : "Hoy";
+
+    const filas = doc.querySelectorAll('.tablaPrincipal tr:not(.cabeceraTabla)');
+
+    filas.forEach(fila => {
+        const horaElement = fila.querySelector('.hora');
+        if (!horaElement) return;
+
+        const hora = horaElement.textContent.trim();
+        const comp = fila.querySelector('.detalles label')?.title || "Competición";
+        const local = fila.querySelector('.local span')?.title || "Local";
+        const visitante = fila.querySelector('.visitante span')?.title || "Visitante";
+        const imga = fila.querySelector('.local img')?.src || "";
+        const imgb = fila.querySelector('.visitante img')?.src || "";
+
+        const canales = fila.querySelectorAll('.listaCanales li');
+        canales.forEach(canal => {
+            // Limpieza específica para FTV: Eliminar '(Ver en directo)' y códigos tipo '(M182 O434)'
+            let rawName = canal.textContent
+                .replace(/\(Ver en directo\)/gi, '')
+                .replace(/\([A-Z0-9\s]+\)/gi, '')
+                .trim();
+
+            // Aplicar el limpiador unificado cleanNameAndExtractQuality
+            const { name, quality } = cleanNameAndExtractQuality(rawName);
+
+            const startTime = new Date(`${fechaEvento.split('/').reverse().join('-')}T${hora}:00`).getTime() || Date.now();
+
+            numberedChannels.push({
+                id: `ev-${name.replace(/\s+/g, '')}-${hora.replace(':', '')}`,
+                name: name,
+                quality: "EVENTO",
+                source: 'events',
+                event: {
+                    time: hora,
+                    competition: comp,
+                    match: `${local} vs ${visitante}`,
+                    date: fechaEvento,
+                    sportEmoji: "⚽",
+                    imga: imga,
+                    imgb: imgb,
+                    startTime: startTime,
+                    endTime: startTime + (105 * 60 * 1000)
+                }
+            });
+        });
+    });
+    return numberedChannels;
+}
+
+        function processEventsData(htmlContent) {
     const numberedChannels = [];
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContent, 'text/html');
