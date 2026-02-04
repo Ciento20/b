@@ -984,7 +984,7 @@
                     </div>
                     <select id="eventSourceSelect" onchange="setEventSource(this.value)" style="background:#333; color:white; border:1px solid #555; font-size:0.45rem; border-radius:4px;">
                         <option value="ipfs">IPFS (Directo)</option>
-                        <option value="vercel">Vercel (Alternativo)</option>
+                        
                         <option value="ciriaco">Ciriaco (Tabla)</option>
                         <option value="ftv">Fútbol en la TV (FTV)</option>
                     </select>
@@ -1072,7 +1072,7 @@
             hideEventDetails: localStorage.getItem('hideEventDetails') === 'true',
             tvCurrentFilter: localStorage.getItem('tvCurrentFilter') || 'all',
             tvSportFilter: localStorage.getItem('tvSportFilter') || 'all',
-            tvEventSource: localStorage.getItem('tvEventSource') || 'ipfs', // 'vercel', 'ciriaco', 'ipfs'
+            tvEventSource: localStorage.getItem('tvEventSource') || 'ipfs', // 'ciriaco', 'ipfs'
             tvSearchTerm: '',
             tvFocusManager: null,
             playerActive: false,
@@ -1115,7 +1115,7 @@
         const GIST_URL = "https://gist.githubusercontent.com/Ciento20/f7847e86d06e5011706fa76f2dab90be/raw";
         const ELCANO_URL = 'https://acestream-ids.vercel.app/';
         const EVENTS_SOURCES = {
-            vercel: 'https://eventos-eight-dun.vercel.app/',
+            
             ciriaco: 'https://ciriaco.netlify.app/',
             ipfs: 'https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/',
             ftv: 'https://www.futbolenlatv.es/deporte'
@@ -1552,10 +1552,8 @@
                 eventTask = fetchProxyContentAndProcess('events', EVENTS_SOURCES.ciriaco, processCiriacoData, BACKUP_KEYS.events);
             } else if (state.tvEventSource === 'ftv') {
                 eventTask = fetchProxyContentAndProcess('events', EVENTS_SOURCES.ftv, processFutbolEnLaTvData, BACKUP_KEYS.events);
-            } else if (state.tvEventSource === 'ipfs') {
-                eventTask = fetchAndProcessSource('events', EVENTS_SOURCES.ipfs, processEventsData, BACKUP_KEYS.events);
             } else {
-                eventTask = fetchAndProcessSource('events', EVENTS_SOURCES.vercel, processVercelEventsData, BACKUP_KEYS.events);
+                eventTask = fetchAndProcessSource('events', EVENTS_SOURCES.ipfs, processEventsData, BACKUP_KEYS.events);
             }
 
             const results = await Promise.allSettled([
@@ -1955,39 +1953,7 @@
             return 105;
         }
 
-        function processVercelEventsData(htmlContent) {
-            const numberedChannels = [];
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlContent, 'text/html');
-            const rows = doc.querySelectorAll('table tbody tr');
-            const channelMappings = {
-                'MOVISTAR': 'M+',
-                'DAZN LA LIGA 1': 'DAZN La Liga',
-                'LALIGA': 'La Liga',
-                'Premier': 'Premier League',
-                'EUROSPORT': '★EUROSPORT',
-                'HYPERMOTION': 'La Liga Hypermotion',
-                'LIGA DE CAMPEONES': 'M+ Liga de Campeones',
-                'PLUS': 'Plus',
-                'VAMOS': 'Vamos',
-                'Deportes': 'Deportes'
-            };
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                if (cells.length >= 6) {
-                    const date = cells[0].textContent.trim(), time = cells[1].textContent.trim(), sport = cells[2].textContent.trim(), comp = cells[3].textContent.trim(), match = cells[4].textContent.trim();
-                    const links = cells[5].querySelectorAll('a[href^="acestream://"]');
-                    links.forEach(link => {
-                        const id = link.href.split('://')[1];
-                        let name = link.textContent.trim();
-                        for (const key in channelMappings) name = name.replace(new RegExp(key, 'gi'), channelMappings[key]);
-                        const { name: cName, quality, multiAudio } = cleanNameAndExtractQuality(name);
-                        numberedChannels.push({ id, name: cName, quality, multiAudio, source: 'events', event: { time, competition: comp, match, date, sportEmoji: '🏆', sportName: sport, startTime: getEventTime(date, time).getTime(), endTime: getEventTime(date, time).getTime() + 7200000 } });
-                    });
-                }
-            });
-            return numberedChannels;
-        }
+        
 
         async function processCiriacoData(html) {
     const numberedChannels = [];
