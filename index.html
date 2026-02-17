@@ -983,10 +983,10 @@
                         <div><span class="settings-label">Motor de Eventos</span><span class="settings-description">Fuente de la agenda deportiva.</span></div>
                     </div>
                     <select id="eventSourceSelect" onchange="setEventSource(this.value)" style="background:#333; color:white; border:1px solid #555; font-size:0.45rem; border-radius:4px;">
-                        <option value="ipfs">IPFS (Directo)</option>
+                        <option value="ipfs">ERA</option>
                         
-                        <option value="ciriaco">Ciriaco (Tabla)</option>
-                        <option value="ftv">Fútbol en la TV (FTV)</option>
+                        <option value="ciriaco">CRT</option>
+                        <option value="ftv">FTV</option>
                     </select>
                 </div>
             </div>
@@ -1061,7 +1061,8 @@
         </div>
     </div>
     <script>
-        const state = {
+        let worker;
+const state = {
             channelsData: [],
             channelHistory: JSON.parse(localStorage.getItem('channelHistory')) || {},
             currentChannel: null,
@@ -1072,7 +1073,8 @@
             hideEventDetails: localStorage.getItem('hideEventDetails') === 'true',
             tvCurrentFilter: localStorage.getItem('tvCurrentFilter') || 'all',
             tvSportFilter: localStorage.getItem('tvSportFilter') || 'all',
-            tvEventSource: localStorage.getItem('tvEventSource') || 'ipfs', // 'ciriaco', 'ipfs'
+            tvEventSource: localStorage.getItem('tvEventSource') || 'ipfs',
+            eventsCache: { ipfs: [], ciriaco: [], ftv: [] },
             tvSearchTerm: '',
             tvFocusManager: null,
             playerActive: false,
@@ -1211,8 +1213,14 @@
         function setEventSource(source) {
             state.tvEventSource = source;
             localStorage.setItem('tvEventSource', source);
+            
+            // Recargar datos desde el caché local sin fetch
+            const baseChannels = state.channelsData.filter(c => c.source !== 'events');
+            state.channelsData = baseChannels.concat(state.eventsCache[source] || []);
+            
+            processChannelNames();
+            renderTVChannels();
             showStatusMessage(`Motor de eventos cambiado a: ${source.toUpperCase()}`, "success");
-            loadInitialChannels();
         }
 
         function requestFullScreen() {
@@ -1366,20 +1374,22 @@
             const allChannels = channelsArray;
             const eventChannels = allChannels.filter(channel => channel.source === 'events');
             const otherChannels = allChannels.filter(channel => channel.source !== 'events');
-            const eventIds = new Set(eventChannels.map(channel => channel.id));
+            
+            // Unificamos las bibliotecas de enlaces manteniendo su prioridad
+            // Eliminamos el filtro de 'eventIds' para que las fuentes no desaparezcan al haber eventos activos
             const uniqueOtherChannelsMap = new Map();
             const orderedOtherSources = ['elcano', 'shickat', 'era', 'gist'];
+            
             orderedOtherSources.forEach(source => {
                 otherChannels.forEach(channel => {
                     if (channel.source === source) {
-                        if (!eventIds.has(channel.id)) {
-                            if (!uniqueOtherChannelsMap.has(channel.id)) {
-                                uniqueOtherChannelsMap.set(channel.id, channel);
-                            }
+                        if (!uniqueOtherChannelsMap.has(channel.id)) {
+                            uniqueOtherChannelsMap.set(channel.id, channel);
                         }
                     }
                 });
             });
+            
             const mergedOtherChannels = Array.from(uniqueOtherChannelsMap.values());
             return eventChannels.concat(mergedOtherChannels);
         }
@@ -1539,82 +1549,56 @@
         }
         async function loadInitialChannels() {
             document.body.classList.remove('loading-finished');
-            const tvChannelsGrid = document.getElementById("tvChannelsGrid");
             document.getElementById('tvStatusMessageContainer').innerHTML = '';
-
+            
             await loadChannelLogos();
+            
+            // Carga inicial de backups para mostrar algo de inmediato
+            loadAndRenderBackupChannels();
 
-            const isShowingBackup = loadAndRenderBackupChannels();
-            showStatusMessage("Cargando agenda deportiva...", "info");
+            const updateStateAndRender = (newChannels) => {
+                if (!newChannels || newChannels.length === 0) return;
+                const combined = state.channelsData.concat(newChannels);
+                const merged = mergeChannels(combined);
+                worker.postMessage({ task: 'processChannels', data: merged });
+            };
 
-            let eventTask;
-            if (state.tvEventSource === 'ciriaco') {
-                eventTask = fetchProxyContentAndProcess('events', EVENTS_SOURCES.ciriaco, processCiriacoData, BACKUP_KEYS.events);
-            } else if (state.tvEventSource === 'ftv') {
-                eventTask = fetchProxyContentAndProcess('events', EVENTS_SOURCES.ftv, processFutbolEnLaTvData, BACKUP_KEYS.events);
-            } else {
-                eventTask = fetchAndProcessSource('events', EVENTS_SOURCES.ipfs, processEventsData, BACKUP_KEYS.events);
-            }
+            // Lanzamos todas las peticiones en paralelo y cada una actualiza según llega
+            const sources = [
+                { name: 'era', url: ERA_URL, proc: processEraData, key: BACKUP_KEYS.era, type: 'direct' },
+                { name: 'shickat', url: SHICKAT_URL, proc: processShickatData, key: BACKUP_KEYS.shickat, type: 'proxy' },
+                { name: 'elcano', url: ELCANO_URL, proc: processElcanoDataFromHtml, key: BACKUP_KEYS.elcano, type: 'proxy' },
+                { name: 'events_ipfs', url: EVENTS_SOURCES.ipfs, proc: processEventsData, key: BACKUP_KEYS.events, type: 'direct', isEvent: true },
+                { name: 'events_ciriaco', url: EVENTS_SOURCES.ciriaco, proc: processCiriacoData, key: BACKUP_KEYS.events, type: 'proxy', isEvent: true },
+                { name: 'events_ftv', url: EVENTS_SOURCES.ftv, proc: processFutbolEnLaTvData, key: BACKUP_KEYS.events, type: 'proxy', isEvent: true }
+            ];
 
-            const results = await Promise.allSettled([
-                eventTask,
-                fetchAndProcessSource('era', ERA_URL, processEraData, BACKUP_KEYS.era),
-                fetchProxyContentAndProcess('shickat', SHICKAT_URL, processShickatData, BACKUP_KEYS.shickat),
-                fetchProxyContentAndProcess('elcano', ELCANO_URL, processElcanoDataFromHtml, BACKUP_KEYS.elcano)
-            ]);
-
-            let allChannels = [];
-            let hasFallback = false;
-            let hasOnlineSuccess = false;
-
-            results.forEach(result => {
-                if (result.status === 'fulfilled' && result.value.channels) {
-                    if (result.value.message.includes('historial')) {
-                        hasFallback = true;
-                        allChannels = allChannels.concat(result.value.channels);
-                    } else {
-                        allChannels = allChannels.concat(result.value.channels);
-                        hasOnlineSuccess = true;
-                    }
-                }
+            let finishedCount = 0;
+            sources.forEach(source => {
+                const fetchMethod = source.type === 'direct' ? fetchAndProcessSource : fetchProxyContentAndProcess;
+                
+                fetchMethod(source.name, source.url, source.proc, source.key)
+                    .then(result => {
+                        if (result && result.channels) {
+                            // Si es fuente de eventos, guardamos en cache
+                            if (source.isEvent) {
+                                const cleanName = source.name.replace('events_', '');
+                                state.eventsCache[cleanName] = result.channels;
+                                // Solo renderizamos si es la fuente activa de eventos
+                                if (cleanName === state.tvEventSource) updateStateAndRender(result.channels);
+                            } else {
+                                updateStateAndRender(result.channels);
+                            }
+                        }
+                    })
+                    .finally(() => {
+                        finishedCount++;
+                        if (finishedCount === sources.length) {
+                            document.body.classList.add('loading-finished');
+                            cleanObsoleteRatings();
+                        }
+                    });
             });
-
-            const statusElement = document.querySelector("#tvStatusMessageContainer .status-message");
-
-            if (allChannels.length > 0) {
-                const newChannels = mergeChannels(allChannels);
-                state.channelsData = newChannels;
-                processChannelNames();
-                renderTVChannels();
-                cleanObsoleteRatings();
-                if (statusElement) statusElement.remove();
-                if (hasOnlineSuccess) {
-                    if (hasFallback) {
-                        showStatusMessage("Canales actualizados (algunos con historial).", "warning");
-                    } else {
-                        showStatusMessage("Canales actualizados correctamente.", "success");
-                    }
-                } else if (isShowingBackup) {
-                    if (statusElement) statusElement.remove();
-                    showStatusMessage("Fallo al actualizar canales. Se sigue mostrando el historial.", "error");
-                } else {
-                    tvChannelsGrid.innerHTML = ` <div class="no-results"><div class="no-results-icon">📡</div><div class="no-results-text">Error al cargar los canales.</div><div class="no-results-hint">No se han conseguido cargar los canales (modo offline/sin historial).</div><button class="retry-button" onclick="loadInitialChannels()">Reintentar</button></div> `;
-                    showStatusMessage("Error al cargar canales. Sin historial disponible.", "error");
-            }
-            setTimeout(() => {
-                document.body.classList.add('loading-finished');
-            }, 800);
-        } else if (isShowingBackup) {
-                if (statusElement) statusElement.remove();
-                showStatusMessage("Fallo al actualizar canales. Se sigue mostrando el historial.", "error");
-            } else {
-                if (statusElement) statusElement.remove();
-                tvChannelsGrid.innerHTML = ` <div class="no-results-container"><div class="no-results"><div class=\"no-results-icon\">📡</div><div class=\"no-results-text\">Error al cargar los canales.</div><div class=\"no-results-hint\">No se han conseguido cargar los canales (modo offline/sin historial).</div><button class=\"retry-button\" onclick=\"loadInitialChannels()\">Reintentar</button></div></div> `;
-                showStatusMessage("Error al cargar canales. Sin historial disponible.", "error");
-            }
-            setTimeout(() => {
-                document.body.classList.add('loading-finished');
-            }, 800);
         }
 
         // NUEVA FUNCIÓN CENTRAL DE LIMPIEZA
@@ -1625,7 +1609,7 @@
 
             name = name
                 .replace(/1080P|1080|720P|720|UHD|FHD|HD|SD|MultiAudio|Multi Audio|Multi|multi|4K/gi, '')
-                .replace(/\(ES\)|\(Es\)|(Estable|New Era II|New Loop|New Era VI|Fórmula 1|BAR|eleven|eventos)/gi, '')
+                .replace(/\(ES\)|\(Es\)|(Estable|New Era I|New Era II|New Loop|New Era VI|Fórmula 1|BAR|eleven|eventos)/gi, '')
                 .replace(/\s+/g, ' ')
                 .trim();            if (name.includes('Eurosport 1')) {
                 name = '★EUROSPORT 1';
@@ -1714,49 +1698,45 @@
         }
 
         async function fetchProxyContentAndProcess(sourceName, url, processor, backupKey) {
-            let lastError;
             let content = null;
             let finalMessage = '';
             const retryKey = `${sourceName}Retries`;
             const currentRetries = state[retryKey] !== undefined ? state[retryKey] : 0;
 
-            for (const proxy of PROXIES) {
-                try {
-                    const proxyUrl = proxy + encodeURIComponent(url);
-                    const response = await fetch(proxyUrl);
+            // Intentamos con los primeros 3 proxies en paralelo para ganar velocidad
+            const rapidProxies = PROXIES.slice(0, 3);
+            
+            try {
+                content = await Promise.any(rapidProxies.map(proxy => 
+                    fetch(proxy + encodeURIComponent(url)).then(res => {
+                        if (!res.ok) throw new Error('Fail');
+                        return res.text();
+                    })
+                ));
+            } catch (e) {
+                // Si los rápidos fallan, probamos el resto secuencialmente como fallback
+                for (const proxy of PROXIES.slice(3)) {
+                    try {
+                        const res = await fetch(proxy + encodeURIComponent(url));
+                        if (res.ok) {
+                            content = await res.text();
+                            break;
+                        }
+                    } catch (err) { continue; }
+                }
+            }
 
-                    if (!response.ok) throw new Error(`Proxy ${proxy} responded with ${response.status}`);
+            if (content) {
+                if (state[retryKey] !== undefined) state[retryKey] = 0;
+                const contentHash = await hashContent(content);
+                const backup = loadBackup(backupKey);
 
-                    content = await response.text();
-                    if (state[retryKey] !== undefined) state[retryKey] = 0;
-
-                    const contentHash = await hashContent(content);
-                    const backup = loadBackup(backupKey);
-
-                    if (backup && backup.contentHash === contentHash) {
-                        finalMessage = `Canales de ${sourceName} cargados (Sin cambios).`;
-                        console.log(`[${sourceName}] Contenido sin cambios. Usando backup local.`);
-                        return {
-                            name: sourceName,
-                            channels: backup.data,
-                            message: finalMessage
-                        };
-                    } else {
-                        const channels = await processor(content);
-                        saveBackup(channels, backupKey, contentHash);
-                        finalMessage = `Canales de ${sourceName} cargados y actualizados.`;
-                        console.log(`[${sourceName}] Contenido actualizado o nuevo. Procesado y guardado.`);
-                        return {
-                            name: sourceName,
-                            channels,
-                            message: finalMessage
-                        };
-                    }
-
-                } catch (error) {
-                    lastError = error;
-                    console.warn(`Proxy ${proxy} falló para ${sourceName}:`, error);
-                    continue;
+                if (backup && backup.contentHash === contentHash) {
+                    return { name: sourceName, channels: backup.data, message: `Canales de ${sourceName} cargados (Sin cambios).` };
+                } else {
+                    const channels = await processor(content);
+                    saveBackup(channels, backupKey, contentHash);
+                    return { name: sourceName, channels, message: `Canales de ${sourceName} cargados y actualizados.` };
                 }
             }
 
@@ -1891,7 +1871,7 @@
                     const acestreamId = link.url.split('://')[1];
 
                     // 1. Aplicar mapeo de nombre específico de Elcano
-                    let simplifiedName = link.name.replace(/\s+/g, ' ').trim();
+                    let simplifiedName = link.name.replace(/\s+/g, ' ').replace(/\*/g, '').trim();
                     const normalizedForMap = simplifiedName.toUpperCase();
                     for (const key in nameMap) {
                         const upperKey = key.toUpperCase();
@@ -1960,77 +1940,52 @@
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
     const rows = doc.querySelectorAll('table.tabla-eventos tbody tr');
-    const fechaActual = doc.querySelector('.fecha')?.innerText.trim() || 'Hoy';
+    let fechaActual = doc.querySelector('.fecha')?.innerText.trim() || 'Hoy';
     
-    const channelMappings = {
-        'LA LIGA 1': 'La Liga', 'MOVISTAR': 'M+', 'EUROSPORT': '★EUROSPORT',
-        'La Liga TV La Liga Hypermotion': 'La Liga Hypermotion', 'ACCION': 'Acción',
-        'CLASICOS': 'Clásicos', 'Plus\\:': 'Plus', 'GOLF': 'Golf', 'VAMOS': 'Vamos',
-        'BALONCESTO 1': 'Baloncesto', 'M. DEPORTES ES': 'M+ Deportes',
-        'LALIGA': 'La Liga', 'LA LIGA': 'La Liga', 'EUROSPORT 4K': 'EUROSPORT 1'
-    };
+    const channelMappings = { 'LA LIGA 1': 'La Liga', 'MOVISTAR': 'M+', 'Premier': 'Premier League', 'EUROSPORT': '★EUROSPORT', 'La Liga TV La Liga Hypermotion': 'La Liga Hypermotion', 'ACCION': 'Acción', 'CLASICOS': 'Clásicos', 'Plus\\+': 'Plus', 'GOLF': 'Golf', 'VAMOS': 'Vamos', 'BALONCESTO 1': 'Baloncesto', 'M. DEPORTES ES': 'M+ Deportes', 'LALIGA': 'La Liga', 'LA LIGA': 'La Liga', 'EUROSPORT 4K': 'EUROSPORT 1' };
+
+    const emojiMap = { '🎾': ['Open Australia', 'Roland Garros', 'Wimbledon', 'US Open', 'ATP', 'WTA', 'Hexagon Cup', 'Grand Slam', 'Davis Cup', 'United Cup', 'Copa Davis', 'Tenis'], '⚽': ['Primera Federación Femenina', 'FA Women\'s Super League', 'Liga F', 'Champions Femenina', 'Premier League', 'La Liga EA Sports', 'Primera Federación', 'Serie A Italiana', 'Saudi Pro League', 'Bundesliga', 'Ligue 1', 'Eredivisie', 'Copa del Rey', 'Champions League', 'Europa League', 'Conference League', 'MLS', 'Eurocopa', 'Coppa Italia', 'Primera División Argentina', 'Serie A Brasil', 'Copa Libertadores', 'Concacaf', 'FA Cup', 'Carabao Cup', 'Copa Alemania', 'Copa Francia', 'Fútbol', 'Futbol'], '🏀': ['Liga Endesa', 'NBA', 'Liga ACB', 'Euroliga', 'Eurocup', 'NCAA Basketball', 'FIBA', 'Copa del Rey Baloncesto', 'Baloncesto'], '🏈': ['NFL', 'NCAA Football', 'Super Bowl'], '🏉': ['Rugby', 'Gallagher Premiership', 'Six Nations', 'Super Rugby', 'Top 14'], '⚾': ['LVBP', 'MLB', 'World Baseball Classic'], '🏍️': ['Moto', 'MotoGP', 'WorldSBK', 'Motocross', 'MXGP', 'Supercross'], '🏎️': ['F1', 'Formula 1', 'IndyCar', 'Nascar', 'Rally', 'WRC', 'Dakar', 'Extreme E', 'GP', 'Carrera'], '🥊': ['UFC', 'Boxeo', 'PFL', 'Bellator', 'MMA', 'K-1', 'Bare Knuckle'], '🚴': ['Ciclismo', 'Tour de Francia', 'Giro de Italia', 'Vuelta a España', 'AlUla Tour', 'Paris-Roubaix', 'Challenge Mallorca', 'Volta a Catalunya'], '⛳': ['Golf', 'Masters', 'PGA', 'Bahrain Championship', 'Ryder Cup', 'US Open Golf', 'The Open', 'LIV Golf'], '🤾': ['EHF Europeo', 'Champions League Handball', 'Asobal', 'Liga Guerreras'], '🏐': ['Voleibol', 'Superliga', 'VNL', 'Voley'], '🏒': ['NHL', 'Hockey'], '🎯': ['Darts', 'Dardos'], '🎱': ['Snooker', 'Billar'], '⛵': ['America\'s Cup', 'Vela', 'SailGP'] };
 
     rows.forEach(row => {
+        // Actualizar fecha si la fila es un separador de día
+        if (row.classList.contains('fecha')) {
+            fechaActual = row.innerText.trim();
+            return;
+        }
         const cells = row.querySelectorAll('td');
         if (cells.length < 5) return;
-
         const hora = cells[0].innerText.trim();
         const comp = cells[2].innerText.trim();
         const match = cells[3].innerText.trim();
         const t1 = cells[3].querySelectorAll('img')[0]?.src || '';
         const t2 = cells[3].querySelectorAll('img')[1]?.src || '';
 
-        // Sistema de emojis idéntico a IPFS
-        const emojiMap = {
-            '🎾': ['Open Australia', 'Roland Garros', 'Wimbledon', 'US Open', 'ATP', 'WTA', 'Davis Cup', 'Tenis'],
-            '⚽': ['Premier League', 'La Liga', 'Champions League', 'Europa League', 'Serie A', 'Bundesliga', 'Fútbol', 'Futbol', 'Copa del Rey'],
-            '🏀': ['Liga Endesa', 'NBA', 'Liga ACB', 'Euroliga', 'Baloncesto'],
-            '🏎️': ['F1', 'Formula 1', 'IndyCar', 'Carrera', 'GP'],
-            '🏍️': ['MotoGP', 'Moto'],
-            '🚴': ['Ciclismo', 'Tour', 'Giro', 'Vuelta'],
-            '⛳': ['Golf', 'Masters', 'PGA', 'LIV Golf']
-        };
-
         let detectedEmoji = '🏆';
         for (const [emoji, keywords] of Object.entries(emojiMap)) {
-            if (keywords.some(key => comp.includes(key) || match.includes(key))) {
-                detectedEmoji = emoji;
-                break;
-            }
+            if (keywords.some(key => comp.includes(key) || match.includes(key))) { detectedEmoji = emoji; break; }
         }
 
-        const eventInfo = {
-            time: hora,
-            competition: comp,
-            match: match,
-            date: fechaActual,
-            sportEmoji: detectedEmoji,
-            imga: t1,
-            imgb: t2,
-            startTime: getEventTime(fechaActual, hora).getTime(),
-            endTime: getEventTime(fechaActual, hora).getTime() + (120 * 60000)
-        };
+        const eventInfo = { time: hora, competition: comp, match: match, date: fechaActual, sportEmoji: detectedEmoji, imga: t1, imgb: t2, startTime: getEventTime(fechaActual, hora).getTime(), endTime: getEventTime(fechaActual, hora).getTime() + (120 * 60000) };
 
         row.querySelectorAll('a[href^="acestream://"]').forEach(link => {
             const id = link.href.split('://')[1];
             let rawName = link.innerText.trim();
-            if (!rawName || rawName.includes('---')) return;
+            if (!rawName || rawName.includes('---') || id.length !== 40) return;
 
-            // Aplicar mapeos específicos
-            for (const key in channelMappings) {
-                rawName = rawName.replace(new RegExp(key, 'gi'), channelMappings[key]);
+            // Normalizar nombre del canal
+            for (const key in channelMappings) { 
+                rawName = rawName.replace(new RegExp(key, 'gi'), channelMappings[key]); 
             }
-
-            // Limpieza de calidad y normalización (Paso idéntico a IPFS)
-            const { name, quality, multiAudio } = cleanNameAndExtractQuality(rawName);
             
-            // Generar ID único para evitar colisiones en el merge
-            const uniqueEventId = `event-ciriaco-${name}-${fechaActual}-${hora}`.replace(/\s+/g, '_');
+            const { name, quality, multiAudio } = cleanNameAndExtractQuality(rawName);
+            const uniqueEventId = `ev-crt-${id.substring(0,8)}-${fechaActual}-${hora}`.replace(/\s+/g, '_');
 
+            // Añadir como canal reproducible con información de evento vinculada
             numberedChannels.push({
-                id: uniqueEventId,
+                id: id,
                 name: name,
-                quality: 'EVENTO',
+                quality: quality || 'EVENTO',
+                multiAudio: multiAudio,
                 source: 'events',
                 event: eventInfo
             });
@@ -2060,54 +2015,36 @@
     const numberedChannels = [];
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContent, 'text/html');
+    let fechaEvento = "Hoy";
+    
+    const channelMappings = { 'LA LIGA 1': 'La Liga', 'MOVISTAR': 'M+', 'Premier': 'Premier League', 'EUROSPORT': '★EUROSPORT', 'La Liga TV La Liga Hypermotion': 'La Liga Hypermotion', 'ACCION': 'Acción', 'CLASICOS': 'Clásicos', 'Plus\\+': 'Plus', 'GOLF': 'Golf', 'VAMOS': 'Vamos', 'BALONCESTO 1': 'Baloncesto', 'M. DEPORTES ES': 'M+ Deportes', 'LALIGA': 'La Liga', 'LA LIGA': 'La Liga', 'EUROSPORT 4K': 'EUROSPORT 1' };
+    const emojiMap = { '🎾': ['Open Australia', 'Roland Garros', 'Wimbledon', 'US Open', 'ATP', 'WTA', 'Hexagon Cup', 'Grand Slam', 'Davis Cup', 'United Cup', 'Copa Davis', 'Tenis'], '⚽': ['Premier League', 'La Liga', 'Champions League', 'Europa League', 'Serie A', 'Bundesliga', 'Fútbol', 'Futbol', 'Copa del Rey'], '🏀': ['Liga Endesa', 'NBA', 'Liga ACB', 'Euroliga', 'Eurocup', 'NCAA Basketball', 'FIBA', 'Copa del Rey Baloncesto', 'Baloncesto'], '🏎️': ['F1', 'Formula 1', 'GP', 'Carrera'], '🏍️': ['MotoGP', 'Moto'], '🚴': ['Ciclismo', 'Tour de Francia', 'Giro', 'Vuelta'] };
 
-    const cabeceraTexto = doc.querySelector('.cabeceraTabla td')?.textContent || "";
-    const fechaMatch = cabeceraTexto.match(/(\d{2}\/\d{2}\/\d{4})/);
-    const fechaEvento = fechaMatch ? fechaMatch[1] : "Hoy";
-
-    const filas = doc.querySelectorAll('.tablaPrincipal tr:not(.cabeceraTabla)');
-
+    const filas = doc.querySelectorAll('.tablaPrincipal tr');
     filas.forEach(fila => {
+        if (fila.classList.contains('cabeceraTabla')) {
+            const fechaMatch = fila.textContent.match(/(\d{2}\/\d{2}\/\d{4})/);
+            if (fechaMatch) fechaEvento = fechaMatch[1];
+            return;
+        }
         const horaElement = fila.querySelector('.hora');
         if (!horaElement) return;
-
         const hora = horaElement.textContent.trim();
         const comp = fila.querySelector('.detalles label')?.title || "Competición";
-        const local = fila.querySelector('.local span')?.title || "Local";
-        const visitante = fila.querySelector('.visitante span')?.title || "Visitante";
-        const imga = fila.querySelector('.local img')?.src || "";
-        const imgb = fila.querySelector('.visitante img')?.src || "";
+        const matchName = `${fila.querySelector('.local span')?.title || "Local"} vs ${fila.querySelector('.visitante span')?.title || "Visitante"}`;
+        
+        let detectedEmoji = '⚽';
+        for (const [emoji, keywords] of Object.entries(emojiMap)) {
+            if (keywords.some(key => comp.includes(key) || matchName.includes(key))) { detectedEmoji = emoji; break; }
+        }
 
-        const canales = fila.querySelectorAll('.listaCanales li');
-        canales.forEach(canal => {
-            // Limpieza específica para FTV: Eliminar '(Ver en directo)' y códigos tipo '(M182 O434)'
-            let rawName = canal.textContent
-                .replace(/\(Ver en directo\)/gi, '')
-                .replace(/\([A-Z0-9\s]+\)/gi, '')
-                .trim();
-
-            // Aplicar el limpiador unificado cleanNameAndExtractQuality
-            const { name, quality } = cleanNameAndExtractQuality(rawName);
-
+        fila.querySelectorAll('.listaCanales li').forEach(canal => {
+            let rawName = canal.textContent.replace(/\(Ver en directo\)/gi, '').replace(/\([A-Z0-9\s]+\)/gi, '').trim();
+            for (const key in channelMappings) { rawName = rawName.replace(new RegExp(key, 'gi'), channelMappings[key]); }
+            const { name } = cleanNameAndExtractQuality(rawName);
             const startTime = new Date(`${fechaEvento.split('/').reverse().join('-')}T${hora}:00`).getTime() || Date.now();
 
-            numberedChannels.push({
-                id: `ev-${name.replace(/\s+/g, '')}-${hora.replace(':', '')}`,
-                name: name,
-                quality: "EVENTO",
-                source: 'events',
-                event: {
-                    time: hora,
-                    competition: comp,
-                    match: `${local} vs ${visitante}`,
-                    date: fechaEvento,
-                    sportEmoji: "⚽",
-                    imga: imga,
-                    imgb: imgb,
-                    startTime: startTime,
-                    endTime: startTime + (105 * 60 * 1000)
-                }
-            });
+            numberedChannels.push({ id: `ev-ftv-${name.replace(/\s+/g, '')}-${hora.replace(':', '')}`, name: name, quality: "EVENTO", source: 'events', event: { time: hora, competition: comp, match: matchName, date: fechaEvento, sportEmoji: detectedEmoji, imga: fila.querySelector('.local img')?.src || "", imgb: fila.querySelector('.visitante img')?.src || "", startTime: startTime, endTime: startTime + (105 * 60 * 1000) } });
         });
     });
     return numberedChannels;
@@ -2680,37 +2617,30 @@
         function getChannelNumberFromName(name) {
             const match = name.match(/\d+/);
             return match ? parseInt(match[0], 10) : 1;
-        }
-
-        function formatEventDate(dateString) {
+        }        function formatEventDate(dateString) {
+            // Eliminamos solo lo que esté entre paréntesis (la redundancia de la fuente)
+            dateString = dateString.replace(/\s*\(.*?\)/g, '').trim();
+            
             const normalizedDate = dateString.toLowerCase();
             const today = new Date();
+            const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
-            // 1. Manejar "Hoy", "Mañana", "Ayer" (Devolver solo el día)
-            if (normalizedDate === 'hoy' || normalizedDate === 'mañana' || normalizedDate === 'ayer') {
-                const date = parseDateString(dateString, today);
-                const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-
-                // Si es "Hoy" o "Mañana", devolvemos la palabra en español para la conjugación correcta (Eventos de Hoy)
-                if (normalizedDate === 'hoy' || normalizedDate === 'mañana') {
-                    return normalizedDate.charAt(0).toUpperCase() + normalizedDate.slice(1);
-                }
-
-                // Si es "Ayer", devolvemos el día de la semana para una mejor UX
+            // 1. Manejar "Hoy", "Mañana", "Ayer"
+            if (normalizedDate === 'hoy' || normalizedDate === 'mañana') {
+                return normalizedDate.charAt(0).toUpperCase() + normalizedDate.slice(1);
+            }
+            
+            const date = parseDateString(dateString, today);
+            if (normalizedDate === 'ayer') {
                 return weekdays[date.getDay()];
             }
 
-            // 2. Manejar formato de fecha DD/MM/YY o DD/MM/YYYY (Devolver "el [Día] [fecha]")
+            // 2. Manejar formato de fecha numérico (Mantiene el nombre del día generado por el código)
             const parts = dateString.split('/');
             if (parts.length >= 2 && parts.length <= 3) {
-                const date = parseDateString(dateString, today);
-                const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-
-                // Devuelve el día y la fecha original (ej: "el Sábado 13/7/25")
-                return `el ${weekdays[date.getDay()]} ${dateString}`;
+                return `${weekdays[date.getDay()]} ${dateString}`;
             }
 
-            // 3. Fallback: Devolver la cadena original
             return dateString;
         }
 
@@ -3163,11 +3093,8 @@
             else if (channel.name.includes('M+')) bgColor = '#2d2d2d';
             else if (channel.name.includes('EUROSPORT')) bgColor = '#2d2d2d'; 
             
-            // 2. Aplicar el logo si está disponible
             if (logoUrl) {
                 if (isDaznBaloncesto) {
-                    // Capa 1: Logotipo (Superior) | Capa 2: Círculo Naranja (Intermedia) | background-color: Fondo oscuro (Inferior)
-                    // Usamos radial-gradient para el círculo y ajustamos el tamaño (45%x80%) para que sea perfectamente redondo
                     backgroundStyle = `background-image: url('${logoUrl}'), radial-gradient(circle, #ff5500 100%, transparent 100%); background-position: center center, 92% center; background-size: contain, 45% 80%; background-repeat: no-repeat, no-repeat; background-origin: content-box, content-box; background-color: ${bgColor};`;
                 } else {
                     backgroundStyle = `background: ${bgColor} url('${logoUrl}') center center / contain no-repeat; background-origin: content-box;`;
@@ -3181,8 +3108,11 @@
             if (!logoUrl) {
                 channelNameHTML = `<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 5px;"><h3 style="font-size: 0.6rem; font-weight: 700; color: white; white-space: normal; margin: 0; text-align: center; display: block;">${channel.displayableName}</h3></div>`;
             } else {
-                // Si hay logo, se mantiene el contenedor vacío o con estilos mínimos para estructura si es necesario
-                channelNameHTML = `<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 5px;"><h3 style="display: none;">${channel.displayableName}</h3></div>`;
+                let badgeContent = '';
+                if (channel.name.toUpperCase().includes('VAMOS 2')) {
+                    badgeContent = `<div style="position: absolute; left: 24px; top: 78%; transform: translateY(-50%); color: #1ec33c; font-weight: 900; font-size: 1.4rem; z-index: 2;">2</div>`;
+                }
+                channelNameHTML = `<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 5px;">${badgeContent}<h3 style="display: none;">${channel.displayableName}</h3></div>`;
             }
 
             // Indicador EN VIVO eliminado por solicitud
@@ -3223,8 +3153,7 @@
                     if (aHasLive && !bHasLive) return -1;
                     if (!aHasLive && bHasLive) return 1;
                     return a.localeCompare(b);
-                });
-
+                });                const renderedNamesInGroup = new Set();
                 sortedSubGroupNames.forEach(subGroupName => {
                     let channels = subGroups[subGroupName];
                     if (state.hideNoLinks) {
@@ -3233,15 +3162,19 @@
                     if (channels.length === 0) return;
 
                     const bestChannel = getBestChannelInSubgroup(channels);
-                    if (!bestChannel) return;                    // Buscamos todos los links físicos que coincidan con el nombre del canal seleccionado
-                    const allPhysicalLinks = state.channelsData.filter(c => 
-                        c.source !== 'events' && 
-                        normalizeText(c.name) === normalizeText(bestChannel.name)
+                    if (!bestChannel) return;
+
+                    const normalizedBestName = normalizeText(bestChannel.name);
+                    if (renderedNamesInGroup.has(normalizedBestName)) return;
+                    renderedNamesInGroup.add(normalizedBestName);
+
+                    const allLinks = state.channelsData.filter(c => 
+                        normalizeText(c.name) === normalizedBestName
                     );
 
-                    const allOptions = allPhysicalLinks.map(c => ({
+                    const allOptions = allLinks.map(c => ({
                         id: c.id,
-                        name: c.displayableName,
+                        name: c.displayableName || c.name,
                         quality: standardizeQuality(c.quality),
                         multiAudio: c.multiAudio,
                         source: c.source,
@@ -3266,14 +3199,15 @@
                             if (firstWord === 'el') {
                                 const dayOfWeek = parts[1];
                                 const datePart = parts.slice(2).join(' ');
-                                coloredDateHtml = `el <span style="color: var(--primary);">${dayOfWeek} ${datePart}</span>`;
+                                coloredDateHtml = `<span style="color: var(--primary);">el ${dayOfWeek} ${datePart}</span>`;
                             } else {
                                 coloredDateHtml = `<span style="color: var(--primary);">${formattedDate}</span>`;
                             }
                         } else {
                             coloredDateHtml = `<span style="color: var(--primary);">${formattedDate}</span>`;
                         }
-                        html += `<h2 class="tv-date-header">${prefix}${formattedDate}</h2>`;
+                        const finalTitle = (prefix === 'Eventos de ' && formattedDate.toLowerCase().startsWith('el')) ? `Eventos ${formattedDate}` : `${prefix}${formattedDate}`;
+                        html += `<h2 class="tv-date-header">${finalTitle}</h2>`;
                         lastDateRendered = formattedDate;
                     }
                 } else {
@@ -3503,7 +3437,8 @@
             // FILTRO ANTIDUPLICADOS INDEPENDIENTE PARA EL MODAL (POR ID DE ACESTREAM)
             const uniqueOptionsMap = new Map();
             optionsList.forEach(opt => {
-                if (!opt.id || opt.source === 'events') return;
+                // Permitir 'events' si el ID tiene la longitud de un hash AceStream (40)
+                if (!opt.id || (opt.source === 'events' && opt.id.length !== 40)) return;
                 
                 const cleanId = opt.id.trim().toLowerCase();
                 if (!uniqueOptionsMap.has(cleanId)) {
@@ -3541,7 +3476,9 @@
 
                 const clickAction = state.copyLinkMode ? `copyAcestreamDirectly('${option.id}')` : `handleChannelPlay({ id: '${option.id}', name: '${mainChannelName.replace(/'/g, "\\'")}' })`;
                 
-                return `<div class="channel-option-item" onclick="${clickAction}"><div class="channel-option-name-container">${lastViewedIndicator}<span class="channel-option-name" style="font-family: monospace; font-size: 0.45rem; color: var(--primary) !important;">ID: ${option.id.substring(0, 8)}...</span></div><div class="channel-option-details"><span style="color: var(--${bClass}); font-weight: 700;">${option.source.toUpperCase()}</span><span style="font-weight: 700; color: var(--primary); border-left: 1px solid #444; padding-left: 3px; margin-left: 3px;">${option.quality}</span><span style="margin-left: 3px;">${ratingStars}</span></div></div>`;
+                const sourceText = option.source === 'elcano' ? 'ELC' : option.source.toUpperCase();
+
+                return `<div class="channel-option-item" onclick="${clickAction}"><div class="channel-option-name-container">${lastViewedIndicator}<span class="channel-option-name" style="font-family: monospace; font-size: 0.45rem; color: var(--primary) !important;">${option.id.substring(0, 8)}</span></div><div class="channel-option-details"><span style="color: var(--${bClass}); font-weight: 700;">${sourceText}</span><span style="font-weight: 700; color: var(--primary); border-left: 1px solid #444; padding-left: 3px; margin-left: 3px;">${option.quality}</span><span style="margin-left: 3px;">${ratingStars}</span></div></div>`;
             };
 
             listDiv.innerHTML = finalOptions.map(renderOptionItem).join('');
@@ -3671,7 +3608,45 @@
             cleanupOldFirstSeenRecords();
         }
 
-        document.addEventListener('DOMContentLoaded', initializeTVMode);
+        // Lógica del Web Worker para procesamiento en segundo plano
+const workerCode = `
+    self.onmessage = function(e) {
+        const { task, data, extra } = e.data;
+        if (task === 'processChannels') {
+            const processed = data.map(channel => {
+                let name = channel.name.replace(/(\\(|\\)|-->.*$)/g, '').trim();
+                const quality = (q => {
+                    if (!q) return 'SD'; q = q.toLowerCase();
+                    if (q.includes('uhd') || q.includes('4k')) return '4K';
+                    if (q.includes('1080') || q.includes('fhd')) return 'FHD';
+                    if (q.includes('720') || q.includes('hd')) return 'HD';
+                    return 'SD';
+                })(name);
+                
+                name = name.replace(/1080P|1080|720P|720|UHD|FHD|HD|SD|MultiAudio|Multi Audio|Multi|multi|4K/gi, '')
+                           .replace(/\\(ES\\)|\\(Es\\)|(Estable|New Era I|New Era II|New Loop|New Era VI|Fórmula 1|BAR|eleven|eventos)/gi, '')
+                           .replace(/\\s+/g, ' ').trim();
+                
+                return { ...channel, name, quality };
+            });
+            self.postMessage({ task: 'channelsProcessed', data: processed });
+        }
+    };
+`;
+
+const blob = new Blob([workerCode], { type: 'application/javascript' });
+worker = new Worker(URL.createObjectURL(blob));
+
+worker.onmessage = function(e) {
+    if (e.data.task === 'channelsProcessed') {
+        state.channelsData = e.data.data;
+        processChannelNames();
+        renderTVChannels();
+        document.body.classList.add('loading-finished');
+    }
+};
+
+document.addEventListener('DOMContentLoaded', initializeTVMode);
     </script>
 </body>
 
