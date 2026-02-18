@@ -315,19 +315,29 @@
             ]
         };
 
-        // --- LÓGICA DE LIMPIEZA DEFINITIVA (ACTUALIZADA PARA TILDES) ---
+        // --- LÓGICA DE LIMPIEZA CORREGIDA PARA EL CONFLICTO "LIGA DE CAMPEONES" ---
         const cleanChannelName = (name) => {
             if (!name) return "";
-            return name
-                .toUpperCase()
-                // Normaliza para separar tildes de las letras y luego las elimina
+            
+            let cleaned = name.toUpperCase()
                 .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "")
-                // Elimina HD, FHD, 4K, resoluciones y asteriscos
+                .replace(/[\u0300-\u036f]/g, "");
+
+            // 1. Solución específica: Si dice LIGA DE CAMPEONES pero no tiene M+, se lo añadimos
+            if (cleaned.includes("LIGA DE CAMPEONES") && !cleaned.includes("M+")) {
+                cleaned = cleaned.replace("LIGA DE CAMPEONES", "M+ LIGA DE CAMPEONES");
+            }
+
+            // 2. Normalizaciones generales
+            cleaned = cleaned
+                .replace(/\bMOVISTAR\b/g, "M+")
+                .replace(/\bLA LIGA\b/g, "LALIGA")
                 .replace(/\b(HD|FHD|4K|1080P|720P)\b/gi, "")
                 .replace(/\*/g, "")
                 .replace(/\s+/g, " ")
                 .trim();
+                
+            return cleaned;
         };
 
         const ComparisonEngine = {
