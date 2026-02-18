@@ -328,9 +328,8 @@
                 cleaned = cleaned.replace("LIGA DE CAMPEONES", "M+ LIGA DE CAMPEONES");
             }
 
-            // 2. Normalizaciones generales
+            // 2. Normalizaciones generales (Quitamos ruidos de calidad primero)
             cleaned = cleaned
-                // Sustitución de PLUS+ por PLUS escapando el carácter especial +
                 .replace(/PLUS\+/g, "PLUS")
                 .replace(/\bMOVISTAR\b/g, "M+")
                 .replace(/\bLA LIGA\b/g, "LALIGA")
@@ -338,8 +337,15 @@
                 .replace(/\*/g, "")
                 .replace(/\s+/g, " ")
                 .trim();
+            
+            // 3. ELIMINACIÓN ESPECÍFICA DEL NÚMERO 1 (Solo para DAZN LALIGA)
+            // Usamos \b1\b para detectar el número como palabra independiente, así evitamos 
+            // problemas si hay espacios o ruidos después del 1 en fuentes como ELC.
+            if (cleaned.includes("DAZN LALIGA")) {
+                cleaned = cleaned.replace(/\b1\b/g, "");
+            }
                 
-            return cleaned;
+            return cleaned.replace(/\s+/g, " ").trim();
         };
 
         const ComparisonEngine = {
