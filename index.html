@@ -313,6 +313,41 @@
             ]
         };
 
+        // --- MOTOR DE COMPARACIÓN PRECISA ---
+        const ComparisonEngine = {
+            getTokens(name) {
+                if (!name) return new Set();
+                return new Set(
+                    name.toUpperCase()
+                        .replace(/\b(FHD|HD|SD|UHD|4K|1080P|720P|MULTI|V\.O|ESP|SPA|LAT|DAZN|MOVISTAR|M\+)\b/gi, "")
+                        .replace(/[*+\-]/g, " ")
+                        .split(/\s+/)
+                        .filter(word => word.length > 0)
+                );
+            },
+            
+            isMatch(nameA, nameB) {
+                const tokensA = this.getTokens(nameA);
+                const tokensB = this.getTokens(nameB);
+                if (tokensA.size === 0 || tokensB.size === 0) return false;
+                
+                const arrA = Array.from(tokensA);
+                const arrB = Array.from(tokensB);
+                
+                if (arrA.length !== arrB.length) return false;
+                return arrA.every(t => tokensB.has(t));
+            }
+        };
+
+        const cleanChannelName = (name) => {
+            if (!name) return "";
+            return name
+                .replace(/\b(FHD|HD|SD|UHD|4K|1080p|720p|MULTI|V\.O|ESP|SPA|LAT)\b/gi, "")
+                .replace(/[*+\-]/g, "")
+                .replace(/\s+/g, " ")
+                .trim();
+        };
+
         let channelLogosMap = {};
         let globalData = [];
         let aceStreamMap = []; 
@@ -335,7 +370,8 @@
                     text.split('\n').forEach(line => {
                         if (line.includes(': http')) {
                             const parts = line.split(': http');
-                            map[parts[0].trim()] = 'http' + parts[1].trim();
+                            const rawName = parts[0].trim();
+                            map[cleanChannelName(rawName)] = 'http' + parts[1].trim();
                         }
                     });
                     return map;
@@ -359,29 +395,16 @@
                 }
                 return master;
             },
-            
-            cleanName(name) {
-                if (!name) return "";
-                return name.toUpperCase()
-                    .replace(/\d{3,4}P/g, '') 
-                    .replace(/\b(HD|FHD|SD|4K|2K|DIRECTO|ESPAÑA|ES|M\+|ESTRENOS|SERIES|MOVISTAR|BAR|TV)\b/g, '') 
-                    .replace(/[\[\(\*\+\]\)]/g, '') 
-                    .replace(/\s+/g, ' ') 
-                    .trim();
-            },
-
             parseEra(text) {
                 const results = [];
                 const lines = text.split('\n').filter(l => l.trim());
                 for (let i = 0; i < lines.length; i += 2) {
-                    const rawName = lines[i].split('-->')[0];
-                    const name = rawName.trim();
+                    const name = lines[i].split('-->')[0].trim();
                     const id = lines[i+1]?.trim().replace(/p$/, '');
                     if (id && id.length === 40) results.push({ name, id });
                 }
                 return results;
             },
-
             parseElcano(html) {
                 const jsonMatch = html.match(/const links\s*=\s*(\[[\s\S]*?\]);/);
                 if (!jsonMatch) return [];
@@ -504,34 +527,35 @@
             renderUniqueChannels(data) {
                 this.container.innerHTML = "";
                 
-                // 1. Obtener nombres limpios de la web (estos mandan)
-                const webChannels = Array.from(new Set(data.flatMap(event => event.canales)));
-                
-                // 2. Crear un mapa de normalización para evitar duplicados
-                // Clave: Nombre Limpio (DAZN 1), Valor: Nombre Original (DAZN 1)
+                // Recolectamos nombres de canales de eventos y de motor AceStream
+                const channelsFromEvents = data.flatMap(event => event.canales);
+                const channelsFromAceStream = aceStreamMap.map(a => a.name);
+                const allNames = [...channelsFromEvents, ...channelsFromAceStream];
+
+                // Usamos Map para filtrar duplicados por nombre normalizado
                 const uniqueMap = new Map();
 
-                webChannels.forEach(originalName => {
-                    const clean = AceStreamEngine.cleanName(originalName);
-                    if (!uniqueMap.has(clean)) {
-                        uniqueMap.set(clean, originalName);
+                allNames.forEach(name => {
+                    if (!name || name.length < 2) return;
+                    
+                    const cleanName = cleanChannelName(name);
+                    const hasIds = aceStreamMap.some(a => ComparisonEngine.isMatch(name, a.name));
+
+                    // Priorizamos guardar la versión que tenga IDs disponibles
+                    if (!uniqueMap.has(cleanName) || hasIds) {
+                        uniqueMap.set(cleanName, name);
                     }
                 });
-
-                // 3. Añadir canales de AceStream solo si no existen ya en la web (normalizados)
-                aceStreamMap.forEach(aceItem => {
-                    const clean = AceStreamEngine.cleanName(aceItem.name);
-                    if (!uniqueMap.has(clean)) {
-                        uniqueMap.set(clean, aceItem.name);
-                    }
-                });
-
-                const sortedNames = Array.from(uniqueMap.values()).sort();
 
                 const wrapper = document.createElement('div');
                 wrapper.className = "channels-wrapper";
                 
-                sortedNames.forEach(channelName => {
+                // Convertimos de nuevo a lista y ordenamos alfabéticamente
+                const sortedChannels = Array.from(uniqueMap.values()).sort((a, b) => 
+                    cleanChannelName(a).localeCompare(cleanChannelName(b))
+                );
+
+                sortedChannels.forEach(channelName => {
                     const temp = document.createElement('div');
                     temp.innerHTML = this.getChannelHtml(channelName);
                     wrapper.appendChild(temp.firstElementChild);
@@ -541,15 +565,13 @@
             },
 
             getChannelHtml(name) {
-                const logoUrl = channelLogosMap[name];
-                const normalizedTarget = AceStreamEngine.cleanName(name);
-                
-                // Verificamos si hay IDs para este nombre normalizado
-                const hasIds = aceStreamMap.some(a => AceStreamEngine.cleanName(a.name) === normalizedTarget);
+                const cleanName = cleanChannelName(name);
+                const logoUrl = channelLogosMap[cleanName];
+                const hasIds = aceStreamMap.some(a => ComparisonEngine.isMatch(name, a.name));
                 
                 return `
                     <div class="channel-button">
-                        ${logoUrl ? `<img src="${logoUrl}" class="channel-logo" onerror="this.outerHTML='<span>${name}</span>'">` : `<span>${name}</span>`}
+                        ${logoUrl ? `<img src="${logoUrl}" class="channel-logo" onerror="this.outerHTML='<span>${cleanName}</span>'">` : `<span>${cleanName}</span>`}
                         ${hasIds ? `<div class="btn-plus" onclick="UIManager.openIdsModal(event, '${name.replace(/'/g, "\\'")}')">+</div>` : ''}
                     </div>`;
             },
@@ -558,26 +580,17 @@
                 event.stopPropagation();
                 const list = document.getElementById('ids-list');
                 const title = document.getElementById('modal-title');
+                const matching = aceStreamMap.filter(a => ComparisonEngine.isMatch(channelName, a.name));
                 
-                const normalizedTarget = AceStreamEngine.cleanName(channelName);
-                // Filtramos todos los IDs que coincidan con la raíz del nombre
-                const matching = aceStreamMap.filter(a => AceStreamEngine.cleanName(a.name) === normalizedTarget);
-                
-                title.textContent = channelName;
+                title.textContent = cleanChannelName(channelName);
                 list.innerHTML = "";
-                
-                if (matching.length === 0) {
-                    list.innerHTML = "<div class='id-item'>Sin IDs exactos disponibles</div>";
-                } else {
-                    matching.forEach((item, i) => {
-                        const btn = document.createElement('div');
-                        btn.className = 'id-item';
-                        // Mostramos el nombre real del ID para que el usuario sepa si es HD, etc.
-                        btn.textContent = `${item.name}`;
-                        btn.onclick = () => window.location.href = `acestream://${item.id}`;
-                        list.appendChild(btn);
-                    });
-                }
+                matching.forEach((item, i) => {
+                    const btn = document.createElement('div');
+                    btn.className = 'id-item';
+                    btn.textContent = `Opción ${i + 1} (${item.name})`;
+                    btn.onclick = () => window.location.href = `acestream://${item.id}`;
+                    list.appendChild(btn);
+                });
                 this.modal.style.display = 'flex';
             },
 
