@@ -15,6 +15,7 @@
             --channel-bg: #2a2a2a;
             --border-color: #333333;
             --nav-bg: #1a1a1a;
+            --success: #06d6a0;
         }
 
         body {
@@ -143,7 +144,6 @@
             margin-top: 5px;
         }
 
-        /* Ajuste para que la cuadrícula de búsqueda sea igual a la de eventos */
         .channels-grid-only {
             display: flex;
             flex-direction: column;
@@ -153,6 +153,7 @@
         }
 
         .channel-button {
+            position: relative;
             background: var(--channel-bg);
             color: var(--text-main);
             border-radius: 12px;
@@ -178,6 +179,73 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
+        }
+
+        /* Botón + para IDs */
+        .btn-plus {
+            position: absolute;
+            bottom: 6px;
+            left: 6px;
+            width: 22px;
+            height: 22px;
+            background: var(--accent-blue);
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* Modal de IDs */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 350px;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            margin-bottom: 15px;
+            font-weight: 700;
+            text-align: center;
+            color: var(--accent-blue);
+        }
+
+        .ids-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .id-item {
+            background: var(--channel-bg);
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .id-item:hover {
+            border-color: var(--accent-blue);
         }
 
         .bottom-nav {
@@ -235,6 +303,13 @@
     <div id="status">Iniciando motor de eventos...</div>
     <div id="events-container"></div>
 
+    <div id="ids-modal" class="modal-overlay" onclick="UIManager.closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div id="modal-title" class="modal-title">Canales Disponibles</div>
+            <div id="ids-list" class="ids-list"></div>
+        </div>
+    </div>
+
     <nav class="bottom-nav">
         <div class="nav-item active" id="nav-home" onclick="UIManager.switchTab('home')">
             <span class="nav-icon">🗓️</span>
@@ -267,6 +342,7 @@
 
         let channelLogosMap = {};
         let globalData = [];
+        let aceStreamMap = []; 
         let currentTab = 'home';
 
         const NetworkService = {
@@ -292,6 +368,46 @@
                     });
                     return map;
                 } catch (e) { return {}; }
+            }
+        };
+
+        const AceStreamEngine = {
+            SOURCES: [
+                { id: 'ERA', url: 'https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/data/listas/listaplana.txt', parser: 'parseEra' },
+                { id: 'ELCANO', url: 'https://acestream-ids.vercel.app/', parser: 'parseElcano' }
+            ],
+
+            async init() {
+                let master = [];
+                for (const src of this.SOURCES) {
+                    try {
+                        const raw = await NetworkService.fetchHtml(src.url);
+                        const parsed = src.parser === 'parseEra' ? this.parseEra(raw) : this.parseElcano(raw);
+                        master = [...master, ...parsed];
+                    } catch (e) { console.error("Error fuente ID:", src.id); }
+                }
+                return master;
+            },
+
+            parseEra(text) {
+                const results = [];
+                const lines = text.split('\n').filter(l => l.trim());
+                for (let i = 0; i < lines.length; i += 2) {
+                    const name = lines[i].split('-->')[0].toUpperCase();
+                    const id = lines[i+1]?.trim().replace(/p$/, '');
+                    if (id && id.length === 40) results.push({ name, id });
+                }
+                return results;
+            },
+
+            parseElcano(html) {
+                const jsonMatch = html.match(/const links\s*=\s*(\[[\s\S]*?\]);/);
+                if (!jsonMatch) return [];
+                try {
+                    return JSON.parse(jsonMatch[1])
+                        .filter(l => l.url.includes('acestream://'))
+                        .map(l => ({ name: l.name.toUpperCase(), id: l.url.split('://')[1] }));
+                } catch (e) { return []; }
             }
         };
 
@@ -392,6 +508,7 @@
         const UIManager = {
             container: document.getElementById('events-container'),
             status: document.getElementById('status'),
+            modal: document.getElementById('ids-modal'),
 
             switchTab(tab) {
                 currentTab = tab;
@@ -445,11 +562,7 @@
             renderUniqueChannels(data) {
                 this.container.innerHTML = "";
                 this.container.className = "channels-grid-only";
-                
-                // Extraer canales únicos ordenados
                 const uniqueChannels = Array.from(new Set(data.flatMap(event => event.canales))).sort();
-                
-                // Usamos el mismo wrapper de 2 columnas que en los eventos
                 const wrapper = document.createElement('div');
                 wrapper.className = "channels-wrapper";
 
@@ -459,13 +572,53 @@
                     tempDiv.innerHTML = channelHtml;
                     wrapper.appendChild(tempDiv.firstElementChild);
                 });
-
                 this.container.appendChild(wrapper);
             },
 
             getChannelHtml(name) {
                 const logoUrl = channelLogosMap[name];
-                return `<div class="channel-button">${logoUrl ? `<img src="${logoUrl}" class="channel-logo" onerror="this.outerHTML='<span>${name}</span>'">` : `<span>${name}</span>`}</div>`;
+                const matchingIds = aceStreamMap.filter(a => 
+                    a.name.includes(name.toUpperCase()) || name.toUpperCase().includes(a.name)
+                );
+
+                const hasIds = matchingIds.length > 0;
+                
+                // Borde verde eliminado
+                return `
+                    <div class="channel-button">
+                        ${logoUrl ? 
+                            `<img src="${logoUrl}" class="channel-logo" onerror="this.outerHTML='<span>${name}</span>'">` : 
+                            `<span>${name}</span>`
+                        }
+                        ${hasIds ? `<div class="btn-plus" onclick="UIManager.openIdsModal(event, '${name.replace(/'/g, "\\'")}')">+</div>` : ''}
+                    </div>`;
+            },
+
+            openIdsModal(event, channelName) {
+                event.stopPropagation();
+                const listContainer = document.getElementById('ids-list');
+                const title = document.getElementById('modal-title');
+                
+                const matchingIds = aceStreamMap.filter(a => 
+                    a.name.includes(channelName.toUpperCase()) || channelName.toUpperCase().includes(a.name)
+                );
+
+                title.textContent = channelName;
+                listContainer.innerHTML = "";
+
+                matchingIds.forEach((item, index) => {
+                    const btn = document.createElement('div');
+                    btn.className = 'id-item';
+                    btn.textContent = `Opción ${index + 1} (${item.name})`;
+                    btn.onclick = () => window.location.href = `acestream://${item.id}`;
+                    listContainer.appendChild(btn);
+                });
+
+                this.modal.style.display = 'flex';
+            },
+
+            closeModal(event) {
+                this.modal.style.display = 'none';
             }
         };
 
@@ -477,6 +630,11 @@
                 ]);
                 channelLogosMap = logos;
                 globalData = DataParser.parse(html);
+                
+                AceStreamEngine.init().then(data => {
+                    aceStreamMap = data;
+                    UIManager.refresh();
+                });
                 
                 updateLoop();
                 setInterval(updateLoop, 60000); 
