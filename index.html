@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Extractor Pro - Clean Edition</title>
+    <title>JSON Extractor Pro - Autorating Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -16,6 +16,7 @@
             --border-color: #333333;
             --nav-bg: #1a1a1a;
             --success: #06d6a0;
+            --warning: #ffd700;
         }
 
         body {
@@ -174,6 +175,18 @@
             object-fit: contain;
         }
 
+        .rating-badge {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            font-size: 0.5rem;
+            color: var(--warning);
+            background: rgba(0,0,0,0.6);
+            padding: 1px 4px;
+            border-radius: 4px;
+            z-index: 5;
+        }
+
         .btn-plus {
             position: absolute;
             bottom: 5px;
@@ -229,6 +242,14 @@
             text-align: center;
             border: 1px solid var(--border-color);
             cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .id-rating {
+            color: var(--warning);
+            font-weight: bold;
         }
 
         .bottom-nav {
@@ -315,36 +336,69 @@
             ]
         };
 
-        // --- LÓGICA DE LIMPIEZA MEJORADA ---
+        /* --- ENGINE: AUTORATING --- */
+        const RatingEngine = {
+            DB_KEY: 'ace_autorating_v1',
+            SESSION_KEY: 'ace_current_session',
+            
+            getDB() {
+                return JSON.parse(localStorage.getItem(this.DB_KEY)) || {};
+            },
+
+            getScore(id) {
+                return this.getDB()[id] || 3.0;
+            },
+
+            saveScore(id, delta) {
+                const db = this.getDB();
+                const current = db[id] || 3.0;
+                db[id] = Math.max(1.0, Math.min(5.0, current + delta));
+                localStorage.setItem(this.DB_KEY, JSON.stringify(db));
+            },
+
+            trackStart(id, channelName, index = 0) {
+                this.checkPreviousSession();
+                localStorage.setItem(this.SESSION_KEY, JSON.stringify({
+                    id: id,
+                    channelName: channelName,
+                    index: index,
+                    start: Date.now()
+                }));
+            },
+
+            checkPreviousSession() {
+                const session = JSON.parse(localStorage.getItem(this.SESSION_KEY));
+                if (!session) return;
+
+                const durationMs = Date.now() - session.start;
+                const min = durationMs / 60000;
+                const sec = durationMs / 1000;
+
+                let delta = 0;
+                if (sec < 10) delta = -2.0;       
+                else if (min < 5) delta = -1.5;   
+                else if (min < 15) delta = -1.0;  
+                else if (min < 30) delta = 0.5;   
+                else if (min >= 30) delta = 1.5;  
+
+                if (delta !== 0) {
+                    this.saveScore(session.id, delta);
+                    console.log(`Rating ID ${session.id}: ${delta > 0 ? '+' : ''}${delta} pts`);
+                }
+                localStorage.removeItem(this.SESSION_KEY);
+            }
+        };
+
         const cleanChannelName = (name) => {
             if (!name) return "";
-            
-            let cleaned = name.toUpperCase()
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "");
-
-            // 1. Manejo específico de LIGA DE CAMPEONES
+            let cleaned = name.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             if (cleaned.includes("LIGA DE CAMPEONES") && !cleaned.includes("M+")) {
                 cleaned = cleaned.replace("LIGA DE CAMPEONES", "M+ LIGA DE CAMPEONES");
             }
-
-            // 2. Normalizaciones generales (Quitamos ruidos de calidad primero)
-            cleaned = cleaned
-                .replace(/PLUS\+/g, "PLUS")
-                .replace(/\bMOVISTAR\b/g, "M+")
-                .replace(/\bLA LIGA\b/g, "LALIGA")
-                .replace(/\b(HD|FHD|4K|1080P|720P)\b/gi, "")
-                .replace(/\*/g, "")
-                .replace(/\s+/g, " ")
-                .trim();
-            
-            // 3. ELIMINACIÓN ESPECÍFICA DEL NÚMERO 1 (Solo para DAZN LALIGA)
-            // Usamos \b1\b para detectar el número como palabra independiente, así evitamos 
-            // problemas si hay espacios o ruidos después del 1 en fuentes como ELC.
+            cleaned = cleaned.replace(/PLUS\+/g, "PLUS").replace(/\bMOVISTAR\b/g, "M+").replace(/\bLA LIGA\b/g, "LALIGA").replace(/\b(HD|FHD|4K|1080P|720P)\b/gi, "").replace(/\*/g, "").replace(/\s+/g, " ").trim();
             if (cleaned.includes("DAZN LALIGA")) {
                 cleaned = cleaned.replace(/\b1\b/g, "");
             }
-                
             return cleaned.replace(/\s+/g, " ").trim();
         };
 
@@ -501,6 +555,7 @@
             },
 
             refresh() {
+                RatingEngine.checkPreviousSession(); 
                 globalData.forEach(item => { item.isLive = LiveEngine.checkLive(item); });
                 const processed = [...globalData].sort((a, b) => (a.isLive === b.isLive) ? 0 : a.isLive ? -1 : 1);
                 
@@ -511,7 +566,14 @@
             renderEvents(data) {
                 this.container.innerHTML = "";
                 let lastDate = "";
+                
                 data.forEach(item => {
+                    const availableChannels = item.canales.filter(c => 
+                        aceStreamMap.some(a => ComparisonEngine.isMatch(c, a.name))
+                    );
+
+                    if (availableChannels.length === 0) return;
+
                     if (item.fecha !== lastDate) {
                         const dateDiv = document.createElement('div');
                         dateDiv.className = 'date-header';
@@ -519,12 +581,13 @@
                         this.container.appendChild(dateDiv);
                         lastDate = item.fecha;
                     }
+
                     const card = document.createElement('div');
                     card.className = `event-card ${item.isLive ? 'is-live' : ''}`;
                     card.innerHTML = `
                         <div class="competicion-title">${item.competition}</div>
                         <div class="event-info"><span class="time">${item.hora}</span><span class="time-separator">|</span>${item.infoHtml}</div>
-                        <div class="channels-wrapper">${item.canales.map(c => this.getChannelHtml(c)).join('')}</div>
+                        <div class="channels-wrapper">${availableChannels.map(c => this.getChannelHtml(c)).join('')}</div>
                     `;
                     this.container.appendChild(card);
                 });
@@ -532,16 +595,13 @@
 
             renderUniqueChannels(data) {
                 this.container.innerHTML = "";
-                const channelsFromEvents = data.flatMap(event => event.canales);
-                const channelsFromAceStream = aceStreamMap.map(a => a.name);
-                const allNames = [...channelsFromEvents, ...channelsFromAceStream];
                 const uniqueMap = new Map();
 
-                allNames.forEach(name => {
-                    if (!name || name.length < 2) return;
-                    const clean = cleanChannelName(name); 
-                    const hasIds = aceStreamMap.some(a => ComparisonEngine.isMatch(name, a.name));
-                    if (!uniqueMap.has(clean) || hasIds) uniqueMap.set(clean, name);
+                aceStreamMap.forEach(item => {
+                    const clean = cleanChannelName(item.name);
+                    if (!uniqueMap.has(clean)) {
+                        uniqueMap.set(clean, item.name);
+                    }
                 });
 
                 const wrapper = document.createElement('div');
@@ -559,12 +619,38 @@
             getChannelHtml(name) {
                 const clean = cleanChannelName(name);
                 const logoUrl = channelLogosMap[clean];
-                const hasIds = aceStreamMap.some(a => ComparisonEngine.isMatch(name, a.name));
+                const matching = aceStreamMap.filter(a => ComparisonEngine.isMatch(name, a.name));
+                const bestIdObj = matching.sort((a, b) => RatingEngine.getScore(b.id) - RatingEngine.getScore(a.id))[0];
+                const score = bestIdObj ? RatingEngine.getScore(bestIdObj.id) : null;
+
+                const safeName = name.replace(/'/g, "\\'");
+
                 return `
-                    <div class="channel-button">
+                    <div class="channel-button" onclick="UIManager.playBestOrNext('${safeName}')">
+                        ${score ? `<div class="rating-badge">★ ${score.toFixed(1)}</div>` : ''}
                         ${logoUrl ? `<img src="${logoUrl}" class="channel-logo" onerror="this.outerHTML='<span>${clean}</span>'">` : `<span>${clean}</span>`}
-                        ${hasIds ? `<div class="btn-plus" onclick="UIManager.openIdsModal(event, '${name.replace(/'/g, "\\'")}')">+</div>` : ''}
+                        ${bestIdObj ? `<div class="btn-plus" onclick="UIManager.openIdsModal(event, '${safeName}')">+</div>` : ''}
                     </div>`;
+            },
+
+            playBestOrNext(channelName) {
+                const matching = aceStreamMap
+                    .filter(a => ComparisonEngine.isMatch(channelName, a.name))
+                    .sort((a, b) => RatingEngine.getScore(b.id) - RatingEngine.getScore(a.id));
+
+                if (matching.length === 0) return;
+
+                const session = JSON.parse(localStorage.getItem(RatingEngine.SESSION_KEY));
+                let nextIndex = 0;
+
+                // Si acabamos de intentar el mismo canal hace menos de 30 segundos, probamos el siguiente
+                if (session && session.channelName === channelName && (Date.now() - session.start) < 30000) {
+                    nextIndex = (session.index + 1) % matching.length;
+                }
+
+                const target = matching[nextIndex];
+                RatingEngine.trackStart(target.id, channelName, nextIndex);
+                window.location.href = `acestream://${target.id}`;
             },
 
             openIdsModal(event, channelName) {
@@ -572,16 +658,25 @@
                 const list = document.getElementById('ids-list');
                 const title = document.getElementById('modal-title');
                 
-                const matching = aceStreamMap.filter(a => ComparisonEngine.isMatch(channelName, a.name));
-                
+                const matching = aceStreamMap
+                    .filter(a => ComparisonEngine.isMatch(channelName, a.name))
+                    .sort((a, b) => RatingEngine.getScore(b.id) - RatingEngine.getScore(a.id));
+
                 title.textContent = cleanChannelName(channelName);
                 list.innerHTML = "";
                 
                 matching.forEach((item, i) => {
+                    const currentRating = RatingEngine.getScore(item.id);
                     const btn = document.createElement('div');
                     btn.className = 'id-item';
-                    btn.textContent = `Opción ${i + 1} (${cleanChannelName(item.name)})`;
-                    btn.onclick = () => window.location.href = `acestream://${item.id}`;
+                    btn.innerHTML = `
+                        <span>Opción ${i + 1} (${cleanChannelName(item.name)})</span>
+                        <span class="id-rating">★ ${currentRating.toFixed(1)}</span>
+                    `;
+                    btn.onclick = () => {
+                        RatingEngine.trackStart(item.id, channelName, i);
+                        window.location.href = `acestream://${item.id}`;
+                    };
                     list.appendChild(btn);
                 });
                 this.modal.style.display = 'flex';
@@ -591,11 +686,14 @@
         };
 
         async function init() {
+            window.addEventListener('focus', () => RatingEngine.checkPreviousSession());
+
             try {
                 const [logos, html] = await Promise.all([NetworkService.fetchLogos(), NetworkService.fetchHtml(CONFIG.TARGET_URL)]);
                 channelLogosMap = logos;
                 globalData = DataParser.parse(html);
-                AceStreamEngine.init().then(data => { aceStreamMap = data; UIManager.refresh(); });
+                const ids = await AceStreamEngine.init();
+                aceStreamMap = ids;
                 UIManager.refresh();
                 setInterval(UIManager.refresh, 60000);
                 UIManager.status.style.display = 'none';
