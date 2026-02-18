@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Extractor Pro - Directos en Tiempo Real</title>
+    <title>JSON Extractor Pro - 16:9 Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -23,8 +23,8 @@
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
             margin: 0;
-            padding: 10px;
-            padding-bottom: 80px;
+            padding: 6px;
+            padding-bottom: 52px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -42,17 +42,17 @@
         }
 
         .date-header {
-            width: 100%;
-            max-width: 450px;
+            width: 95%;
+            max-width: 500px; /* Incrementado para reducir márgenes laterales */
             text-align: center;
-            margin: 30px 0;
+            margin: 18px 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
+            font-size: 0.6rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
             color: #efefef;
         }
 
@@ -61,56 +61,57 @@
             flex: 1;
             height: 1px;
             background: var(--border-color);
-            margin: 0 15px;
+            margin: 0 10px;
         }
 
         #events-container {
-            width: 100%;
-            max-width: 450px;
+            width: 95%; /* Ocupa la mayor parte del ancho disponible */
+            max-width: 500px; /* Incrementado de 310px a 500px */
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            gap: 18px;
         }
 
         .event-card {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            padding-bottom: 10px;
+            gap: 8px;
+            padding-bottom: 8px;
+            width: 100%;
         }
 
         .competicion-title {
             color: var(--accent-blue);
-            font-size: 0.85rem;
+            font-size: 0.65rem;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
 
         .competicion-title::before {
             content: "⚽"; 
-            font-size: 0.8rem;
+            font-size: 0.55rem;
         }
 
         .event-info {
             display: flex;
             align-items: center;
-            font-size: 0.95rem;
+            font-size: 0.75rem;
             font-weight: 500;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
 
         .time {
-            font-size: 0.8rem;
+            font-size: 0.6rem;
             color: #fff;
-            margin-right: 8px;
+            margin-right: 5px;
             white-space: nowrap;
         }
 
         .time-separator {
             color: var(--accent-blue);
-            margin-right: 10px;
+            margin-right: 6px;
             font-weight: bold;
         }
 
@@ -123,14 +124,14 @@
 
         .vs-text {
             color: var(--accent-blue);
-            font-size: 0.75rem;
+            font-size: 0.55rem;
             font-weight: 800;
-            margin: 0 2px;
+            margin: 0 1px;
         }
 
         .team-logo {
-            width: 24px;
-            height: 24px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             object-fit: contain;
             background: #fff;
@@ -140,25 +141,17 @@
         .channels-wrapper {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-top: 5px;
-        }
-
-        .channels-grid-only {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            max-width: 450px;
-            margin-top: 20px;
+            gap: 10px;
+            margin-top: 4px;
         }
 
         .channel-button {
             position: relative;
             background: var(--channel-bg);
             color: var(--text-main);
-            border-radius: 12px;
+            border-radius: 8px;
             text-align: center;
-            font-size: 0.75rem;
+            font-size: 0.6rem;
             font-weight: 600;
             border: 1px solid var(--border-color);
             display: flex;
@@ -166,7 +159,7 @@
             justify-content: center;
             aspect-ratio: 16 / 9;
             overflow: hidden;
-            padding: 8px;
+            padding: 6px;
             cursor: pointer;
             transition: transform 0.2s;
         }
@@ -176,31 +169,28 @@
         }
 
         .channel-logo {
-            width: 100%;
-            height: 100%;
+            width: 80%;
+            height: 80%;
             object-fit: contain;
         }
 
-        /* Botón + para IDs */
         .btn-plus {
             position: absolute;
-            bottom: 6px;
-            left: 6px;
-            width: 22px;
-            height: 22px;
+            bottom: 5px;
+            left: 5px;
+            width: 16px;
+            height: 16px;
             background: var(--accent-blue);
             color: white;
-            border-radius: 6px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 11px;
             font-weight: bold;
             z-index: 10;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
 
-        /* Modal de IDs */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -209,43 +199,34 @@
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            padding: 20px;
         }
 
         .modal-content {
             background: var(--card-bg);
-            width: 100%;
-            max-width: 350px;
-            border-radius: 20px;
-            padding: 20px;
+            width: 85%;
+            max-width: 280px;
+            border-radius: 12px;
+            padding: 15px;
             border: 1px solid var(--border-color);
         }
 
         .modal-title {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            font-size: 0.8rem;
             font-weight: 700;
             text-align: center;
             color: var(--accent-blue);
         }
 
-        .ids-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
         .id-item {
             background: var(--channel-bg);
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 0.8rem;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            font-size: 0.7rem;
             text-align: center;
             border: 1px solid var(--border-color);
             cursor: pointer;
-        }
-
-        .id-item:hover {
-            border-color: var(--accent-blue);
         }
 
         .bottom-nav {
@@ -253,14 +234,13 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 65px;
+            height: 48px;
             background: var(--nav-bg);
             border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: space-around;
             align-items: center;
             z-index: 1000;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
         }
 
         .nav-item {
@@ -269,11 +249,11 @@
             align-items: center;
             color: var(--text-muted);
             text-decoration: none;
-            font-size: 0.7rem;
+            font-size: 0.55rem;
             font-weight: 600;
-            gap: 4px;
-            cursor: pointer;
+            gap: 2px;
             flex: 1;
+            cursor: pointer;
         }
 
         .nav-item.active {
@@ -281,31 +261,31 @@
         }
 
         .nav-icon {
-            font-size: 1.2rem;
+            font-size: 1rem;
         }
 
         #status {
             position: fixed;
-            bottom: 75px;
+            bottom: 60px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.65rem;
+            font-size: 0.55rem;
             color: var(--accent-blue);
             background: rgba(0,0,0,0.8);
-            padding: 5px 12px;
-            border-radius: 20px;
+            padding: 4px 10px;
+            border-radius: 12px;
             z-index: 100;
         }
     </style>
 </head>
 <body>
 
-    <div id="status">Iniciando motor de eventos...</div>
+    <div id="status">Iniciando motor...</div>
     <div id="events-container"></div>
 
     <div id="ids-modal" class="modal-overlay" onclick="UIManager.closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div id="modal-title" class="modal-title">Canales Disponibles</div>
+            <div id="modal-title" class="modal-title">Canales</div>
             <div id="ids-list" class="ids-list"></div>
         </div>
     </div>
@@ -333,13 +313,6 @@
             ]
         };
 
-        const DURATIONS = {
-            "F1 - Carrera": 210, "F1 - Clasificación": 105, "F1 - Sprint": 90, "F1 - Entrenamientos": 75, "F1 - Tests": 540,
-            "MotoGP": 120, "SBK": 120, "WRC": 90, "WEC": 390, "IndyCar": 240, "NASCAR": 240,
-            "Fútbol": 135, "NBA": 160, "ACB": 130, "Euroliga": 130, "Balonmano": 105, "Voleibol": 150, "Waterpolo": 90, "Rugby": 120,
-            "Tenis": 150, "Pádel": 120, "Bádminton": 75, "Ciclismo": 240, "Boxeo": 120, "UFC": 210, "NFL": 210, "Golf": 330, "eSports": 150
-        };
-
         let channelLogosMap = {};
         let globalData = [];
         let aceStreamMap = []; 
@@ -354,7 +327,6 @@
                 try { return await Promise.any(fetchPromises); } 
                 catch (e) { throw new Error("Error de conexión"); }
             },
-
             async fetchLogos() {
                 try {
                     const response = await fetch(CONFIG.GIST_LOGOS);
@@ -376,7 +348,6 @@
                 { id: 'ERA', url: 'https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/data/listas/listaplana.txt', parser: 'parseEra' },
                 { id: 'ELCANO', url: 'https://acestream-ids.vercel.app/', parser: 'parseElcano' }
             ],
-
             async init() {
                 let master = [];
                 for (const src of this.SOURCES) {
@@ -384,11 +355,10 @@
                         const raw = await NetworkService.fetchHtml(src.url);
                         const parsed = src.parser === 'parseEra' ? this.parseEra(raw) : this.parseElcano(raw);
                         master = [...master, ...parsed];
-                    } catch (e) { console.error("Error fuente ID:", src.id); }
+                    } catch (e) {}
                 }
                 return master;
             },
-
             parseEra(text) {
                 const results = [];
                 const lines = text.split('\n').filter(l => l.trim());
@@ -399,7 +369,6 @@
                 }
                 return results;
             },
-
             parseElcano(html) {
                 const jsonMatch = html.match(/const links\s*=\s*(\[[\s\S]*?\]);/);
                 if (!jsonMatch) return [];
@@ -412,25 +381,14 @@
         };
 
         const LiveEngine = {
-            getDuration(compName) {
-                const key = Object.keys(DURATIONS).find(k => compName.includes(k));
-                return key ? DURATIONS[key] : 120;
-            },
-
             checkLive(event) {
                 if (!event.fecha.toLowerCase().includes("hoy")) return false;
                 const now = new Date();
                 const [hrs, mins] = event.hora.split(':').map(Number);
                 const startTime = new Date();
                 startTime.setHours(hrs, mins, 0, 0);
-                const duration = this.getDuration(event.competition);
-                const endTime = new Date(startTime.getTime() + duration * 60000);
+                const endTime = new Date(startTime.getTime() + 120 * 60000);
                 return now >= startTime && now <= endTime;
-            },
-
-            process(data) {
-                data.forEach(item => { item.isLive = this.checkLive(item); });
-                return [...data].sort((a, b) => (a.isLive === b.isLive) ? 0 : a.isLive ? -1 : 1);
             }
         };
 
@@ -439,12 +397,6 @@
                 if (!url || url.startsWith('http')) return url;
                 return CONFIG.BASE_URL + (url.startsWith('/') ? '' : '/') + url;
             },
-
-            generateKey(fecha, hora, competition, info) {
-                const raw = `${fecha}|${hora}|${competition}|${info}`;
-                return btoa(unescape(encodeURIComponent(raw))).substring(0, 10).toUpperCase();
-            },
-
             parse(html) {
                 const doc = new DOMParser().parseFromString(html, 'text/html');
                 const rows = doc.querySelectorAll('.tablaPrincipal tr');
@@ -456,13 +408,11 @@
                         currentFecha = row.textContent.trim();
                         return;
                     }
-
                     const hora = row.querySelector('.hora')?.textContent.trim();
                     if (!hora) return;
 
                     const compElem = row.querySelector('.detalles .ajusteDoslineas') || row.querySelector('.detalles label');
                     const competition = compElem?.title || compElem?.textContent || "Competición";
-
                     const canales = Array.from(row.querySelectorAll('.listaCanales li'))
                         .map(ch => ch.textContent.trim().split('(')[0].trim());
 
@@ -473,33 +423,20 @@
                     const eventoUnico = row.querySelector('.eventoUnico');
 
                     let infoHtml = "";
-                    let infoText = "";
-
                     if (local && visitante) {
-                        const lName = local.title || local.textContent;
-                        const vName = visitante.title || visitante.textContent;
-                        infoText = `${lName} vs ${vName}`;
                         infoHtml = `
                             <div class="vs-container">
                                 <img class="team-logo" src="${this.fixUrl(localImg?.src)}" onerror="this.style.display='none'">
-                                <span>${lName}</span>
+                                <span>${local.title || local.textContent}</span>
                                 <span class="vs-text">VS</span>
-                                <span>${vName}</span>
+                                <span>${visitante.title || visitante.textContent}</span>
                                 <img class="team-logo" src="${this.fixUrl(visitanteImg?.src)}" onerror="this.style.display='none'">
                             </div>`;
                     } else if (eventoUnico) {
-                        infoText = eventoUnico.innerText.trim();
-                        infoHtml = `<div class="vs-container"><span>${infoText}</span></div>`;
+                        infoHtml = `<div class="vs-container"><span>${eventoUnico.innerText.trim()}</span></div>`;
                     }
 
-                    results.push({ 
-                        key: this.generateKey(currentFecha, hora, competition, infoText),
-                        fecha: currentFecha, 
-                        hora, 
-                        competition, 
-                        infoHtml, 
-                        canales 
-                    });
+                    results.push({ fecha: currentFecha, hora, competition, infoHtml, canales });
                 });
                 return results;
             }
@@ -519,19 +456,16 @@
             },
 
             refresh() {
-                const processed = LiveEngine.process(globalData);
-                if (currentTab === 'home') {
-                    this.renderEvents(processed);
-                } else {
-                    this.renderUniqueChannels(processed);
-                }
+                globalData.forEach(item => { item.isLive = LiveEngine.checkLive(item); });
+                const processed = [...globalData].sort((a, b) => (a.isLive === b.isLive) ? 0 : a.isLive ? -1 : 1);
+                
+                if (currentTab === 'home') this.renderEvents(processed);
+                else this.renderUniqueChannels(processed);
             },
 
             renderEvents(data) {
-                this.container.className = "";
                 this.container.innerHTML = "";
                 let lastDate = "";
-
                 data.forEach(item => {
                     if (item.fecha !== lastDate) {
                         const dateDiv = document.createElement('div');
@@ -540,20 +474,12 @@
                         this.container.appendChild(dateDiv);
                         lastDate = item.fecha;
                     }
-
                     const card = document.createElement('div');
                     card.className = `event-card ${item.isLive ? 'is-live' : ''}`;
-                    const channelsHtml = item.canales
-                        .map(c => this.getChannelHtml(c)).join('');
-
                     card.innerHTML = `
                         <div class="competicion-title">${item.competition}</div>
-                        <div class="event-info">
-                            <span class="time">${item.hora}</span>
-                            <span class="time-separator">|</span>
-                            ${item.infoHtml}
-                        </div>
-                        <div class="channels-wrapper">${channelsHtml}</div>
+                        <div class="event-info"><span class="time">${item.hora}</span><span class="time-separator">|</span>${item.infoHtml}</div>
+                        <div class="channels-wrapper">${item.canales.map(c => this.getChannelHtml(c)).join('')}</div>
                     `;
                     this.container.appendChild(card);
                 });
@@ -561,93 +487,57 @@
 
             renderUniqueChannels(data) {
                 this.container.innerHTML = "";
-                this.container.className = "channels-grid-only";
                 const uniqueChannels = Array.from(new Set(data.flatMap(event => event.canales))).sort();
                 const wrapper = document.createElement('div');
                 wrapper.className = "channels-wrapper";
-
                 uniqueChannels.forEach(channelName => {
-                    const channelHtml = this.getChannelHtml(channelName);
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = channelHtml;
-                    wrapper.appendChild(tempDiv.firstElementChild);
+                    const temp = document.createElement('div');
+                    temp.innerHTML = this.getChannelHtml(channelName);
+                    wrapper.appendChild(temp.firstElementChild);
                 });
                 this.container.appendChild(wrapper);
             },
 
             getChannelHtml(name) {
                 const logoUrl = channelLogosMap[name];
-                const matchingIds = aceStreamMap.filter(a => 
-                    a.name.includes(name.toUpperCase()) || name.toUpperCase().includes(a.name)
-                );
-
-                const hasIds = matchingIds.length > 0;
-                
-                // Borde verde eliminado
+                const hasIds = aceStreamMap.some(a => a.name.includes(name.toUpperCase()) || name.toUpperCase().includes(a.name));
                 return `
                     <div class="channel-button">
-                        ${logoUrl ? 
-                            `<img src="${logoUrl}" class="channel-logo" onerror="this.outerHTML='<span>${name}</span>'">` : 
-                            `<span>${name}</span>`
-                        }
+                        ${logoUrl ? `<img src="${logoUrl}" class="channel-logo" onerror="this.outerHTML='<span>${name}</span>'">` : `<span>${name}</span>`}
                         ${hasIds ? `<div class="btn-plus" onclick="UIManager.openIdsModal(event, '${name.replace(/'/g, "\\'")}')">+</div>` : ''}
                     </div>`;
             },
 
             openIdsModal(event, channelName) {
                 event.stopPropagation();
-                const listContainer = document.getElementById('ids-list');
+                const list = document.getElementById('ids-list');
                 const title = document.getElementById('modal-title');
-                
-                const matchingIds = aceStreamMap.filter(a => 
-                    a.name.includes(channelName.toUpperCase()) || channelName.toUpperCase().includes(a.name)
-                );
-
+                const matching = aceStreamMap.filter(a => a.name.includes(channelName.toUpperCase()) || channelName.toUpperCase().includes(a.name));
                 title.textContent = channelName;
-                listContainer.innerHTML = "";
-
-                matchingIds.forEach((item, index) => {
+                list.innerHTML = "";
+                matching.forEach((item, i) => {
                     const btn = document.createElement('div');
                     btn.className = 'id-item';
-                    btn.textContent = `Opción ${index + 1} (${item.name})`;
+                    btn.textContent = `Opción ${i + 1} (${item.name})`;
                     btn.onclick = () => window.location.href = `acestream://${item.id}`;
-                    listContainer.appendChild(btn);
+                    list.appendChild(btn);
                 });
-
                 this.modal.style.display = 'flex';
             },
 
-            closeModal(event) {
-                this.modal.style.display = 'none';
-            }
+            closeModal() { this.modal.style.display = 'none'; }
         };
 
         async function init() {
             try {
-                const [logos, html] = await Promise.all([
-                    NetworkService.fetchLogos(),
-                    NetworkService.fetchHtml(CONFIG.TARGET_URL)
-                ]);
+                const [logos, html] = await Promise.all([NetworkService.fetchLogos(), NetworkService.fetchHtml(CONFIG.TARGET_URL)]);
                 channelLogosMap = logos;
                 globalData = DataParser.parse(html);
-                
-                AceStreamEngine.init().then(data => {
-                    aceStreamMap = data;
-                    UIManager.refresh();
-                });
-                
-                updateLoop();
-                setInterval(updateLoop, 60000); 
-                
-                UIManager.status.textContent = "Sincronizado";
-                setTimeout(() => UIManager.status.style.display = 'none', 3000);
-            } catch (err) {
-                UIManager.status.textContent = "Error de carga";
-            }
-        }
-
-        function updateLoop() {
-            UIManager.refresh();
+                AceStreamEngine.init().then(data => { aceStreamMap = data; UIManager.refresh(); });
+                UIManager.refresh();
+                setInterval(UIManager.refresh, 60000);
+                UIManager.status.style.display = 'none';
+            } catch (err) { UIManager.status.textContent = "Error"; }
         }
 
         init();
