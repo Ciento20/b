@@ -315,7 +315,7 @@
             ]
         };
 
-        // --- LÓGICA DE LIMPIEZA CORREGIDA PARA EL CONFLICTO "LIGA DE CAMPEONES" ---
+        // --- LÓGICA DE LIMPIEZA MEJORADA ---
         const cleanChannelName = (name) => {
             if (!name) return "";
             
@@ -323,13 +323,15 @@
                 .normalize("NFD")
                 .replace(/[\u0300-\u036f]/g, "");
 
-            // 1. Solución específica: Si dice LIGA DE CAMPEONES pero no tiene M+, se lo añadimos
+            // 1. Manejo específico de LIGA DE CAMPEONES
             if (cleaned.includes("LIGA DE CAMPEONES") && !cleaned.includes("M+")) {
                 cleaned = cleaned.replace("LIGA DE CAMPEONES", "M+ LIGA DE CAMPEONES");
             }
 
             // 2. Normalizaciones generales
             cleaned = cleaned
+                // Sustitución de PLUS+ por PLUS escapando el carácter especial +
+                .replace(/PLUS\+/g, "PLUS")
                 .replace(/\bMOVISTAR\b/g, "M+")
                 .replace(/\bLA LIGA\b/g, "LALIGA")
                 .replace(/\b(HD|FHD|4K|1080P|720P)\b/gi, "")
