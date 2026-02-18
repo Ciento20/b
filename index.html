@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Extractor Pro - 16:9 Edition</title>
+    <title>JSON Extractor Pro - Clean Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -359,23 +359,39 @@
                 }
                 return master;
             },
+            
+            cleanName(name) {
+                if (!name) return "";
+                return name.toUpperCase()
+                    .replace(/\d{3,4}P/g, '') 
+                    .replace(/\b(HD|FHD|SD|4K|2K|DIRECTO|ESPAÑA|ES|M\+|ESTRENOS|SERIES|MOVISTAR|BAR|TV)\b/g, '') 
+                    .replace(/[\[\(\*\+\]\)]/g, '') 
+                    .replace(/\s+/g, ' ') 
+                    .trim();
+            },
+
             parseEra(text) {
                 const results = [];
                 const lines = text.split('\n').filter(l => l.trim());
                 for (let i = 0; i < lines.length; i += 2) {
-                    const name = lines[i].split('-->')[0].toUpperCase();
+                    const rawName = lines[i].split('-->')[0];
+                    const name = rawName.trim();
                     const id = lines[i+1]?.trim().replace(/p$/, '');
                     if (id && id.length === 40) results.push({ name, id });
                 }
                 return results;
             },
+
             parseElcano(html) {
                 const jsonMatch = html.match(/const links\s*=\s*(\[[\s\S]*?\]);/);
                 if (!jsonMatch) return [];
                 try {
                     return JSON.parse(jsonMatch[1])
                         .filter(l => l.url.includes('acestream://'))
-                        .map(l => ({ name: l.name.toUpperCase(), id: l.url.split('://')[1] }));
+                        .map(l => ({ 
+                            name: l.name.trim(), 
+                            id: l.url.split('://')[1] 
+                        }));
                 } catch (e) { return []; }
             }
         };
@@ -488,18 +504,34 @@
             renderUniqueChannels(data) {
                 this.container.innerHTML = "";
                 
-                // Canales de la web de eventos
-                const channelsFromEvents = data.flatMap(event => event.canales);
-                // Canales de las listas AceStream (ERA/ELCANO)
-                const channelsFromAceStream = aceStreamMap.map(a => a.name);
+                // 1. Obtener nombres limpios de la web (estos mandan)
+                const webChannels = Array.from(new Set(data.flatMap(event => event.canales)));
                 
-                // Unificar, eliminar duplicados y ordenar
-                const allUniqueChannels = Array.from(new Set([...channelsFromEvents, ...channelsFromAceStream])).sort();
+                // 2. Crear un mapa de normalización para evitar duplicados
+                // Clave: Nombre Limpio (DAZN 1), Valor: Nombre Original (DAZN 1)
+                const uniqueMap = new Map();
+
+                webChannels.forEach(originalName => {
+                    const clean = AceStreamEngine.cleanName(originalName);
+                    if (!uniqueMap.has(clean)) {
+                        uniqueMap.set(clean, originalName);
+                    }
+                });
+
+                // 3. Añadir canales de AceStream solo si no existen ya en la web (normalizados)
+                aceStreamMap.forEach(aceItem => {
+                    const clean = AceStreamEngine.cleanName(aceItem.name);
+                    if (!uniqueMap.has(clean)) {
+                        uniqueMap.set(clean, aceItem.name);
+                    }
+                });
+
+                const sortedNames = Array.from(uniqueMap.values()).sort();
 
                 const wrapper = document.createElement('div');
                 wrapper.className = "channels-wrapper";
                 
-                allUniqueChannels.forEach(channelName => {
+                sortedNames.forEach(channelName => {
                     const temp = document.createElement('div');
                     temp.innerHTML = this.getChannelHtml(channelName);
                     wrapper.appendChild(temp.firstElementChild);
@@ -510,7 +542,11 @@
 
             getChannelHtml(name) {
                 const logoUrl = channelLogosMap[name];
-                const hasIds = aceStreamMap.some(a => a.name.includes(name.toUpperCase()) || name.toUpperCase().includes(a.name));
+                const normalizedTarget = AceStreamEngine.cleanName(name);
+                
+                // Verificamos si hay IDs para este nombre normalizado
+                const hasIds = aceStreamMap.some(a => AceStreamEngine.cleanName(a.name) === normalizedTarget);
+                
                 return `
                     <div class="channel-button">
                         ${logoUrl ? `<img src="${logoUrl}" class="channel-logo" onerror="this.outerHTML='<span>${name}</span>'">` : `<span>${name}</span>`}
@@ -522,16 +558,26 @@
                 event.stopPropagation();
                 const list = document.getElementById('ids-list');
                 const title = document.getElementById('modal-title');
-                const matching = aceStreamMap.filter(a => a.name.includes(channelName.toUpperCase()) || channelName.toUpperCase().includes(a.name));
+                
+                const normalizedTarget = AceStreamEngine.cleanName(channelName);
+                // Filtramos todos los IDs que coincidan con la raíz del nombre
+                const matching = aceStreamMap.filter(a => AceStreamEngine.cleanName(a.name) === normalizedTarget);
+                
                 title.textContent = channelName;
                 list.innerHTML = "";
-                matching.forEach((item, i) => {
-                    const btn = document.createElement('div');
-                    btn.className = 'id-item';
-                    btn.textContent = `Opción ${i + 1} (${item.name})`;
-                    btn.onclick = () => window.location.href = `acestream://${item.id}`;
-                    list.appendChild(btn);
-                });
+                
+                if (matching.length === 0) {
+                    list.innerHTML = "<div class='id-item'>Sin IDs exactos disponibles</div>";
+                } else {
+                    matching.forEach((item, i) => {
+                        const btn = document.createElement('div');
+                        btn.className = 'id-item';
+                        // Mostramos el nombre real del ID para que el usuario sepa si es HD, etc.
+                        btn.textContent = `${item.name}`;
+                        btn.onclick = () => window.location.href = `acestream://${item.id}`;
+                        list.appendChild(btn);
+                    });
+                }
                 this.modal.style.display = 'flex';
             },
 
@@ -544,7 +590,6 @@
                 channelLogosMap = logos;
                 globalData = DataParser.parse(html);
                 
-                // Iniciamos la carga de IDs de AceStream y refrescamos cuando termine
                 AceStreamEngine.init().then(data => { 
                     aceStreamMap = data; 
                     UIManager.refresh(); 
