@@ -315,12 +315,15 @@
             ]
         };
 
-        // --- LÓGICA DE LIMPIEZA DEFINITIVA ---
+        // --- LÓGICA DE LIMPIEZA DEFINITIVA (ACTUALIZADA PARA TILDES) ---
         const cleanChannelName = (name) => {
             if (!name) return "";
             return name
                 .toUpperCase()
-                // Elimina HD, FHD, 4KBB, resoluciones (1080p, 720p) y asteriscos
+                // Normaliza para separar tildes de las letras y luego las elimina
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                // Elimina HD, FHD, 4K, resoluciones y asteriscos
                 .replace(/\b(HD|FHD|4K|1080P|720P)\b/gi, "")
                 .replace(/\*/g, "")
                 .replace(/\s+/g, " ")
@@ -551,7 +554,6 @@
                 const list = document.getElementById('ids-list');
                 const title = document.getElementById('modal-title');
                 
-                // Filtramos y limpiamos nombres en el modal
                 const matching = aceStreamMap.filter(a => ComparisonEngine.isMatch(channelName, a.name));
                 
                 title.textContent = cleanChannelName(channelName);
@@ -560,7 +562,6 @@
                 matching.forEach((item, i) => {
                     const btn = document.createElement('div');
                     btn.className = 'id-item';
-                    // Aquí es donde limpiamos el nombre dentro del paréntesis
                     btn.textContent = `Opción ${i + 1} (${cleanChannelName(item.name)})`;
                     btn.onclick = () => window.location.href = `acestream://${item.id}`;
                     list.appendChild(btn);
