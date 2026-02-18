@@ -140,19 +140,17 @@
             padding: 1px;
         }
 
-        /* AJUSTE PARA SCROLL HORIZONTAL */
         .channels-wrapper {
             display: flex;
             flex-direction: row;
             overflow-x: auto;
             gap: 10px;
             margin-top: 4px;
-            padding-bottom: 8px; /* Espacio para la barra de scroll */
-            scrollbar-width: thin; /* Para Firefox */
+            padding-bottom: 8px;
+            scrollbar-width: thin;
             scrollbar-color: var(--accent-blue) transparent;
         }
 
-        /* Ocultar scrollbar en Chrome/Safari si se desea algo más limpio */
         .channels-wrapper::-webkit-scrollbar {
             height: 4px;
         }
@@ -173,7 +171,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            flex: 0 0 120px; /* Ancho fijo para forzar el scroll horizontal */
+            flex: 0 0 120px;
             aspect-ratio: 16 / 9;
             overflow: hidden;
             padding: 6px;
@@ -352,7 +350,11 @@
             ]
         };
 
-        /* --- ENGINE: AUTORATING --- */
+        const STORAGE_CONFIG = {
+            CACHE_KEY: 'ace_ids_cache',
+            EXPIRATION_MS: 30 * 24 * 60 * 60 * 1000 // 30 días
+        };
+
         const RatingEngine = {
             DB_KEY: 'ace_autorating_v1',
             SESSION_KEY: 'ace_current_session',
@@ -399,7 +401,6 @@
 
                 if (delta !== 0) {
                     this.saveScore(session.id, delta);
-                    console.log(`Rating ID ${session.id}: ${delta > 0 ? '+' : ''}${delta} pts`);
                 }
                 localStorage.removeItem(this.SESSION_KEY);
             }
@@ -467,9 +468,30 @@
                         const raw = await NetworkService.fetchHtml(src.url);
                         const parsed = src.parser === 'parseEra' ? this.parseEra(raw) : this.parseElcano(raw);
                         master = [...master, ...parsed];
-                    } catch (e) {}
+                    } catch (e) { console.warn(`Fuente ${src.id} fallida.`); }
+                }
+
+                if (master.length > 0) {
+                    this.saveToCache(master);
+                } else {
+                    console.log("Usando backup local...");
+                    master = this.loadFromCache();
                 }
                 return master;
+            },
+            saveToCache(data) {
+                const cacheObj = { timestamp: Date.now(), data: data };
+                localStorage.setItem(STORAGE_CONFIG.CACHE_KEY, JSON.stringify(cacheObj));
+            },
+            loadFromCache() {
+                const cached = localStorage.getItem(STORAGE_CONFIG.CACHE_KEY);
+                if (!cached) return [];
+                try {
+                    const cacheObj = JSON.parse(cached);
+                    const isExpired = (Date.now() - cacheObj.timestamp) > STORAGE_CONFIG.EXPIRATION_MS;
+                    if (isExpired) console.warn("Caché expirada, pero se usa por falta de red.");
+                    return cacheObj.data || [];
+                } catch (e) { return []; }
             },
             parseEra(text) {
                 const results = [];
@@ -622,8 +644,9 @@
 
                 const wrapper = document.createElement('div');
                 wrapper.className = "channels-wrapper";
-                // En modo buscar, permitimos que se envuelvan o sigan scroll horizontal segun prefieras.
-                // Aqui lo mantengo flex para consistencia.
+                wrapper.style.flexWrap = "wrap";
+                wrapper.style.justifyContent = "center";
+                
                 const sortedChannels = Array.from(uniqueMap.values()).sort((a, b) => cleanChannelName(a).localeCompare(cleanChannelName(b)));
 
                 sortedChannels.forEach(channelName => {
@@ -640,7 +663,6 @@
                 const matching = aceStreamMap.filter(a => ComparisonEngine.isMatch(name, a.name));
                 const bestIdObj = matching.sort((a, b) => RatingEngine.getScore(b.id) - RatingEngine.getScore(a.id))[0];
                 const score = bestIdObj ? RatingEngine.getScore(bestIdObj.id) : null;
-
                 const safeName = name.replace(/'/g, "\\'");
 
                 return `
@@ -706,15 +728,19 @@
             window.addEventListener('focus', () => RatingEngine.checkPreviousSession());
 
             try {
-                const [logos, html] = await Promise.all([NetworkService.fetchLogos(), NetworkService.fetchHtml(CONFIG.TARGET_URL)]);
+                const [logos, html] = await Promise.all([
+                    NetworkService.fetchLogos(), 
+                    NetworkService.fetchHtml(CONFIG.TARGET_URL)
+                ]);
                 channelLogosMap = logos;
                 globalData = DataParser.parse(html);
-                const ids = await AceStreamEngine.init();
-                aceStreamMap = ids;
+                aceStreamMap = await AceStreamEngine.init();
                 UIManager.refresh();
                 setInterval(UIManager.refresh, 60000);
                 UIManager.status.style.display = 'none';
-            } catch (err) { UIManager.status.textContent = "Error de carga"; }
+            } catch (err) { 
+                UIManager.status.textContent = "Error de carga. Reintente."; 
+            }
         }
 
         init();
