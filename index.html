@@ -43,7 +43,7 @@
 
         .date-header {
             width: 95%;
-            max-width: 500px; /* Incrementado para reducir márgenes laterales */
+            max-width: 500px;
             text-align: center;
             margin: 18px 0;
             display: flex;
@@ -65,8 +65,8 @@
         }
 
         #events-container {
-            width: 95%; /* Ocupa la mayor parte del ancho disponible */
-            max-width: 500px; /* Incrementado de 310px a 500px */
+            width: 95%;
+            max-width: 500px;
             display: flex;
             flex-direction: column;
             gap: 18px;
@@ -177,7 +177,7 @@
         .btn-plus {
             position: absolute;
             bottom: 5px;
-            left: 5px;
+            right: 5px;
             width: 16px;
             height: 16px;
             background: var(--accent-blue);
@@ -487,14 +487,24 @@
 
             renderUniqueChannels(data) {
                 this.container.innerHTML = "";
-                const uniqueChannels = Array.from(new Set(data.flatMap(event => event.canales))).sort();
+                
+                // Canales de la web de eventos
+                const channelsFromEvents = data.flatMap(event => event.canales);
+                // Canales de las listas AceStream (ERA/ELCANO)
+                const channelsFromAceStream = aceStreamMap.map(a => a.name);
+                
+                // Unificar, eliminar duplicados y ordenar
+                const allUniqueChannels = Array.from(new Set([...channelsFromEvents, ...channelsFromAceStream])).sort();
+
                 const wrapper = document.createElement('div');
                 wrapper.className = "channels-wrapper";
-                uniqueChannels.forEach(channelName => {
+                
+                allUniqueChannels.forEach(channelName => {
                     const temp = document.createElement('div');
                     temp.innerHTML = this.getChannelHtml(channelName);
                     wrapper.appendChild(temp.firstElementChild);
                 });
+                
                 this.container.appendChild(wrapper);
             },
 
@@ -533,11 +543,19 @@
                 const [logos, html] = await Promise.all([NetworkService.fetchLogos(), NetworkService.fetchHtml(CONFIG.TARGET_URL)]);
                 channelLogosMap = logos;
                 globalData = DataParser.parse(html);
-                AceStreamEngine.init().then(data => { aceStreamMap = data; UIManager.refresh(); });
+                
+                // Iniciamos la carga de IDs de AceStream y refrescamos cuando termine
+                AceStreamEngine.init().then(data => { 
+                    aceStreamMap = data; 
+                    UIManager.refresh(); 
+                });
+
                 UIManager.refresh();
                 setInterval(UIManager.refresh, 60000);
                 UIManager.status.style.display = 'none';
-            } catch (err) { UIManager.status.textContent = "Error"; }
+            } catch (err) { 
+                UIManager.status.textContent = "Error de carga"; 
+            }
         }
 
         init();
