@@ -40,11 +40,8 @@
         .is-live .time {
             animation: blink-blue 1s infinite;
             font-weight: 800;
-        }
-
-        .date-header {
+        }        .date-header {
             width: 95%;
-            max-width: 500px;
             text-align: center;
             margin: 18px 0;
             display: flex;
@@ -63,14 +60,44 @@
             height: 1px;
             background: var(--border-color);
             margin: 0 10px;
-        }
-
-        #events-container {
+        }        #events-container {
             width: 95%;
             max-width: 500px;
             display: flex;
             flex-direction: column;
             gap: 18px;
+            transition: max-width 0.3s ease;
+        }
+
+        /* Optimización para pantallas horizontales / escritorio */
+        @media (min-width: 768px) {
+            #events-container {
+                max-width: 85%;
+            }
+            .date-header {
+                max-width: 85%;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            #events-container {
+                max-width: 1100px;
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                gap: 24px;
+                align-items: start;
+            }
+            .date-header {
+                max-width: 100%;
+                grid-column: 1 / -1;
+                margin: 30px 0 10px 0;
+            }
+            .event-card {
+                border: 1px solid #222;
+                padding: 15px;
+                border-radius: 12px;
+                background: rgba(255,255,255,0.02);
+            }
         }
 
         .event-card {
@@ -144,11 +171,16 @@
             display: flex;
             flex-direction: row;
             overflow-x: auto;
-            gap: 10px;
-            margin-top: 4px;
-            padding-bottom: 8px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--accent-blue) transparent;
+            gap: 12px;
+            margin-top: 6px;
+            padding: 4px 2px 12px 2px;
+            scrollbar-width: none;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .channels-wrapper::-webkit-scrollbar {
+            display: none;
         }
 
         .channels-wrapper::-webkit-scrollbar {
@@ -163,20 +195,22 @@
             position: relative;
             background: var(--channel-bg);
             color: var(--text-main);
-            border-radius: 8px;
+            border-radius: 10px;
             text-align: center;
-            font-size: 0.6rem;
+            font-size: 0.65rem;
             font-weight: 600;
             border: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            flex: 0 0 120px;
-            aspect-ratio: 16 / 9;
+            flex: 0 0 140px;
+            height: 78.75px;
+            scroll-snap-align: start;
             overflow: hidden;
-            padding: 6px;
+            padding: 8px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
         .channel-button:active {
@@ -642,13 +676,31 @@
                     }
                 });
 
-                const wrapper = document.createElement('div');
-                wrapper.className = "channels-wrapper";
-                wrapper.style.flexWrap = "wrap";
-                wrapper.style.justifyContent = "center";
-                
-                const sortedChannels = Array.from(uniqueMap.values()).sort((a, b) => cleanChannelName(a).localeCompare(cleanChannelName(b)));
+                const getPriority = (name) => {
+                    const n = name.toUpperCase();
+                    if (n.includes('DAZN')) return 1;
+                    if (n.includes('M+') || n.includes('MOVISTAR')) return 2;
+                    if (n.includes('EUROSPORT')) return 3;
+                    return 4;
+                };
 
+                const sortedChannels = Array.from(uniqueMap.values()).sort((a, b) => {
+                    const priorityA = getPriority(a);
+                    const priorityB = getPriority(b);
+                    
+                    if (priorityA !== priorityB) {
+                        return priorityA - priorityB;
+                    }
+                    return cleanChannelName(a).localeCompare(cleanChannelName(b));
+                });                const wrapper = document.createElement('div');
+                wrapper.className = "channels-grid-view";
+                wrapper.style.display = "grid";
+                wrapper.style.gridTemplateColumns = "repeat(auto-fill, minmax(140px, 1fr))";
+                wrapper.style.gap = "12px";
+                wrapper.style.padding = "10px";
+                wrapper.style.width = "100%";
+                wrapper.style.boxSizing = "border-box";
+                
                 sortedChannels.forEach(channelName => {
                     const temp = document.createElement('div');
                     temp.innerHTML = this.getChannelHtml(channelName);
