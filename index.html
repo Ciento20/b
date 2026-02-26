@@ -1,64 +1,54 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TV</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.8em%22 font-size=%2285%22>📺</text></svg>"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><style>
-        /* Estilos para la Loader Bar */
-        #loader-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: transparent;
-            z-index: 10001;
-            transition: opacity 0.4s ease;
-        }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>TV Deportes</title>
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#121212">
+    
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22TV%20Deportes%22,%22short_name%22:%22TV%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22#121212%22,%22theme_color%22:%22#448aff%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20100%20100%27%3E%3Ctext%20y=%27.8em%27%20font-size=%2785%27%3E📺%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%20maskable%22}]}">
 
-        .loader-bar {
-            height: 100%;
-            width: 30%;
-            background: var(--accent-blue);
-            box-shadow: 0 0 10px var(--accent-blue);
-            animation: loading-slide 2s infinite ease-in-out;
-        }
-
-        @keyframes loading-slide {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(400%); }
-        }
-
-        .loading-finished #loader-container {
-            opacity: 0;
-            pointer-events: none;
-        }:root{--bg-color:#121212;--card-bg:#1e1e1e;--accent-blue:#448aff;--text-main:#ffffff;--text-muted:#888888;--channel-bg:#2a2a2a;--border-color:#333333;--nav-bg:#1a1a1a;--success:#06d6a0;--warning:var(--accent-blue)}body{background-color:var(--bg-color);color:var(--text-main);font-family:Inter,sans-serif;margin:0;padding:6px;padding-bottom:52px;display:flex;flex-direction:column;align-items:center}@keyframes blink-blue{0%{opacity:1;color:var(--accent-blue)}50%{opacity:.3;color:#fff}100%{opacity:1;color:var(--accent-blue)}}.is-live .time{animation:blink-blue 1s infinite;font-weight:800}.date-header{width:100%;text-align:center;margin:20px 0;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#efefef;left:0;right:0}.date-header::after,.date-header::before{content:"";flex:1;height:1px;background:var(--border-color);margin:0 10px}#events-container{width:95%;max-width:500px;display:flex;flex-direction:column;gap:18px;transition:max-width .3s ease}@media (min-width:768px){#events-container{max-width:600px}.date-header{max-width:100%}}@media (min-width:1200px){#events-container{max-width:800px;display:flex;flex-direction:column;gap:18px}.date-header{max-width:100%;margin:30px 0 10px 0}.event-card{border-bottom:1px solid #222;padding:10px 0}.event-card:last-child, .event-card:has(+ .date-header){border-bottom:none}}.event-card{display:flex;flex-direction:column;gap:8px;padding-bottom:8px;width:100%;border-bottom:1px solid #222}.event-card:last-child, .event-card:has(+ .date-header){border-bottom:none}.competicion-title{color:var(--accent-blue);font-size:.65rem;font-weight:600;display:flex;align-items:center;gap:4px}.competicion-title::before{content: "";font-size:.55rem}.event-info{display:flex;align-items:center;font-size:.75rem;font-weight:500;margin-bottom:2px}.time{font-size:.6rem;color:#fff;margin-right:5px;white-space:nowrap}.time-separator{color:var(--accent-blue);margin-right:6px;font-weight:700}.vs-container{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.vs-text{color:var(--accent-blue);font-size:.55rem;font-weight:800;margin:0 1px}.team-logo{width:18px;height:18px;object-fit:contain;}.channels-wrapper{display:flex;flex-direction:row;overflow-x:auto;gap:12px;margin-top:6px;padding:4px 2px 12px 2px;scrollbar-width:none;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}.channels-wrapper::-webkit-scrollbar{display:none}.channels-wrapper::-webkit-scrollbar{height:4px}.channels-wrapper::-webkit-scrollbar-thumb{background:var(--accent-blue);border-radius:10px}.channel-button{position:relative;background:var(--channel-bg);color:var(--text-main);border-radius:10px;text-align:center;font-size:.65rem;font-weight:600;border:1px solid var(--border-color);display:flex;align-items:center;justify-content:center;flex:0 0 140px;height:78.75px;scroll-snap-align:start;overflow:hidden;padding:8px;cursor:pointer;transition:all .2s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 6px rgba(0,0,0,.3)}.channel-button:active{transform:scale(.95)}.channel-logo{width:80%;height:80%;object-fit:contain}.rating-badge{position:absolute;top:4px;left:4px;font-size:.5rem;color:var(--accent-blue);background:rgba(0,0,0,.6);padding:1px 4px;border-radius:4px;z-index:5}.btn-plus{position:absolute;bottom:0;right:0;width:40px;height:40px;background:transparent;color:transparent;display:flex;align-items:center;justify-content:center;z-index:10;cursor:pointer}.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);display:none;justify-content:center;align-items:center;z-index:2000}.modal-content{background:var(--card-bg);width:85%;max-width:280px;max-height:80vh;overflow-y:auto;border-radius:12px;padding:15px;border:1px solid var(--border-color)}.modal-title{margin-bottom:12px;font-size:.8rem;font-weight:700;text-align:center;color:var(--accent-blue)}.id-item{background:var(--channel-bg);padding:10px;margin-bottom:8px;border-radius:8px;font-size:.7rem;text-align:center;border:1px solid var(--border-color);cursor:pointer;display:flex;justify-content:space-between;align-items:center}.id-rating{color:var(--accent-blue);font-weight:700}.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:48px;background:var(--nav-bg);border-top:1px solid var(--border-color);display:flex;justify-content:space-around;align-items:center;z-index:1000}.nav-item{display:flex;flex-direction:column;align-items:center;color:var(--text-muted);text-decoration:none;font-size:.55rem;font-weight:600;gap:2px;flex:1;cursor:pointer}        .nav-item.active{color:var(--accent-blue)}.nav-icon{font-size:1rem}#status{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);font-size:.55rem;color:var(--accent-blue);background:rgba(0,0,0,.8);padding:4px 10px;border-radius:12px;z-index:100}
-        /* Fuerza el ancho total en modo búsqueda */        #events-container.search-mode-active {
-            display: flex !important;
-            flex-direction: row !important;
-            flex-wrap: wrap !important;
-            justify-content: center !important;
-            gap: 12px !important;
-            padding: 10px !important;
-            max-width: 100% !important;
-        }
-
-        #events-container.search-mode-active .channel-button {
-            flex: 0 0 140px !important;
-            width: 140px !important;
-            height: 78.75px !important;
-        }
-
-        #events-container.search-mode-active .event-card {
-            width: 100% !important;
-        }
-        </style></head><body>
-    <div id="loader-container">
-        <div class="loader-bar"></div>
-    </div><div id="status">Iniciando motor...</div><div id="searchContainer" style="display:none;width:95%;max-width:500px;margin:10px auto;gap:8px;align-items:center"><input type="text" id="globalSearchInput" placeholder="Buscar canal, equipo o competición..." style="flex:1;padding:12px 16px;border-radius:12px;border:1px solid var(--border-color);background:var(--card-bg);color:#fff;font-size:.9rem;outline:0"></div><div id="events-container"></div>
-<div id="noResultsContainer" class="no-results-container" style="display: none; text-align: center; padding: 40px; color: var(--text-muted);">
-    <div class="no-results">
-        <div class="no-results-icon" style="font-size: 3rem; margin-bottom: 10px;">📡</div>
-        <div class="no-results-text" style="font-weight: 700; font-size: 1.1rem; color: var(--text-main);">No se encontraron canales</div>
-        <div class="no-results-hint" style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Prueba con otros filtros o términos de búsqueda</div>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.8em%22 font-size=%2285%22>📺</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        #loader-container{position:fixed;top:0;left:0;width:100%;height:3px;background:transparent;z-index:10001;transition:opacity .4s ease}.loader-bar{height:100%;width:30%;background:var(--accent-blue);box-shadow:0 0 10px var(--accent-blue);animation:loading-slide 2s infinite ease-in-out}@keyframes loading-slide{0%{transform:translateX(-100%)}100%{transform:translateX(400%)}}.loading-finished #loader-container{opacity:0;pointer-events:none}:root{--bg-color:#121212;--card-bg:#1e1e1e;--accent-blue:#448aff;--text-main:#ffffff;--text-muted:#888888;--channel-bg:#2a2a2a;--border-color:#333333;--nav-bg:#1a1a1a;--warning:var(--accent-blue)}body{background-color:var(--bg-color);color:var(--text-main);font-family:Inter,sans-serif;margin:0;padding:6px;padding-bottom:52px;display:flex;flex-direction:column;align-items:center;min-height:100vh;overflow-x:hidden}@keyframes blink-blue{0%{opacity:1;color:var(--accent-blue)}50%{opacity:.3;color:#fff}100%{opacity:1;color:var(--accent-blue)}}@keyframes blink-line{0%{border-color:var(--accent-blue)}50%{border-color:transparent}100%{border-color:var(--accent-blue)}}.is-live .time{animation:blink-blue 1s infinite;font-weight:800}.date-header{width:100%;box-sizing:border-box;text-align:center;margin:0 auto;padding:15px 20px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent-blue);position:sticky;top:0;background:var(--bg-color);z-index:100;box-shadow:none;left:0;right:0;}.date-number{color:var(--text-main);font-weight:400;}.date-header::after,.date-header::before{content:"";flex:1;height:1px;background:var(--accent-blue);margin:0 10px;opacity:0.5}#events-container{width:95%;max-width:500px;display:flex;flex-direction:column;gap:18px;transition:max-width .3s ease, opacity 0.3s ease, transform 0.3s ease; scroll-snap-type: y proximity; scroll-padding-top: 50px; min-height: 100vh;}.tab-transitioning{opacity: 0; transform: translateY(10px);}@media (min-width:768px){#events-container{max-width:600px}.date-header{max-width:100%}}@media (min-width:1200px){#events-container{max-width:800px;display:flex;flex-direction:column;gap:18px}.date-header{width:100%;margin:0 auto}.event-card{border-bottom:1px solid #222;padding:10px 0}.event-card:last-child, .event-card:has(+ .date-header){border-bottom:none}}.event-card{display:flex;flex-direction:column;gap:8px;padding-bottom:8px;width:100%;border-bottom:1px solid #222;transition:opacity 0.3s, filter 0.3s; scroll-snap-align: start;}.event-finished{opacity:0.5;filter:grayscale(0.2) saturate(0.9);pointer-events:none}.competicion-title{color:var(--accent-blue);font-size:.65rem;font-weight:600;display:flex;align-items:center;gap:4px}.competicion-title::before{content: "";font-size:.55rem}.event-info{display:flex;align-items:center;font-size:.75rem;font-weight:500;margin-bottom:2px}.time{font-size:.6rem;color:#fff;margin-right:5px;white-space:nowrap}.time-separator{color:var(--accent-blue);margin-right:6px;font-weight:700}.vs-container{display:flex;align-items:center;gap:6px;flex-wrap:wrap;row-gap:4px;justify-content:space-between}.team-group{display:flex;align-items:center;gap:6px;white-space:nowrap}.team-group:last-child{margin-left:auto}.vs-text{color:var(--accent-blue);font-size:.55rem;font-weight:800;margin:0 1px}.team-logo{width:24px;height:24px;object-fit:contain;}.channels-wrapper{display:flex;flex-direction:row;overflow-x:auto;gap:12px;margin-top:6px;padding:4px 2px 12px 2px;scrollbar-width:none;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}.channels-wrapper::-webkit-scrollbar{height:4px}.channels-wrapper::-webkit-scrollbar-thumb{background:var(--accent-blue);border-radius:10px}.channel-button{position:relative;background:var(--channel-bg);color:var(--text-main);border-radius:10px;text-align:center;font-size:.65rem;font-weight:600;border:1px solid var(--border-color);display:flex;align-items:center;justify-content:center;flex:0 0 140px;height:78.75px;scroll-snap-align:start;overflow:hidden;padding:8px;cursor:pointer;transition:all .2s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 6px rgba(0,0,0,.3)}.channel-button:active{transform:scale(.95)}.channel-logo{width:80%;height:80%;object-fit:contain}.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);display:none;justify-content:center;align-items:center;z-index:2000}.modal-content{background:var(--card-bg);width:85%;max-width:280px;max-height:80vh;overflow-y:auto;border-radius:12px;padding:15px;border:1px solid var(--border-color)}.modal-title{margin-bottom:12px;font-size:.8rem;font-weight:700;text-align:center;color:var(--accent-blue)}.id-item{background:var(--channel-bg);padding:10px;margin-bottom:8px;border-radius:8px;font-size:.7rem;text-align:center;border:1px solid var(--border-color);cursor:pointer;display:flex;justify-content:space-between;align-items:center}.id-rating{color:var(--accent-blue);font-weight:700}.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:48px;background:var(--nav-bg);border-top:1px solid var(--border-color);display:flex;justify-content:space-around;align-items:center;z-index:1000}.nav-item{display:flex;flex-direction:column;align-items:center;color:var(--text-muted);text-decoration:none;font-size:.55rem;font-weight:600;gap:2px;flex:1;cursor:pointer}.nav-item.active{color:var(--accent-blue)}.nav-icon{font-size:1rem}#status{position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);z-index:10000;display:flex;align-items:center;justify-content:center}.spinner{width:48px;height:48px;border:5px solid color-mix(in srgb, var(--accent-blue) 20%, transparent);border-top:5px solid var(--accent-blue);border-radius:50%;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}#events-container.search-mode-active {padding: 0 10px;}#events-container.search-mode-active .event-card {width: 100%;}
+    </style>
+</head>
+<body>
+    <div id="loader-container"><div class="loader-bar"></div></div>
+    <div id="status"><div class="spinner"></div></div>
+    
+    <div id="searchContainer" style="display:none;width:95%;max-width:500px;margin:10px auto 0 auto;gap:8px;align-items:center;padding-bottom:10px;">
+        <div style="position:relative;flex:1;display:flex;align-items:center">
+            <input type="text" id="globalSearchInput" placeholder="Buscar canal, equipo o competición..." style="width:100%;padding:12px 40px 12px 16px;border-radius:12px;border:1px solid var(--border-color);background:var(--card-bg);color:#fff;font-size:.9rem;outline:0">
+            <span id="clearSearch" style="position:absolute;right:12px;color:var(--text-muted);cursor:pointer;display:none;font-size:1.2rem;user-select:none">&times;</span>
+        </div>
     </div>
-</div><div id="ids-modal" class="modal-overlay" onclick="UIManager.closeModal(event)"><div class="modal-content" onclick="event.stopPropagation()"><div id="modal-title" class="modal-title">Canales</div><div id="ids-list" class="ids-list"></div></div></div><nav class="bottom-nav"><div class="nav-item active" id="nav-home" onclick='UIManager.switchTab("home")'><span class="nav-icon">🗓️</span><span>EVENTOS</span></div><div class="nav-item" id="nav-channels" onclick='UIManager.switchTab("channels")'><span class="nav-icon">🔍</span><span>BUSCAR</span></div></nav><script>const CONFIG = {
+
+    <div id="events-container"></div>
+    <div id="noResultsContainer" style="display:none;text-align:center;padding:40px;color:var(--text-muted)">
+        <div><div style="font-size:3rem;margin-bottom:10px">📡</div><div style="font-weight:700;font-size:1.1rem;color:var(--text-main)">Sin resultados</div><div style="font-size:.85rem;margin-top:5px;opacity:.8">Intenta con otra búsqueda</div></div>
+    </div>
+
+    <div id="ids-modal" class="modal-overlay" onclick="UIManager.closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div id="modal-title" class="modal-title">Canales</div>
+            <div id="ids-list" class="ids-list"></div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" id="nav-home" onclick='UIManager.switchTab("home")'><span class="nav-icon">🗓️</span><span>EVENTOS</span></div>
+        <div class="nav-item" id="nav-channels" onclick='UIManager.switchTab("channels")'><span class="nav-icon">🔍</span><span>BUSCAR</span></div>
+    </nav>
+
+    <script>
+        const CONFIG = {
             BASE_URL: 'https://www.futbolenlatv.es',
             TARGET_URL: 'https://www.futbolenlatv.es/deporte',
             GIST_LOGOS: 'https://gist.githubusercontent.com/Ciento20/f7847e86d06e5011706fa76f2dab90be/raw/',
@@ -71,133 +61,91 @@
 
         const STORAGE_CONFIG = {
             CACHE_KEY: 'ace_ids_cache',
-            EXPIRATION_MS: 30 * 24 * 60 * 60 * 1000 // 30 días
-        };        const RatingEngine = {
+            EXPIRATION_MS: 30 * 24 * 60 * 60 * 1000
+        };
+
+        const RatingEngine = {
             DB_KEY: 'ace_autorating_v1',
             SESSION_KEY: 'ace_current_session',
-            PENDING_KEY: 'ace_pending_penalty',
+            PENDING_KEY: 'ace_pending_penalties_list',
             interval: null,
 
             getDB() { return JSON.parse(localStorage.getItem(this.DB_KEY)) || {}; },
             getScore(id) { return this.getDB()[id] || 3.0; },
-
             saveScore(id, delta) {
+                if (delta < 0) return;
                 const db = this.getDB();
                 db[id] = Math.max(1.0, Math.min(5.0, (db[id] || 3.0) + delta));
                 localStorage.setItem(this.DB_KEY, JSON.stringify(db));
             },
-
             trackStart(id, channelName, index = 0) {
+                this.checkPreviousSession();
+                const now = Date.now();
                 this.stopRealTimeUpdate();
-                this.processFocusReturn(channelName); 
-
-                const sessionData = {
-                    id: id, channelName: channelName, index: index,
-                    start: Date.now(), lastProcessedMin: 0
-                };
+                const sessionData = { id, channelName, index, start: now, lastProcessedMin: 0 };
                 localStorage.setItem(this.SESSION_KEY, JSON.stringify(sessionData));
                 this.startRealTimeUpdate();
-            },            processFocusReturn(newChannelName) {
-                const pending = JSON.parse(localStorage.getItem(this.PENDING_KEY));
-                if (!pending) return;
-
-                // Penalización de -1.5 si vuelve antes de 30 min al mismo canal
-                const isExpired = (Date.now() - pending.timestamp) > 1800000; // 30 min
-                const isDifferentChannel = pending.channelName !== newChannelName;
-
-                if (isDifferentChannel || isExpired) {
-                    localStorage.removeItem(this.PENDING_KEY);
-                } else {
-                    this.saveScore(pending.id, -1.5);
-                    localStorage.removeItem(this.PENDING_KEY);
-                }
             },
-
             checkPreviousSession() {
                 const session = JSON.parse(localStorage.getItem(this.SESSION_KEY));
                 if (!session) return;
-
                 const durationSec = (Date.now() - session.start) / 1000;
-                if (durationSec < 45) {
-                    localStorage.setItem(this.PENDING_KEY, JSON.stringify({
-                        id: session.id, 
-                        channelName: session.channelName, 
-                        timestamp: Date.now()
-                    }));
+                if (durationSec < 90) {
+                    const db = this.getDB();
+                    db[session.id] = Math.max(1.0, (db[session.id] || 3.0) - 0.5);
+                    localStorage.setItem(this.DB_KEY, JSON.stringify(db));
+                    localStorage.setItem(this.PENDING_KEY, JSON.stringify({ id: session.id, timestamp: Date.now() }));
+                } else {
+                    localStorage.removeItem(this.PENDING_KEY);
                 }
-                localStorage.removeItem(this.SESSION_KEY);
-                this.stopRealTimeUpdate();
-            },            startRealTimeUpdate() {
+            },
+            startRealTimeUpdate() {
                 if (this.interval) clearInterval(this.interval);
                 this.interval = setInterval(() => {
                     const session = JSON.parse(localStorage.getItem(this.SESSION_KEY));
                     if (!session) return this.stopRealTimeUpdate();
                     const min = (Date.now() - session.start) / 60000;
-                    let delta = 0;
-
-                    // Nueva lógica de premios: Solo a partir de 30 min y cada 30 min extra
                     if (min >= 30 && (min - session.lastProcessedMin) >= 30) {
-                        delta = 1.0;
-                    }
-
-                    if (delta > 0) {
-                        this.saveScore(session.id, delta);
+                        this.saveScore(session.id, 1.0);
                         session.lastProcessedMin = Math.floor(min / 30) * 30;
                         localStorage.setItem(this.SESSION_KEY, JSON.stringify(session));
                     }
                 }, 30000);
             },
-
             stopRealTimeUpdate() { if (this.interval) clearInterval(this.interval); }
         };
 
         const cleanChannelName = (name) => {
             if (!name) return "";
+            let rawUpper = name.toUpperCase();
+            if (rawUpper.includes("ACB EVENTO 01")) name = "DAZN BALONCESTO";
+            if (rawUpper.includes("ACB EVENTO 02")) name = "DAZN BALONCESTO 2";
+            if (rawUpper.includes("M. DEPORTES")) name = "M+ DEPORTES";
             let cleaned = name.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             if (cleaned.includes("LIGA DE CAMPEONES") && !cleaned.includes("M+")) {
                 cleaned = cleaned.replace("LIGA DE CAMPEONES", "M+ LIGA DE CAMPEONES");
             }
-            cleaned = cleaned.replace(/PLUS\+/g, "PLUS").replace(/\bMOVISTAR\b/g, "M+").replace(/\bLA LIGA\b/g, "LALIGA").replace(/\bHYPERMOTION\b/g, "LALIGA TV HYPERMOTION").replace(/\bBAR\b/gi, "").replace(/\b(HD|FHD|4K|1080P|720P)\b/gi, "").replace(/\*/g, "").replace(/\s+/g, " ").trim();
-            if (cleaned.includes("DAZN LALIGA")) {
-                cleaned = cleaned.replace(/\b1\b/g, "");
-            }
-            if (cleaned.includes("HYPERMOTION 2")) {
-                cleaned = "LALIGA TV HYPERMOTION 2";
-            } else if (cleaned.includes("HYPERMOTION 3")) {
-                cleaned = "LALIGA TV HYPERMOTION 3";
-            } else if (cleaned.includes("HYPERMOTION 4")) {
-                cleaned = "LALIGA TV HYPERMOTION 4";
-            } else if (cleaned.includes("HYPERMOTION")) {
-                cleaned = "LALIGA TV HYPERMOTION";
-            }
+            cleaned = cleaned.replace(/PLUS\+/g, "PLUS").replace(/\bMOVISTAR\b/g, "M+").replace(/\bM\./g, "M+").replace(/\(ES\)/gi, "").replace(/\bLA LIGA\b/g, "LALIGA").replace(/\bHYPERMOTION\b/g, "LALIGA TV HYPERMOTION").replace(/\bBAR\b/gi, "").replace(/\b(HD|FHD|4K|1080P|720P)\b/gi, "").replace(/\*/g, "").replace(/\s+/g, " ").trim();
+            if (cleaned.includes("CALCIO EVENTOS")) { cleaned = cleaned.replace("CALCIO EVENTOS", "SKY SPORTS CALCIO EVENTOS"); }
+            if (cleaned.includes("(1RFEF) (SOLO EVENTOS)")) { cleaned = "PRIMERA FEDERACION"; }
+            if (cleaned.includes("DAZN LALIGA")) { cleaned = cleaned.replace(/\b1\b/g, ""); }
+            if (cleaned.includes("HYPERMOTION 2")) { cleaned = "LALIGA TV HYPERMOTION 2"; }
+            else if (cleaned.includes("HYPERMOTION 3")) { cleaned = "LALIGA TV HYPERMOTION 3"; }
+            else if (cleaned.includes("HYPERMOTION 4")) { cleaned = "LALIGA TV HYPERMOTION 4"; }
+            else if (cleaned.includes("HYPERMOTION")) { cleaned = "LALIGA TV HYPERMOTION"; }
             return cleaned.replace(/\s+/g, " ").trim();
         };
 
         const ComparisonEngine = {
-            isMatch(nameA, nameB) {
-                return cleanChannelName(nameA) === cleanChannelName(nameB);
-            },
-            normalizeText(text) {
-                return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-            }
+            isMatch(nameA, nameB) { return cleanChannelName(nameA) === cleanChannelName(nameB); },
+            normalizeText(text) { return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim(); }
         };
 
         let channelLogosMap = JSON.parse(localStorage.getItem('logo_cache')) || {};
         let globalData = JSON.parse(localStorage.getItem('event_data_cache')) || [];
         let aceStreamMap = []; 
-        let currentTab = 'home';        // Estado extendido para el buscador con mapeo de deportes
-        const state = {
-            tvCurrentFilter: 'all',
-            tvSearchTerm: '',
-            searchToEmoji: {
-                'f1': '🏎️', 'formula 1': '🏎️', 'moto': '🏍️', 'motogp': '🏍️', 'motor': '🏎️',
-                'futbol': '⚽', 'soccer': '⚽', 'balonpie': '⚽',
-                'tenis': '🎾', 'tennis': '🎾', 'rafa': '🎾',
-                'basket': '🏀', 'baloncesto': '🏀', 'nba': '🏀',
-                'ufc': '🥊', 'mma': '🥊', 'boxeo': '🥊',
-                'ciclismo': '🚴', 'tour': '🚴', 'giro': '🚴'
-            }
-        };
+        let currentTab = localStorage.getItem('active_tab') || 'home';
+        const state = { tvSearchTerm: localStorage.getItem('search_query') || '' };
 
         const NetworkService = {
             async fetchHtml(targetUrl) {
@@ -216,8 +164,7 @@
                     text.split('\n').forEach(line => {
                         if (line.includes(': http')) {
                             const parts = line.split(': http');
-                            const rawName = parts[0].trim();
-                            map[cleanChannelName(rawName)] = 'http' + parts[1].trim();
+                            map[cleanChannelName(parts[0].trim())] = 'http' + parts[1].trim();
                         }
                     });
                     return map;
@@ -229,75 +176,46 @@
             SOURCES: [
                 { id: 'ERA', url: 'https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/data/listas/listaplana.txt', parser: 'parseEra' },
                 { id: 'ELCANO', url: 'https://acestream-ids.vercel.app/', parser: 'parseElcano' }
-            ],            // Función simple de hashing para strings
-            generateHash(str) {
-                let hash = 5381, i = str.length;
-                while(i) hash = (hash * 33) ^ str.charCodeAt(--i);
-                return (hash >>> 0).toString(16);
-            },
-
+            ],
+            generateHash(str){let hash=5381,i=str.length;while(i)hash=(hash*33)^str.charCodeAt(--i);return(hash>>>0).toString(16)},
             async init() {
                 let masterMap = new Map();
                 const cache = JSON.parse(localStorage.getItem(STORAGE_CONFIG.CACHE_KEY)) || { hashes: {}, data: [] };
                 const currentHashes = cache.hashes || {};
                 let hasChanges = false;
-
-                // Mapear datos previos para acceso rápido
                 cache.data.forEach(item => masterMap.set(item.id, item));
-
                 for (const src of this.SOURCES) {
                     try {
                         const raw = await NetworkService.fetchHtml(src.url);
                         const newHash = this.generateHash(raw);
-
-                        if (currentHashes[src.id] === newHash) {
-                            console.log(`[Hash] Fuente ${src.id} sin cambios. Saltando parseo.`);
-                            continue;
-                        }
-
-                        console.log(`[Hash] Fuente ${src.id} ha cambiado. Procesando...`);
+                        if (currentHashes[src.id] === newHash) continue;
                         hasChanges = true;
                         currentHashes[src.id] = newHash;
-                        
                         const parsed = src.parser === 'parseEra' ? this.parseEra(raw) : this.parseElcano(raw);
                         parsed.forEach(item => {
                             item.source = src.id === 'ELCANO' ? 'ELC' : 'ERA';
                             masterMap.set(item.id, item);
                         });
-                    } catch (e) { console.warn(`Fuente ${src.id} fallida.`); }
+                    } catch (e) {}
                 }
-
                 const master = Array.from(masterMap.values());
-
-                if (hasChanges && master.length > 0) {
-                    this.saveToCache(master, currentHashes);
-                } else if (master.length === 0) {
-                    return this.loadFromCache();
-                }
-                return master;
-            },            saveToCache(data, hashes = {}) {
-                const cacheObj = { 
-                    timestamp: Date.now(), 
-                    data: data, 
-                    hashes: hashes 
-                };
-                localStorage.setItem(STORAGE_CONFIG.CACHE_KEY, JSON.stringify(cacheObj));
+                if (hasChanges && master.length > 0) { this.saveToCache(master, currentHashes); }
+                return master.length > 0 ? master : this.loadFromCache();
+            },
+            saveToCache(data, hashes = {}) {
+                localStorage.setItem(STORAGE_CONFIG.CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data, hashes }));
             },
             loadFromCache() {
                 const cached = localStorage.getItem(STORAGE_CONFIG.CACHE_KEY);
                 if (!cached) return [];
-                try {
-                    const cacheObj = JSON.parse(cached);
-                    const isExpired = (Date.now() - cacheObj.timestamp) > STORAGE_CONFIG.EXPIRATION_MS;
-                    if (isExpired) console.warn("Caché expirada, pero se usa por falta de red.");
-                    return cacheObj.data || [];
-                } catch (e) { return []; }
+                const cacheObj = JSON.parse(cached);
+                return (Date.now() - cacheObj.timestamp) > STORAGE_CONFIG.EXPIRATION_MS ? [] : (cacheObj.data || []);
             },
             parseEra(text) {
                 const results = [];
                 const lines = text.split('\n').filter(l => l.trim());
                 for (let i = 0; i < lines.length; i += 2) {
-                    const name = lines[i].split('-->')[0].trim();
+                    let name = lines[i].split('-->')[0].replace(/\b(HDP|SDP|FHDP)\b/gi, '').trim();
                     const id = lines[i+1]?.trim().replace(/p$/, '');
                     if (id && id.length === 40) results.push({ name, id });
                 }
@@ -307,97 +225,64 @@
                 const jsonMatch = html.match(/const links\s*=\s*(\[[\s\S]*?\]);/);
                 if (!jsonMatch) return [];
                 try {
-                    return JSON.parse(jsonMatch[1])
-                        .filter(l => l.url.includes('acestream://'))
-                        .map(l => ({ 
-                            name: l.name.trim(), 
-                            id: l.url.split('://')[1] 
-                        }));
+                    return JSON.parse(jsonMatch[1]).filter(l => l.url.includes('acestream://'))
+                        .map(l => ({ name: l.name.trim(), id: l.url.split('://')[1] }));
                 } catch (e) { return []; }
             }
         };
 
         const LiveEngine = {
             checkLive(event) {
-                if (!event.fecha.toLowerCase().includes("hoy")) return false;
+                const fechaLimpia = event.fecha.toLowerCase();
+                if (!fechaLimpia.includes("hoy") && !fechaLimpia.includes("directo")) return false;
                 const now = new Date();
                 const [hrs, mins] = event.hora.split(':').map(Number);
-                const startTime = new Date();
-                startTime.setHours(hrs, mins, 0, 0);
-                const endTime = new Date(startTime.getTime() + 120 * 60000);
+                const startTime = new Date(); startTime.setHours(hrs, mins, 0, 0);
+                const searchPool = (event.competition + ' ' + event.infoHtml.replace(/<[^>]*>?/gm, '')).toUpperCase();
+                const specificDurations = [
+                    { key: 'FÓRMULA 1', sub: 'LIBRES', duration: 75 }, { key: 'FÓRMULA 1', sub: 'CLASIFICACIÓN', duration: 85 },
+                    { key: 'FÓRMULA 1', sub: 'SPRINT', duration: 65 }, { key: 'FÓRMULA 1', sub: 'CARRERA', duration: 145 },
+                    { key: 'MOTOGP', sub: 'CARRERA', duration: 85 }, { key: 'LALIGA', duration: 115 }, { key: 'NBA', duration: 165 }
+                ];
+                let duration = 120;
+                const match = specificDurations.find(d => searchPool.includes(d.key) && (!d.sub || searchPool.includes(d.sub)));
+                if (match) duration = match.duration;
+                const endTime = new Date(startTime.getTime() + duration * 60000);
                 return now >= startTime && now <= endTime;
             }
         };
 
         const DataParser = {
-            fixUrl(url) {
-                if (!url || url.startsWith('http')) return url;
-                return CONFIG.BASE_URL + (url.startsWith('/') ? '' : '/') + url;
-            },
+            fixUrl(url) { return (!url || url.startsWith('http')) ? url : CONFIG.BASE_URL + (url.startsWith('/') ? '' : '/') + url; },
             parse(html) {
                 const doc = new DOMParser().parseFromString(html, 'text/html');
                 const rows = doc.querySelectorAll('.tablaPrincipal tr');
                 const results = [];
                 let currentFecha = "";
-
                 rows.forEach(row => {
                     if (row.classList.contains('cabeceraTabla')) {
-                        currentFecha = row.textContent.trim().replace(/PARTIDOS/gi, 'EVENTOS');
+                        currentFecha = row.textContent.trim().toUpperCase().replace(/PARTIDOS/gi, 'EVENTOS')
+                            .replace(/,/g, ' &nbsp; ').replace(/(\d+)/g, '<span class="date-number">$1</span>')
+                            .replace(/\b(EVENTOS|DE|HOY|MAÑANA)\b/g, '<span style="color:var(--text-main); margin-right: 4px;">$1</span>');
                         return;
                     }
                     const hora = row.querySelector('.hora')?.textContent.trim();
                     if (!hora) return;
-
                     const compElem = row.querySelector('.detalles .ajusteDoslineas') || row.querySelector('.detalles label');
                     let competition = compElem?.title || compElem?.textContent || "Competición";
                     const sportImg = row.querySelector('.contenedorImgCompeticion img');
                     const sportName = (sportImg?.getAttribute('alt') || sportImg?.getAttribute('title') || '').toUpperCase();
-                    
-                    const emojiMap = {
-                        'FÚTBOL': '⚽', 'FUTBOL': '⚽', 
-                        'BALONCESTO': '🏀', 'BASKETBALL': '🏀', 
-                        'TENIS': '🎾', 'TENNIS': '🎾',
-                        'MOTOR': '🏎️', 'FÓRMULA 1': '🏎️', 'FORMULA 1': '🏎️', 'MOTOGP': '🏍️',
-                        'CICLISMO': '🚴', 
-                        'GOLF': '⛳', 
-                        'BALONMANO': '🤾', 
-                        'UFC': '🥊', 'BOXEO': '🥊', 'MMA': '🥊',
-                        'HOCKEY': '🛼',
-                        'RUGBY': '🏉'
-                    };
-
+                    const emojiMap = { 'FÚTBOL': '⚽', 'BALONCESTO': '🏀', 'TENIS': '🎾', 'AUTOMOVILISMO': '🏁', 'FÓRMULA 1': '🏎️', 'MOTOCICLISMO': '🏍️', 'UFC': '👊' };
                     let emoji = "🏆";
-                    for (const [key, icon] of Object.entries(emojiMap)) {
-                        if (sportName.includes(key)) {
-                            emoji = icon;
-                            break;
-                        }
-                    }
-                    competition = emoji + " " + competition;
-                    const canales = Array.from(row.querySelectorAll('.listaCanales li'))
-                        .map(ch => ch.textContent.trim().split('(')[0].trim());
-
+                    for (const [key, icon] of Object.entries(emojiMap)) { if (sportName.includes(key)) { emoji = icon; break; } }
+                    const canales = Array.from(row.querySelectorAll('.listaCanales li')).map(ch => ch.textContent.trim().split('(')[0].trim());
                     const local = row.querySelector('.local span');
                     const visitante = row.querySelector('.visitante span');
                     const localImg = row.querySelector('.local img');
                     const visitanteImg = row.querySelector('.visitante img');
                     const eventoUnico = row.querySelector('.eventoUnico');
-
-                    let infoHtml = "";
-                    if (local && visitante) {
-                        infoHtml = `
-                            <div class="vs-container">
-                                <img src="${this.fixUrl(localImg?.src)}" style="width:18px;height:18px;object-fit:contain;" onerror="this.style.display='none'">
-                                <span>${local.title || local.textContent}</span>
-                                <span class="vs-text">VS</span>
-                                <span>${visitante.title || visitante.textContent}</span>
-                                <img src="${this.fixUrl(visitanteImg?.src)}" style="width:18px;height:18px;object-fit:contain;" onerror="this.style.display='none'">
-                            </div>`;
-                    } else if (eventoUnico) {
-                        infoHtml = `<div class="vs-container"><span>${eventoUnico.innerText.trim()}</span></div>`;
-                    }
-
-                    results.push({ fecha: currentFecha, hora, competition, infoHtml, canales });
+                    let infoHtml = local && visitante ? `<div class="vs-container"><div class="team-group"><img src="${this.fixUrl(localImg?.src)}" class="team-logo" onerror="this.style.display='none'"><span>${local.title || local.textContent}</span><span class="vs-text">VS</span></div><div class="team-group"><span>${visitante.title || visitante.textContent}</span><img src="${this.fixUrl(visitanteImg?.src)}" class="team-logo" onerror="this.style.display='none'"></div></div>` : `<div class="vs-container"><span>${eventoUnico?.innerText.trim() || ''}</span></div>`;
+                    results.push({ fecha: currentFecha, hora, competition: emoji + " " + competition, infoHtml, canales });
                 });
                 return results;
             }
@@ -407,319 +292,115 @@
             container: document.getElementById('events-container'),
             status: document.getElementById('status'),
             modal: document.getElementById('ids-modal'),
-            lastClickTime: 0,
+            lastEventsHTML: '',
 
             switchTab(tab) {
-                if (tab === 'home') {
-                    const now = Date.now();
-                    if (now - this.lastClickTime < 1000) {
-                        this.setRandomColor();
-                        this.lastClickTime = 0;
-                        return;
-                    }
-                    this.lastClickTime = now;
-                }
                 currentTab = tab;
-                const searchContainer = document.getElementById('searchContainer');
-                
+                localStorage.setItem('active_tab', tab);
                 document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-                document.getElementById(`nav-${tab}`).classList.add('active');                if (tab === 'channels') {
-                    searchContainer.style.display = 'flex';
-                    this.container.classList.add('search-mode-active');
-                    const input = document.getElementById('globalSearchInput');                    let searchTimeout;
-                    input.addEventListener('input', (e) => {
-                        clearTimeout(searchTimeout);
-                        searchTimeout = setTimeout(() => {
-                            const newTerm = ComparisonEngine.normalizeText(e.target.value);
-                            if (state.tvSearchTerm !== newTerm) {
-                                state.tvSearchTerm = newTerm;
-                                this.refresh();
-                            }
-                        }, 150);
-                    });
-                    input.focus();                } else {
-                    searchContainer.style.display = 'none';
-                    this.container.classList.remove('search-mode-active');
-                    state.tvSearchTerm = '';
-                }
-
+                document.getElementById(`nav-${tab}`).classList.add('active');
+                document.getElementById('searchContainer').style.display = (tab === 'channels') ? 'flex' : 'none';
+                if (tab !== 'channels') { state.tvSearchTerm = ''; document.getElementById('globalSearchInput').value = ''; }
                 this.refresh();
                 window.scrollTo(0,0);
-            },            lastEventsHTML: '',            refresh() {
-                RatingEngine.checkPreviousSession();
-                globalData.forEach(item => { item.isLive = LiveEngine.checkLive(item); });
+            },
+            refresh() {
+                globalData.forEach(item => item.isLive = LiveEngine.checkLive(item));
                 const processed = [...globalData].sort((a, b) => (a.isLive === b.isLive) ? 0 : a.isLive ? -1 : 1);
-                
-                if (currentTab === 'home') {
-                    if (state.tvSearchTerm === '' && this.lastEventsHTML) {
-                        if (this.container.innerHTML !== this.lastEventsHTML) {
-                            this.container.innerHTML = this.lastEventsHTML;
-                        }
-                    } else {
-                        this.renderEvents(processed);
-                    }
-                } else {
-                    this.renderUniqueChannels(processed);
-                }
-            },            renderEvents(data) {
-                let htmlBuffer = "";
-                let lastDate = "";
-                
-                data.forEach(item => {
-                    // Filtrar canales con IDs y fusionar duplicados (BAR, etc.) usando el nombre limpio
-                    const availableChannels = [];
-                    const seen = new Set();
-                    
-                    item.canales.forEach(c => {
-                        if (aceStreamMap.some(a => ComparisonEngine.isMatch(c, a.name))) {
-                            const clean = cleanChannelName(c);
-                            if (!seen.has(clean)) {
-                                seen.add(clean);
-                                availableChannels.push(c);
-                            }
-                        }
-                    });
-
-                    if (availableChannels.length === 0) return;                    if (item.fecha !== lastDate) {
-                        htmlBuffer += `<div class="date-header">${item.fecha}</div>`;
-                        lastDate = item.fecha;
-                    }
-
-                    htmlBuffer += `
-                        <div class="event-card ${item.isLive ? 'is-live' : ''}">
-                            <div class="competicion-title">${item.competition}</div>
-                            <div class="event-info"><span class="time">${item.hora}</span><span class="time-separator">|</span>${item.infoHtml}</div>
-                            <div class="channels-wrapper">${availableChannels.map(c => this.getChannelHtml(c)).join('')}</div>
-                        </div>
-                    `;
+                currentTab === 'home' && state.tvSearchTerm === '' && this.lastEventsHTML ? (this.container.innerHTML = this.lastEventsHTML) : (currentTab === 'home' ? this.renderEvents(processed) : this.renderUniqueChannels(processed));
+            },
+            renderEvents(data) {
+                document.getElementById('noResultsContainer').style.display = 'none';
+                const renderedList = data.map(item => ({ ...item, availableChannels: item.canales.filter(c => aceStreamMap.some(a => ComparisonEngine.isMatch(c, a.name))) })).filter(i => i.availableChannels.length > 0);
+                let htmlBuffer = "", lastDate = "";
+                renderedList.forEach((item, idx) => {
+                    if (item.fecha !== lastDate) { htmlBuffer += `<div class="date-header">${item.fecha}</div>`; lastDate = item.fecha; }
+                    const [h, m] = item.hora.split(':').map(Number);
+                    const isPast = !item.isLive && (new Date() > new Date().setHours(h, m, 0, 0)) && item.fecha.toUpperCase().includes('HOY');
+                    htmlBuffer += `<div class="event-card ${item.isLive ? 'is-live' : ''} ${isPast ? 'event-finished' : ''}"><div class="competicion-title">${item.competition}</div><div class="event-info"><span class="time">${item.hora}</span><span class="time-separator">|</span>${item.infoHtml}</div><div class="channels-wrapper">${item.availableChannels.map(c => this.getChannelHtml(c)).join('')}</div></div>`;
                 });
                 this.container.innerHTML = htmlBuffer;
                 if (state.tvSearchTerm === '') this.lastEventsHTML = htmlBuffer;
-            },            renderUniqueChannels(data) {
-                const input = document.getElementById('globalSearchInput');
-                const selectionStart = input.selectionStart;
-                const selectionEnd = input.selectionEnd;
+            },
+            renderUniqueChannels(data) {
                 const searchTerm = state.tvSearchTerm;
                 this.container.innerHTML = "";
-
                 if (searchTerm) {
-                    const matchedEvents = data.filter(event => {
-                        const textToSearch = ComparisonEngine.normalizeText(event.competition + event.infoHtml);
-                        const hasEmojiMatch = Object.entries(state.searchToEmoji).some(([key, emoji]) => 
-                            searchTerm.includes(key) && (event.competition.includes(emoji) || textToSearch.includes(key))
-                        );
-                        return textToSearch.includes(searchTerm) || hasEmojiMatch;
-                    });
-
-                    if (matchedEvents.length > 0) {
-                        this.renderEvents(matchedEvents);
-                        const divider = document.createElement('div');
-                        divider.style.cssText = "width:100%; height:1px; background:#333; margin:20px 0; grid-column: 1/-1;";
-                        this.container.appendChild(divider);
-                    }
+                    const matchedEvents = data.filter(e => ComparisonEngine.normalizeText(e.competition + e.infoHtml).includes(searchTerm));
+                    if (matchedEvents.length > 0) { this.renderEvents(matchedEvents); this.container.innerHTML += '<hr style="border:0; border-top:1px solid #333; margin:20px 0; width:100%">'; }
                 }
-
                 const uniqueMap = new Map();
-                const filteredAceStreams = aceStreamMap.filter(ace => {
-                    if (!searchTerm) return true;
-                    const normalizedName = ComparisonEngine.normalizeText(ace.name);
-                    const hasEmojiMatch = Object.entries(state.searchToEmoji).some(([key, emoji]) => 
-                        searchTerm.includes(key) && (ace.name.includes(emoji) || normalizedName.includes(key))
-                    );
-                    return normalizedName.includes(searchTerm) || hasEmojiMatch;
+                aceStreamMap.filter(ace => !searchTerm || ComparisonEngine.normalizeText(ace.name).includes(searchTerm)).forEach(item => {
+                    const clean = cleanChannelName(item.name); if (!uniqueMap.has(clean)) uniqueMap.set(clean, item.name);
                 });
-
-                filteredAceStreams.forEach(item => {
-                    const clean = cleanChannelName(item.name);
-                    if (!uniqueMap.has(clean)) uniqueMap.set(clean, item.name);
-                });
-
-                const noResults = document.getElementById('noResultsContainer');
-                if (uniqueMap.size === 0 && this.container.children.length === 0) {
-                    if (noResults) noResults.style.display = 'block';
-                    return;
-                } else {
-                    if (noResults) noResults.style.display = 'none';
-                }
-
-                input.focus();
-                input.setSelectionRange(selectionStart, selectionEnd);                const getPriority = (name) => {
-                    const n = name.toUpperCase();
-                    // Excluir canales internacionales de la prioridad alta
-                    const isForeign = n.includes('(PL)') || n.includes('(DE)') || n.includes('(RU)');
-
-                    if (n.includes('ELEVEN') || isForeign) return 4.1;
-                    if (n.includes('DAZN')) return 1;
-                    if (n.includes('M+') || n.includes('MOVISTAR') || n.includes('LIGA DE CAMPEONES') || n.includes('HYPERMOTION')) return 2;
-                    if (n.includes('EUROSPORT')) return 3;
-                    
-                    return 4.1;
-                };
-
-                const sortedChannels = Array.from(uniqueMap.values()).sort((a, b) => {
-                    const pA = getPriority(a), pB = getPriority(b);
-                    return pA !== pB ? pA - pB : cleanChannelName(a).localeCompare(cleanChannelName(b));
-                });
-
-                let lastP = Math.floor(getPriority(sortedChannels[0]));
-                sortedChannels.forEach(channelName => {
-                    const currentP = Math.floor(getPriority(channelName));
-                    if (currentP !== lastP) {
-                        const spacer = document.createElement('div');
-                        spacer.style.cssText = 'width: 100%; height: 20px; grid-column: 1 / -1; display: block; clear: both;';
-                        this.container.appendChild(spacer);
-                        lastP = currentP;
-                    }
-                    this.container.insertAdjacentHTML('beforeend', this.getChannelHtml(channelName));
-                });
-            },            getChannelHtml(name) {
+                if (uniqueMap.size === 0 && this.container.children.length === 0) { document.getElementById('noResultsContainer').style.display = 'block'; return; }
+                document.getElementById('noResultsContainer').style.display = 'none';
+                
+                const sorted = Array.from(uniqueMap.values()).sort((a,b) => cleanChannelName(a).localeCompare(cleanChannelName(b)));
+                this.container.innerHTML += `<div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; width:100%">${sorted.map(c => this.getChannelHtml(c)).join('')}</div>`;
+            },
+            getChannelHtml(name) {
                 const clean = cleanChannelName(name);
                 const logoUrl = channelLogosMap[clean];
                 const matching = aceStreamMap.filter(a => ComparisonEngine.isMatch(name, a.name));
-                const pending = JSON.parse(localStorage.getItem(RatingEngine.PENDING_KEY));
-                const getEffectiveScore = (id) => {
-                    let s = RatingEngine.getScore(id);
-                    if (pending && pending.id === id) s = Math.max(1.0, s - 1.5);
-                    return s;
-                };
-                const bestIdObj = matching.sort((a, b) => getEffectiveScore(b.id) - getEffectiveScore(a.id))[0];
-                const score = bestIdObj ? getEffectiveScore(bestIdObj.id) : null;
-                const safeName = name.replace(/'/g, "\\'");
-                
-                let extraStyle = '';
-                let badgeHtml = '';
-                const upperName = name.toUpperCase();
-
-                if (upperName.includes('BALONCESTO') && upperName.includes('DAZN')) {
-                    badgeHtml = '<div style="position: absolute; right: 13%; top: 50%; transform: translateY(-50%); font-size: 40px; line-height: 1; z-index: 0; opacity: 1;">🏀</div>';
-                }
-
-                if (upperName.includes('VAMOS 2')) {
-                    badgeHtml = '<div style="position: absolute; left: 28px; bottom: 12px; color: #1ec33c; font-weight: 900; font-size: 1.5rem; z-index: 2;">2</div>';
-                }
-
-                return `
-                    <div class="channel-button" style="${extraStyle}" onclick="UIManager.playBestOrNext('${safeName}')">
-                        
-                        ${badgeHtml}
-                        ${logoUrl ? `<img src="${logoUrl}" class="channel-logo" style="position:relative; z-index:2;" onerror="this.outerHTML='<span>${clean}</span>'">` : `<span style="position:relative; z-index:2;">${clean}</span>`}
-                        ${bestIdObj ? `<div class="btn-plus" onclick="UIManager.openIdsModal(event, '${safeName}')">+</div>` : ''}
-                    </div>`;
-            },            playBestOrNext(channelName) {
-                const matching = aceStreamMap
-                    .filter(a => ComparisonEngine.isMatch(channelName, a.name))
-                    .sort((a, b) => RatingEngine.getScore(b.id) - RatingEngine.getScore(a.id));
-
-                if (matching.length === 0) return;
-
-                const session = JSON.parse(localStorage.getItem(RatingEngine.SESSION_KEY));
-                let nextIndex = 0;
-
-                // Si re-clickea el mismo canal en menos de 30 segundos, penalizamos el anterior y saltamos al siguiente
-                if (session && session.channelName === channelName && (Date.now() - session.start) < 30000) {
-                    RatingEngine.saveScore(session.id, -2.0); // Penalización extra por fallo inmediato
-                    nextIndex = (session.index + 1) % matching.length;
-                }
-
-                const target = matching[nextIndex];
-                RatingEngine.trackStart(target.id, channelName, nextIndex);
-                window.location.href = `acestream://${target.id}`;
+                if (matching.length === 0) return '';
+                return `<div class="channel-button" onclick="UIManager.handleChannelClick(event, '${name.replace(/'/g, "\\'")}')" oncontextmenu="UIManager.openIdsModal(event, '${name.replace(/'/g, "\\'")}')">${logoUrl ? `<img src="${logoUrl}" class="channel-logo" onerror="this.outerHTML='<span>${clean}</span>'">` : `<span>${clean}</span>`}</div>`;
             },
-
+            handleChannelClick(event, channelName) {
+                const matching = aceStreamMap.filter(a => ComparisonEngine.isMatch(channelName, a.name)).sort((a, b) => RatingEngine.getScore(b.id) - RatingEngine.getScore(a.id));
+                if (matching.length === 0) return;
+                const lastIdxKey = 'last_idx_' + ComparisonEngine.normalizeText(channelName);
+                const lastTimeKey = 'last_ts_' + ComparisonEngine.normalizeText(channelName);
+                const lastIndex = parseInt(localStorage.getItem(lastIdxKey)) || 0;
+                const nextIndex = (Date.now() - (parseInt(localStorage.getItem(lastTimeKey)) || 0) > 900000) ? 0 : (lastIndex + 1) % matching.length;
+                localStorage.setItem(lastIdxKey, nextIndex);
+                localStorage.setItem(lastTimeKey, Date.now());
+                RatingEngine.trackStart(matching[nextIndex].id, channelName, nextIndex);
+                window.location.href = 'acestream://' + matching[nextIndex].id;
+            },
             openIdsModal(event, channelName) {
-                event.stopPropagation();
+                event.preventDefault();
+                const matching = aceStreamMap.filter(a => ComparisonEngine.isMatch(channelName, a.name)).sort((a, b) => RatingEngine.getScore(b.id) - RatingEngine.getScore(a.id));
+                document.getElementById('modal-title').textContent = cleanChannelName(channelName);
                 const list = document.getElementById('ids-list');
-                const title = document.getElementById('modal-title');
-                
-                const matching = aceStreamMap
-                    .filter(a => ComparisonEngine.isMatch(channelName, a.name))
-                    .sort((a, b) => RatingEngine.getScore(b.id) - RatingEngine.getScore(a.id));
-
-                title.textContent = cleanChannelName(channelName);
                 list.innerHTML = "";
-                
                 matching.forEach((item, i) => {
-                    let currentRating = RatingEngine.getScore(item.id);
-                    const pending = JSON.parse(localStorage.getItem(RatingEngine.PENDING_KEY));
-                    if (pending && pending.id === item.id) {
-                        currentRating = Math.max(1.0, currentRating - 1.5);
-                    }
-                    const btn = document.createElement('div');
-                    btn.className = 'id-item';
-                    btn.innerHTML = `
-                        <span style="display: flex; align-items: center; gap: 8px; flex: 1;">
-                            <small style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.55rem; font-weight: 700; color: var(--accent-blue); border: 1px solid rgba(68, 138, 255, 0.3); min-width: 32px; text-align: center;">${item.source || 'ID'}</small>
-                            <span style="font-family: monospace; opacity: 0.9;">${item.id.substring(0, 10).toUpperCase()}</span>
-                        </span>
-                        <span class="id-rating">★ ${currentRating.toFixed(1)}</span>
-                    `;
-                    btn.onclick = () => {
-                        RatingEngine.trackStart(item.id, channelName, i);
-                        window.location.href = `acestream://${item.id}`;
-                    };
+                    const btn = document.createElement('div'); btn.className = 'id-item';
+                    btn.innerHTML = `<small style="opacity:0.6">${item.source}</small><span>${item.id.substring(0, 10)}...</span><span class="id-rating">★ ${RatingEngine.getScore(item.id).toFixed(1)}</span>`;
+                    btn.onclick = () => { RatingEngine.trackStart(item.id, channelName, i); window.location.href = `acestream://${item.id}`; };
                     list.appendChild(btn);
                 });
                 this.modal.style.display = 'flex';
-            },            closeModal() { this.modal.style.display = 'none'; },
+            },
+            closeModal() { this.modal.style.display = 'none'; }
+        };
 
-            setRandomColor() {
-                const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
-                document.documentElement.style.setProperty('--accent-blue', randomColor);
-                localStorage.setItem('custom_accent_color', randomColor);
-            }
-        };        async function init() {
-            const savedColor = localStorage.getItem('custom_accent_color');
-            if (savedColor) document.documentElement.style.setProperty('--accent-blue', savedColor);
-            window.addEventListener('focus', () => RatingEngine.checkPreviousSession());
-
-            // 1. RENDERIZADO INSTANTÁNEO DESDE CACHÉ
-            // Cargamos IDs guardados para completar el mapa
-            aceStreamMap = AceStreamEngine.loadFromCache();
+        async function init() {
+            const gInput = document.getElementById('globalSearchInput');
+            const cBtn = document.getElementById('clearSearch');
+            UIManager.switchTab(currentTab);
+            gInput.addEventListener('input', (e) => {
+                cBtn.style.display = e.target.value ? 'block' : 'none';
+                clearTimeout(window.sT);
+                window.sT = setTimeout(() => { state.tvSearchTerm = ComparisonEngine.normalizeText(e.target.value); UIManager.refresh(); }, 150);
+            });
+            cBtn.addEventListener('click', () => { gInput.value = ''; state.tvSearchTerm = ''; cBtn.style.display = 'none'; UIManager.refresh(); });
             
-            // Si hay datos previos, refrescamos la UI de inmediato
-            if (globalData.length > 0 || aceStreamMap.length > 0) {
-                UIManager.refresh();
-                // Ocultamos solo el texto de estado, pero NO añadimos 'loading-finished'
-                // para que la barra de carga superior siga visible hasta que termine la red
-                UIManager.status.style.display = 'none';
-            }
-
+            aceStreamMap = AceStreamEngine.loadFromCache();
+            if (globalData.length > 0 || aceStreamMap.length > 0) { UIManager.refresh(); UIManager.status.style.display = 'none'; }
+            
             try {
-                // 2. CARGA DE RED EN SEGUNDO PLANO
-                const [logos, html] = await Promise.all([
-                    NetworkService.fetchLogos(), 
-                    NetworkService.fetchHtml(CONFIG.TARGET_URL)
-                ]);
-                
-                // Actualizamos logos en memoria y caché
-                if (logos && Object.keys(logos).length > 0) {
-                    channelLogosMap = logos;
-                    localStorage.setItem('logo_cache', JSON.stringify(logos));
-                }
-
-                // Parseamos y guardamos nuevos eventos
+                const [logos, html] = await Promise.all([NetworkService.fetchLogos(), NetworkService.fetchHtml(CONFIG.TARGET_URL)]);
+                if (logos) { channelLogosMap = logos; localStorage.setItem('logo_cache', JSON.stringify(logos)); }
                 const freshData = DataParser.parse(html);
-                if (freshData && freshData.length > 0) {
-                    globalData = freshData;
-                    localStorage.setItem('event_data_cache', JSON.stringify(freshData));
-                }
-
-                // Actualizamos IDs de fuentes externas
+                if (freshData.length > 0) { globalData = freshData; localStorage.setItem('event_data_cache', JSON.stringify(freshData)); }
                 aceStreamMap = await AceStreamEngine.init();
-                
-                // 3. FINALIZACIÓN Y OCULTAR BARRA DE CARGA
                 UIManager.refresh();
-                setInterval(UIManager.refresh, 60000);
-                UIManager.status.style.display = 'none';
-                document.body.classList.add('loading-finished'); 
-            } catch (err) {
-                console.error("Error en carga real:", err);
                 document.body.classList.add('loading-finished');
-                if (globalData.length === 0) {
-                    UIManager.status.style.display = 'block';
-                    UIManager.status.textContent = "Error de red. Usando caché.";
-                }
-            }
+                UIManager.status.style.display = 'none';
+            } catch (err) { document.body.classList.add('loading-finished'); }
         }
-
-        init();</script></body></html>
+        init();
+    </script>
+</body>
+</html>
