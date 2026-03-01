@@ -4,72 +4,116 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Pro - Panel de Control TV</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     
     <style>
         :root {
-            --bg-color: #0a0a0a;
-            --card-bg: #161616;
+            --bg-color: #0d0d0d;
+            --card-bg: #1a1a1a;
+            --card-hover: #222222;
             --accent-blue: #448aff;
             --text-main: #ffffff;
-            --text-muted: #a0a0a0;
-            --danger: #ff4444;
-            --success: #00c851;
-            --border: #2a2a2a;
+            --text-muted: #888888;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --border: #333333;
+            --radius: 12px;
         }
+
+        * { box-sizing: border-box; }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Header & Tabs --- */
+        header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 20px 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-title {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            padding-bottom: 100px;
+            margin-bottom: 15px;
         }
 
-        .admin-container {
-            width: 100%;
-            max-width: 700px;
+        h1 { font-size: 1.4rem; margin: 0; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 8px;}
+        
+        .tabs {
             display: flex;
-            flex-direction: column;
-            gap: 25px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            gap: 20px;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 10px 0;
+            cursor: pointer;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            color: var(--text-main);
+            border-bottom: 3px solid var(--accent-blue);
         }
 
-        header { border-bottom: 2px solid var(--accent-blue); padding-bottom: 15px; margin-bottom: 10px; }
-        h1 { font-size: 1.8rem; margin: 0; }
-        p.subtitle { color: var(--text-muted); font-size: 0.9rem; margin: 5px 0 0 0; }
+        /* --- Main Content --- */
+        main {
+            padding: 20px;
+            flex: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
 
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Cards & Settings --- */
         .card {
             background: var(--card-bg);
-            border-radius: 16px;
-            padding: 24px;
+            border-radius: var(--radius);
+            padding: 20px;
             border: 1px solid var(--border);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
 
-        .card-title {
+        .card-header {
             font-weight: 700;
             font-size: 1.1rem;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 12px;
-            color: var(--accent-blue);
-        }
-
-        /* Estilos para el Escáner */
-        #reader {
-            width: 100%;
-            background: black;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 15px;
-            display: none; /* Oculto por defecto */
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
         }
 
         .setting-row {
@@ -77,294 +121,558 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px 0;
-            border-bottom: 1px solid #222;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-
-        input[type="color"] { border: none; width: 45px; height: 45px; cursor: pointer; background: none; }
+        .setting-row:last-child { border-bottom: none; padding-bottom: 0; }
         
-        input[type="text"], textarea {
-            background: #222;
-            border: 1px solid var(--border);
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            width: 100%;
-            box-sizing: border-box;
-            font-family: monospace;
-        }
+        .setting-info strong { display: block; margin-bottom: 4px; font-size: 0.95rem; }
+        .setting-info span { color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; display: block;}
 
-        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        /* --- Inputs & Buttons --- */
+        input[type="color"] { 
+            -webkit-appearance: none; border: none; width: 40px; height: 40px; 
+            border-radius: 8px; cursor: pointer; background: none; 
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 8px; }
+
+        .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #333; transition: .4s; border-radius: 26px;
-        }
-        .slider:before {
-            position: absolute; content: ""; height: 20px; width: 20px;
-            left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;
-        }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .3s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--accent-blue); }
-        input:checked + .slider:before { transform: translateX(24px); }
+        input:checked + .slider:before { transform: translateX(22px); }
 
         .btn {
-            background: #333;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 0.9rem;
+            background: #333; color: white; border: 1px solid var(--border);
+            padding: 10px 16px; border-radius: 8px; cursor: pointer;
+            font-weight: 600; font-size: 0.85rem; transition: 0.2s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            font-family: inherit;
         }
-        .btn:hover { background: #444; transform: translateY(-1px); }
-        .btn-primary { background: var(--accent-blue); }
-        .btn-danger { background: var(--danger); }
-        .btn-success { background: var(--success); }
+        .btn:hover { background: #444; }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; }
+        .btn-primary:hover { background: #2b70f0; }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); color: var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: white; }
+        .btn-success { background: rgba(16, 185, 129, 0.1); border-color: var(--success); color: var(--success); }
+        .btn-success:hover { background: var(--success); color: white; }
+        .btn-block { width: 100%; margin-top: 10px; padding: 12px; }
 
-        #qr-container {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
-            display: inline-block;
-            margin: 20px auto;
+        /* --- Tables & Lists --- */
+        .table-container { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
+        th { background: #111; color: var(--text-muted); padding: 12px; font-weight: 600; white-space: nowrap; }
+        td { padding: 12px; border-top: 1px solid var(--border); background: #1a1a1a; vertical-align: middle; }
+        tr:hover td { background: var(--card-hover); }
+        
+        .input-sm {
+            background: #000; border: 1px solid var(--border); color: white;
+            padding: 6px; border-radius: 6px; width: 60px; text-align: center; font-family: monospace;
         }
-
-        .sync-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 15px;
+        
+        .search-box {
+            width: 100%; padding: 12px 15px; background: #000; border: 1px solid var(--border);
+            color: white; border-radius: 8px; margin-bottom: 15px; font-family: inherit; outline: none;
         }
+        .search-box:focus { border-color: var(--accent-blue); }
 
-        .scroll-area { max-height: 300px; overflow-y: auto; margin-top: 10px; border-radius: 8px; background: #0c0c0c; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th { text-align: left; color: var(--text-muted); padding: 12px; position: sticky; top: 0; background: #1a1a1a; }
-        td { padding: 12px; border-top: 1px solid #222; }
+        /* --- Code & Textareas --- */
+        textarea {
+            width: 100%; background: #000; border: 1px solid var(--border);
+            color: #00ffcc; padding: 15px; border-radius: 8px;
+            font-family: 'Courier New', monospace; font-size: 0.85rem;
+            resize: vertical; outline: none; line-height: 1.4;
+        }
+        textarea:focus { border-color: var(--warning); }
 
+        /* --- Utils --- */
+        .badge { background: #333; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-family: monospace; color: #ccc;}
+        #qr-container { background: white; padding: 15px; border-radius: 12px; display: none; margin: 20px auto; width: fit-content; text-align: center;}
+        #reader { width: 100%; border-radius: 12px; overflow: hidden; display: none; margin-bottom: 15px; border: 2px solid var(--accent-blue);}
+        
         .toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: var(--success); color: white; padding: 12px 30px;
-            border-radius: 50px; display: none; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--card-bg); color: white; padding: 12px 24px; border: 1px solid var(--border);
+            border-radius: 50px; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.5); font-size: 0.9rem;
+            display: flex; align-items: center; gap: 8px; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        .back-btn { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; padding: 0; display: flex; align-items: center;}
+        .back-btn:hover { color: white; }
 
         @media (max-width: 600px) {
-            .sync-grid { grid-template-columns: 1fr; }
+            .action-buttons { display: flex; flex-direction: column; gap: 10px; }
+            .action-buttons .btn { width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <div class="admin-container">
-        <header>
-            <h1>Panel de Administración</h1>
-            <p class="subtitle">Configuración avanzada y sincronización entre dispositivos</p>
-        </header>
+    <header>
+        <div class="header-title">
+            <h1><span style="font-size: 1.8rem;">⚙️</span> Admin Pro</h1>
+            <button class="back-btn" onclick="window.location.href='index.html'" title="Volver a la App">✖️</button>
+        </div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('ui')">🎨 Apariencia</button>
+            <button class="tab-btn" onclick="switchTab('data')">💾 Datos & Caché</button>
+            <button class="tab-btn" onclick="switchTab('rating')">⭐ Reputación</button>
+            <button class="tab-btn" onclick="switchTab('sync')">🔄 Sync & Backup</button>
+            <button class="tab-btn" onclick="switchTab('dev')">🛠️ Dev Tools</button>
+        </div>
+    </header>
 
-        <section class="card">
-            <div class="card-title">🎨 Apariencia y UI</div>
-            <div class="setting-row">
-                <div>
-                    <strong>Color de Acento</strong>
-                    <div style="font-size: 0.8rem; color: var(--text-muted);">Define el color global de la interfaz</div>
+    <main>
+        <section id="tab-ui" class="tab-content active">
+            <div class="card">
+                <div class="card-header">Personalización de Interfaz</div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <strong>Color de Acento Principal</strong>
+                        <span>Define el color global utilizado en botones, iconos y bordes activos de la app.</span>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="colorHex" class="input-sm" style="width: 80px;" readonly>
+                        <input type="color" id="accentColorPicker" onchange="UI.updateColor(this.value)">
+                    </div>
                 </div>
-                <input type="color" id="accentColorPicker" onchange="updateAccentColor(this.value)">
-            </div>
-            <div class="setting-row">
-                <div>
-                    <strong>Logos de Canales</strong>
-                    <div style="font-size: 0.8rem; color: var(--text-muted);">Mostrar imágenes en la lista</div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <strong>Mostrar Logos de Canales</strong>
+                        <span>Si se desactiva, se mostrará el nombre del canal en texto plano, mejorando el rendimiento.</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="showLogosToggle" onchange="UI.updateLogoToggle(this.checked)">
+                        <span class="slider"></span>
+                    </label>
                 </div>
-                <label class="switch">
-                    <input type="checkbox" id="showLogosToggle" onchange="updateLogoVisibility(this.checked)">
-                    <span class="slider"></span>
-                </label>
+                
+                <button class="btn btn-block" onclick="UI.resetTheme()">↺ Restaurar Tema por Defecto</button>
             </div>
         </section>
 
-        <section class="card">
-            <div class="card-title">🔄 Sincronización Express</div>
-            <p class="subtitle" style="margin-bottom: 15px;">Sincroniza tus datos escaneando o compartiendo el código.</p>
-            
-            <div id="reader"></div>
-            <div id="reader-results"></div>
+        <section id="tab-data" class="tab-content">
+            <div class="card">
+                <div class="card-header">Gestor de Almacenamiento Local</div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+                    Administra el espacio utilizado por la aplicación. Borrar la caché forzará a la app a descargar los datos nuevamente en el próximo inicio.
+                </p>
 
-            <div style="text-align: center;">
-                <div id="qr-container" style="display: none;">
+                <div id="cacheList">
+                    </div>
+
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--danger);">
+                    <div class="setting-info" style="margin-bottom: 15px;">
+                        <strong style="color: var(--danger);">Zona Peligrosa</strong>
+                        <span>Elimina todas las configuraciones, reputación y cachés. La app quedará como recién instalada.</span>
+                    </div>
+                    <button class="btn btn-danger btn-block" onclick="DataMgr.factoryReset()">⚠️ Factory Reset (Borrar Todo)</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-rating" class="tab-content">
+            <div class="card">
+                <div class="card-header">Editor de Reputación (Inteligencia de Canales)</div>
+                <input type="text" id="ratingSearch" class="search-box" placeholder="🔍 Buscar canal por nombre..." onkeyup="RatingMgr.filter()">
+                
+                <div class="table-container">
+                    <table id="ratingsTable">
+                        <thead>
+                            <tr>
+                                <th>Canal (ID)</th>
+                                <th style="text-align: center;">Puntuación</th>
+                                <th style="text-align: right;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ratingsBody">
+                            </tbody>
+                    </table>
+                </div>
+                <button class="btn btn-danger btn-block" style="margin-top: 15px;" onclick="RatingMgr.resetAll()">♻️ Reiniciar toda la Reputación</button>
+            </div>
+        </section>
+
+        <section id="tab-sync" class="tab-content">
+            <div class="card">
+                <div class="card-header">Sincronización QR (Rápida)</div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+                    Transfiere tus ajustes visuales y la reputación a otro móvil. (No incluye datos de caché pesados).
+                </p>
+
+                <div id="reader"></div>
+                
+                <div class="action-buttons" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button class="btn btn-primary" style="flex: 1;" onclick="SyncMgr.generateQR()">📱 Mostrar mi QR</button>
+                    <button class="btn btn-success" style="flex: 1;" onclick="SyncMgr.startScanner()">📸 Escanear QR</button>
+                </div>
+
+                <div id="qr-container">
                     <div id="qrcode"></div>
-                    <p style="color: black; font-size: 0.7rem; font-weight: bold; margin-top: 10px;">ESCÁNEAME CON OTRO MÓVIL</p>
+                    <p style="color: black; font-size: 0.75rem; font-weight: bold; margin-top: 10px;">ESCÁNEAME</p>
                 </div>
             </div>
 
-            <div class="sync-grid">
-                <button class="btn btn-primary" onclick="generateSyncQR()">📱 Mostrar mi QR</button>
-                <button class="btn btn-success" id="btn-scan" onclick="startScanner()">📸 Escanear QR Ajeno</button>
-            </div>
-
-            <div style="margin-top: 20px;">
-                <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 8px;">O pega el código JSON manualmente:</label>
-                <textarea id="importArea" rows="2" placeholder='{"custom_accent_color": ...}'></textarea>
-                <button class="btn" style="width: 100%; margin-top: 8px;" onclick="importConfig()">📥 Importar Manual</button>
-            </div>
-        </section>
-
-        <section class="card">
-            <div class="card-title">⭐ Inteligencia de Canales</div>
-            <div class="scroll-area">
-                <table id="ratingsTable">
-                    <thead>
-                        <tr>
-                            <th>Canal / ID</th>
-                            <th style="text-align: right;">Puntuación</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ratingsBody"></tbody>
-                </table>
-            </div>
-            <div class="sync-grid" style="margin-top: 15px;">
-                <button class="btn btn-danger" onclick="resetRatings()">♻️ Reiniciar</button>
-                <button class="btn" onclick="renderRatings()">🔄 Refrescar</button>
+            <div class="card">
+                <div class="card-header">Copia de Seguridad Real (Archivo)</div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+                    Exporta el 100% de tu configuración actual (incluyendo historiales y estados) en un archivo local.
+                </p>
+                <div class="action-buttons" style="display: flex; gap: 10px;">
+                    <button class="btn" style="flex: 1;" onclick="SyncMgr.exportBackup()">💾 Exportar Backup (.json)</button>
+                    <label class="btn" style="flex: 1; margin: 0; cursor: pointer;">
+                        📂 Importar Backup
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="SyncMgr.importBackup(event)">
+                    </label>
+                </div>
             </div>
         </section>
 
-        <button class="btn" onclick="window.location.href='index.html'" style="width: 100%; padding: 15px; background: #222;">⬅️ Volver a la App</button>
+        <section id="tab-dev" class="tab-content">
+            <div class="card" style="border-color: var(--warning);">
+                <div class="card-header" style="color: var(--warning);">Entorno de Desarrollo (LocalStorage)</div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+                    Editor en crudo de la base de datos interna de la app. <b>Advertencia:</b> Modificar esto sin conocimientos puede corromper la app.
+                </p>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span style="font-size: 0.8rem; font-family: monospace;">Estructura JSON (Raw)</span>
+                    <button class="btn" style="padding: 4px 10px; font-size: 0.7rem;" onclick="DevMgr.loadRaw()">↻ Recargar</button>
+                </div>
+
+                <textarea id="rawStorage" rows="18"></textarea>
+                
+                <button class="btn btn-block" style="background: var(--warning); color: black; border: none; margin-top: 15px; font-weight: bold;" onclick="DevMgr.saveRaw()">Guardar Cambios Crudos</button>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" class="toast">
+        <span id="toast-icon">✅</span>
+        <span id="toast-msg">Mensaje</span>
     </div>
 
-    <div id="toast" class="toast">¡Hecho!</div>
-
     <script>
-        let html5QrCode; // Variable global para el escáner
+        // --- Core Utilities ---
+        const Utils = {
+            showToast: (msg, type = 'success') => {
+                const toast = document.getElementById('toast');
+                document.getElementById('toast-msg').textContent = msg;
+                document.getElementById('toast-icon').textContent = type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️';
+                toast.className = 'toast show';
+                setTimeout(() => toast.className = 'toast', 3000);
+            },
+            getSizeStr: (str) => {
+                const bytes = new Blob([str]).size;
+                if (bytes < 1024) return bytes + ' B';
+                if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+                return (bytes / 1048576).toFixed(2) + ' MB';
+            },
+            confirmAction: (msg) => confirm(msg)
+        };
 
-        // --- INICIALIZACIÓN ---
+        // --- Tab Navigation ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            document.querySelector(`.tab-btn[onclick="switchTab('${tabId}')"]`).classList.add('active');
+            
+            if(tabId === 'data') DataMgr.render();
+            if(tabId === 'rating') RatingMgr.render();
+            if(tabId === 'dev') DevMgr.loadRaw();
+        }
+
+        // --- UI Manager ---
+        const UI = {
+            init: () => {
+                const savedColor = localStorage.getItem('custom_accent_color') || '#448aff';
+                document.getElementById('accentColorPicker').value = savedColor;
+                document.getElementById('colorHex').value = savedColor.toUpperCase();
+                document.documentElement.style.setProperty('--accent-blue', savedColor);
+                
+                const showLogos = localStorage.getItem('settings_show_logos') !== 'false';
+                document.getElementById('showLogosToggle').checked = showLogos;
+            },
+            updateColor: (color) => {
+                localStorage.setItem('custom_accent_color', color);
+                document.getElementById('colorHex').value = color.toUpperCase();
+                document.documentElement.style.setProperty('--accent-blue', color);
+                Utils.showToast('Color actualizado');
+            },
+            updateLogoToggle: (checked) => {
+                localStorage.setItem('settings_show_logos', checked);
+                Utils.showToast(checked ? 'Logos activados' : 'Logos ocultos');
+            },
+            resetTheme: () => {
+                localStorage.removeItem('custom_accent_color');
+                localStorage.removeItem('settings_show_logos');
+                UI.init();
+                Utils.showToast('Tema restaurado');
+            }
+        };
+
+        // --- Data & Cache Manager ---
+        const DataMgr = {
+            cachesToTrack: [
+                { key: 'event_data_cache', name: 'Datos de Eventos TV', icon: '🗓️' },
+                { key: 'ace_ids_cache', name: 'Lista de Enlaces AceStream', icon: '🔗' },
+                { key: 'logo_cache', name: 'Caché de Logos/Imágenes', icon: '🖼️' },
+                { key: 'ace_autorating_v1', name: 'Base de Datos de Reputación', icon: '⭐' }
+            ],
+            render: () => {
+                const list = document.getElementById('cacheList');
+                list.innerHTML = '';
+                
+                DataMgr.cachesToTrack.forEach(item => {
+                    const data = localStorage.getItem(item.key);
+                    const size = data ? Utils.getSizeStr(data) : 'Vacío';
+                    const isEmpty = !data;
+
+                    list.innerHTML += `
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <strong>${item.icon} ${item.name}</strong>
+                                <span>Clave: <span class="badge">${item.key}</span> | Peso: ${size}</span>
+                            </div>
+                            <button class="btn ${isEmpty ? '' : 'btn-danger'}" ${isEmpty ? 'disabled' : ''} 
+                                    onclick="DataMgr.clearKey('${item.key}')">🗑️</button>
+                        </div>
+                    `;
+                });
+
+                // Añadir fila para variables de sesión/temporales
+                const tempKeys = Object.keys(localStorage).filter(k => k.startsWith('last_idx_') || k.startsWith('last_ts_') || k === 'search_query');
+                list.innerHTML += `
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <strong>🧹 Datos de Sesión Temporal</strong>
+                            <span>Limpiar búsquedas y estado de reproducción (${tempKeys.length} items)</span>
+                        </div>
+                        <button class="btn btn-danger" ${tempKeys.length===0?'disabled':''} onclick="DataMgr.clearSession()">🗑️</button>
+                    </div>
+                `;
+            },
+            clearKey: (key) => {
+                if(Utils.confirmAction(`¿Seguro que deseas borrar ${key}?`)) {
+                    localStorage.removeItem(key);
+                    DataMgr.render();
+                    Utils.showToast('Caché eliminada');
+                }
+            },
+            clearSession: () => {
+                Object.keys(localStorage).forEach(k => {
+                    if(k.startsWith('last_idx_') || k.startsWith('last_ts_') || k === 'search_query' || k === 'ace_current_session') {
+                        localStorage.removeItem(k);
+                    }
+                });
+                DataMgr.render();
+                Utils.showToast('Sesión limpiada');
+            },
+            factoryReset: () => {
+                if(Utils.confirmAction("¡ATENCIÓN! Esto borrará absolutamente todo. ¿Estás completamente seguro?")) {
+                    localStorage.clear();
+                    Utils.showToast('Sistema reseteado por completo');
+                    setTimeout(() => location.reload(), 1500);
+                }
+            }
+        };
+
+        // --- Rating Manager ---
+        const RatingMgr = {
+            db: {},
+            render: () => {
+                RatingMgr.db = JSON.parse(localStorage.getItem('ace_autorating_v1')) || {};
+                const tbody = document.getElementById('ratingsBody');
+                tbody.innerHTML = '';
+                
+                const entries = Object.entries(RatingMgr.db);
+                if(entries.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Sin datos de reputación todavía</td></tr>`;
+                    return;
+                }
+
+                entries.forEach(([id, data]) => {
+                    const name = typeof data === 'object' ? (data.name || 'Desconocido') : 'Desconocido';
+                    const score = typeof data === 'object' ? data.score : data;
+                    const safeName = name.replace(/'/g, "&apos;");
+                    
+                    tbody.innerHTML += `
+                        <tr class="rating-row" data-name="${name.toLowerCase()}">
+                            <td>
+                                <b>${name}</b><br>
+                                <span style="font-size:0.65rem; font-family:monospace; color:var(--text-muted);">${id.substring(0,15)}...</span>
+                            </td>
+                            <td style="text-align:center;">
+                                <input type="number" step="0.1" min="1" max="5" value="${parseFloat(score).toFixed(1)}" 
+                                    class="input-sm" id="score_${id}">
+                            </td>
+                            <td style="text-align:right;">
+                                <button class="btn btn-success" style="padding: 6px; font-size: 0.7rem;" onclick="RatingMgr.save('${id}', '${safeName}')">💾</button>
+                                <button class="btn btn-danger" style="padding: 6px; font-size: 0.7rem;" onclick="RatingMgr.delete('${id}')">❌</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            },
+            filter: () => {
+                const term = document.getElementById('ratingSearch').value.toLowerCase();
+                document.querySelectorAll('.rating-row').forEach(row => {
+                    row.style.display = row.dataset.name.includes(term) ? '' : 'none';
+                });
+            },
+            save: (id, name) => {
+                const newScore = parseFloat(document.getElementById('score_' + id).value);
+                if(isNaN(newScore) || newScore < 1 || newScore > 5) return Utils.showToast('Valor inválido (1-5)', 'error');
+                
+                RatingMgr.db[id] = { name: name, score: newScore };
+                localStorage.setItem('ace_autorating_v1', JSON.stringify(RatingMgr.db));
+                Utils.showToast('Puntuación actualizada');
+            },
+            delete: (id) => {
+                if(Utils.confirmAction('¿Eliminar este canal del registro?')) {
+                    delete RatingMgr.db[id];
+                    localStorage.setItem('ace_autorating_v1', JSON.stringify(RatingMgr.db));
+                    RatingMgr.render();
+                    Utils.showToast('Registro eliminado');
+                }
+            },
+            resetAll: () => {
+                if(Utils.confirmAction('¿Borrar TODO el historial de aprendizaje y puntuaciones?')) {
+                    localStorage.removeItem('ace_autorating_v1');
+                    RatingMgr.render();
+                    Utils.showToast('Reputación reiniciada');
+                }
+            }
+        };
+
+        // --- Sync & Backup Manager ---
+        let html5QrCode;
+        const SyncMgr = {
+            generateQR: () => {
+                const qrContainer = document.getElementById('qr-container');
+                const qrDiv = document.getElementById('qrcode');
+                qrDiv.innerHTML = "";
+                qrContainer.style.display = 'block';
+
+                // Solo sincronizamos configuraciones ligeras para evitar desbordar el QR
+                const config = {
+                    ui_accent: localStorage.getItem('custom_accent_color'),
+                    ui_logos: localStorage.getItem('settings_show_logos'),
+                    ratings: JSON.parse(localStorage.getItem('ace_autorating_v1')) || {}
+                };
+
+                const dataString = JSON.stringify(config);
+                if (dataString.length > 2500) {
+                    Utils.showToast('Datos demasiado grandes para QR. Usa el Backup de Archivo.', 'warning');
+                    qrContainer.style.display = 'none';
+                    return;
+                }
+
+                new QRCode(qrDiv, { text: dataString, width: 220, height: 220, correctLevel : QRCode.CorrectLevel.L });
+            },
+            startScanner: () => {
+                const readerDiv = document.getElementById('reader');
+                readerDiv.style.display = 'block';
+                document.getElementById('qr-container').style.display = 'none';
+                
+                html5QrCode = new Html5Qrcode("reader");
+                html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, 
+                    (decodedText) => {
+                        html5QrCode.stop().then(() => {
+                            readerDiv.style.display = 'none';
+                            SyncMgr.processImport(decodedText);
+                        });
+                    }
+                ).catch(err => Utils.showToast("Error cámara: " + err, 'error'));
+            },
+            processImport: (rawJson) => {
+                try {
+                    const data = JSON.parse(rawJson);
+                    if (Utils.confirmAction("Se ha detectado configuración válida. ¿Deseas aplicarla y sobrescribir la actual?")) {
+                        if (data.ui_accent) localStorage.setItem('custom_accent_color', data.ui_accent);
+                        if (data.ui_logos !== undefined) localStorage.setItem('settings_show_logos', data.ui_logos);
+                        if (data.ratings) localStorage.setItem('ace_autorating_v1', JSON.stringify(data.ratings));
+                        
+                        Utils.showToast("Sincronización QR completada. Recargando...");
+                        setTimeout(() => location.reload(), 1500);
+                    }
+                } catch (e) {
+                    Utils.showToast("El código no contiene datos válidos", 'error');
+                }
+            },
+            exportBackup: () => {
+                const dump = JSON.stringify(localStorage, null, 2);
+                const blob = new Blob([dump], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `TV_Backup_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                Utils.showToast('Backup descargado');
+            },
+            importBackup: (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if(Utils.confirmAction(`¿Restaurar copia de seguridad? Esto sobrescribirá todos los datos actuales.`)) {
+                            localStorage.clear();
+                            Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
+                            Utils.showToast('Restauración completa. Recargando...');
+                            setTimeout(() => location.reload(), 1500);
+                        }
+                    } catch (error) {
+                        Utils.showToast('Archivo de backup corrupto o inválido', 'error');
+                    }
+                    event.target.value = ''; // Reset input
+                };
+                reader.readAsText(file);
+            }
+        };
+
+        // --- Dev Tools Manager ---
+        const DevMgr = {
+            loadRaw: () => {
+                const dump = JSON.stringify(localStorage, null, 2);
+                document.getElementById('rawStorage').value = dump;
+            },
+            saveRaw: () => {
+                try {
+                    const rawStr = document.getElementById('rawStorage').value;
+                    const parsed = JSON.parse(rawStr); // Validar JSON
+                    
+                    if(Utils.confirmAction("Estás a punto de forzar datos crudos en el sistema. ¿Continuar?")) {
+                        localStorage.clear();
+                        Object.keys(parsed).forEach(k => {
+                            // Ensure values are strings for localStorage
+                            let val = typeof parsed[k] === 'object' ? JSON.stringify(parsed[k]) : String(parsed[k]);
+                            localStorage.setItem(k, val);
+                        });
+                        Utils.showToast('Base de datos sobrescrita');
+                        UI.init(); // Refresh local UI state
+                    }
+                } catch (e) {
+                    Utils.showToast('JSON Inválido: Revisa la sintaxis', 'error');
+                }
+            }
+        };
+
+        // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
-            loadSettings();
-            renderRatings();
+            UI.init();
         });
 
-        function showToast(msg, isError = false) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.style.background = isError ? "var(--danger)" : "var(--success)";
-            t.style.display = 'block';
-            setTimeout(() => { t.style.display = 'none'; }, 2500);
-        }
-
-        // --- LÓGICA DEL ESCÁNER ---
-        function startScanner() {
-            const readerDiv = document.getElementById('reader');
-            readerDiv.style.display = 'block';
-            
-            html5QrCode = new Html5Qrcode("reader");
-            
-            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-
-            // Iniciar cámara trasera
-            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
-            .catch(err => {
-                showToast("Error al abrir cámara: " + err, true);
-                readerDiv.style.display = 'none';
-            });
-        }
-
-        function onScanSuccess(decodedText) {
-            // Detener escáner inmediatamente para evitar lecturas múltiples
-            html5QrCode.stop().then(() => {
-                document.getElementById('reader').style.display = 'none';
-                processImportedData(decodedText);
-            });
-        }
-
-        function processImportedData(rawJson) {
-            try {
-                const data = JSON.parse(rawJson);
-                
-                // PREGUNTA DE CONFIRMACIÓN
-                const confirmApply = confirm("¡QR detectado! ¿Quieres aplicar esta nueva configuración? Los ajustes actuales se sobrescribirán.");
-                
-                if (confirmApply) {
-                    applySettings(data);
-                }
-            } catch (e) {
-                showToast("El QR no contiene datos válidos", true);
-            }
-        }
-
-        function applySettings(data) {
-            if (data.custom_accent_color) localStorage.setItem('custom_accent_color', data.custom_accent_color);
-            if (data.settings_show_logos !== undefined) localStorage.setItem('settings_show_logos', data.settings_show_logos);
-            if (data.ace_autorating_v1) localStorage.setItem('ace_autorating_v1', JSON.stringify(data.ace_autorating_v1));
-
-            showToast("Sincronización exitosa");
-            setTimeout(() => location.reload(), 1200);
-        }
-
-        // --- FUNCIONES EXISTENTES ---
-        function loadSettings() {
-            const savedColor = localStorage.getItem('custom_accent_color') || '#448aff';
-            document.getElementById('accentColorPicker').value = savedColor;
-            document.documentElement.style.setProperty('--accent-blue', savedColor);
-            const showLogos = localStorage.getItem('settings_show_logos') !== 'false';
-            document.getElementById('showLogosToggle').checked = showLogos;
-        }
-
-        function updateAccentColor(color) {
-            localStorage.setItem('custom_accent_color', color);
-            document.documentElement.style.setProperty('--accent-blue', color);
-            showToast("Color actualizado");
-        }
-
-        function updateLogoVisibility(visible) {
-            localStorage.setItem('settings_show_logos', visible);
-            showToast(visible ? "Logos activados" : "Logos ocultos");
-        }
-
-        function generateSyncQR() {
-            const qrContainer = document.getElementById('qr-container');
-            const qrDiv = document.getElementById('qrcode');
-            qrDiv.innerHTML = "";
-            qrContainer.style.display = 'block';
-
-            const config = {
-                custom_accent_color: localStorage.getItem('custom_accent_color'),
-                settings_show_logos: localStorage.getItem('settings_show_logos'),
-                ace_autorating_v1: JSON.parse(localStorage.getItem('ace_autorating_v1')) || {}
-            };
-
-            new QRCode(qrDiv, {
-                text: JSON.stringify(config),
-                width: 200,
-                height: 200,
-                correctLevel : QRCode.CorrectLevel.L
-            });
-            window.scrollTo({ top: 200, behavior: 'smooth' });
-        }
-
-        function importConfig() {
-            const val = document.getElementById('importArea').value;
-            if (val) processImportedData(val);
-        }
-
-        function renderRatings() {
-            const body = document.getElementById('ratingsBody');
-            const db = JSON.parse(localStorage.getItem('ace_autorating_v1')) || {};
-            body.innerHTML = '';
-            Object.entries(db).forEach(([id, data]) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `<td>${data.name || id}</td><td style="text-align:right">★ ${data.score.toFixed(1)}</td>`;
-                body.appendChild(row);
-            });
-        }
-
-        function resetRatings() {
-            if(confirm("¿Borrar reputación de canales?")) {
-                localStorage.removeItem('ace_autorating_v1');
-                renderRatings();
-            }
-        }
     </script>
 </body>
 </html>
