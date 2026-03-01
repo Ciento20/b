@@ -715,14 +715,56 @@
                 const customCSS = localStorage.getItem('admin_custom_css') || '';
                 document.getElementById('customCssInput').value = customCSS;
 
-                // Load Layout Settings
-                const layout = JSON.parse(localStorage.getItem('settings_layout_pro')) || { radius: 12, density: 'normal' };
+                const layout = JSON.parse(localStorage.getItem('settings_layout_pro')) || { radius: 12, density: 'normal', finishedOpacity: 50 };
                 document.getElementById('radiusRange').value = layout.radius;
                 document.getElementById('radiusVal').textContent = layout.radius + 'px';
                 document.getElementById('densitySelect').value = layout.density;
+                
+                UIMgr.apply();
+            },
+            apply: () => {
+                const color = localStorage.getItem('custom_accent_color') || '#3b82f6';
+                const amoled = localStorage.getItem('settings_amoled') === 'true';
+                const layout = JSON.parse(localStorage.getItem('settings_layout_pro')) || { radius: 12, density: 'normal', finishedOpacity: 50 };
+                const customCSS = localStorage.getItem('admin_custom_css') || '';
+
+                let styleEl = document.getElementById('uimgr-dynamic-style');
+                if(!styleEl) {
+                    styleEl = document.createElement('style');
+                    styleEl.id = 'uimgr-dynamic-style';
+                    document.head.appendChild(styleEl);
+                }
+
+                let css = `
+                    :root {
+                        --primary: ${color};
+                        --primary-hover: ${color}dd;
+                        --radius-lg: ${layout.radius}px;
+                        --radius-md: ${Math.max(0, layout.radius - 4)}px;
+                    }
+                    .is-finished { opacity: ${layout.finishedOpacity / 100} !important; filter: grayscale(0.8); transition: opacity 0.3s; }
+                `;
+
+                if(amoled) {
+                    css += `
+                        body, .sidebar, .main-content, .topbar { background-color: #000 !important; }
+                        .card, .table-wrapper, .sidebar-header, .nav-menu { background-color: #050505 !important; border-color: #1a1a1a !important; }
+                        .nav-item.active { background: rgba(255,255,255,0.05) !important; }
+                    `;
+                }
+
+                if(layout.density === 'compact') {
+                    css += `th, td { padding: 6px 10px !important; } .card { padding: 15px !important; } .stat-value { font-size: 1.4rem !important; }`;
+                } else if(layout.density === 'large') {
+                    css += `th, td { padding: 20px 25px !important; font-size: 1.1rem !important; } .card { padding: 35px !important; } .stat-value { font-size: 2.5rem !important; }`;
+                }
+
+                css += customCSS;
+                styleEl.textContent = css;
             },
             updateAmoled: (checked) => {
                 localStorage.setItem('settings_amoled', checked);
+                UIMgr.apply();
                 Utils.toast(checked ? 'Modo AMOLED activado' : 'Modo AMOLED desactivado');
             },
             updateLayout: (key, val) => {
@@ -730,19 +772,23 @@
                 layout[key] = val;
                 if(key === 'radius') document.getElementById('radiusVal').textContent = val + 'px';
                 localStorage.setItem('settings_layout_pro', JSON.stringify(layout));
+                UIMgr.apply();
             },
             updateAccent: (color) => {
                 localStorage.setItem('custom_accent_color', color);
                 document.getElementById('colorHex').value = color.toUpperCase();
+                UIMgr.apply();
                 Utils.toast('Color primario guardado');
             },
             updateLogoToggle: (checked) => {
                 localStorage.setItem('settings_show_logos', checked);
+                EventsMgr.render(); 
                 Utils.toast(checked ? 'Logos habilitados' : 'Logos ocultados');
             },
             saveCustomCSS: () => {
                 const css = document.getElementById('customCssInput').value;
                 localStorage.setItem('admin_custom_css', css);
+                UIMgr.apply();
                 Utils.toast('CSS Inyectado con éxito');
             },
             resetTheme: () => {
@@ -755,6 +801,9 @@
         };        const EventsMgr = {
             render: () => {
                 const data = JSON.parse(localStorage.getItem('event_data_cache')) || [];
+                const showLogos = localStorage.getItem('settings_show_logos') !== 'false';
+                const logoCache = JSON.parse(localStorage.getItem('logo_cache')) || {};
+                
                 document.getElementById('event-count').textContent = data.length;
                 const tbody = document.getElementById('eventsTableBody');
 
@@ -763,16 +812,30 @@
                     return;
                 }
 
-                // Optimización: Batch Rendering para evitar congelación del hilo principal
+                const now = new Date();
                 const htmlContent = data.map(item => {
                     const cleanHtml = item.infoHtml ? item.infoHtml.replace(/<[^>]*>?/gm, ' ') : 'N/A';
                     const comp = item.competition || 'Sin competición';
                     const searchString = Utils.escapeHTML((comp + ' ' + cleanHtml).toLowerCase());
                     
+                    let finishedClass = "";
+                    if (item.hora && item.hora.includes(':')) {
+                        const [h, m] = item.hora.split(':');
+                        const eventTime = new Date();
+                        eventTime.setHours(parseInt(h), parseInt(m), 0);
+                        if (now - eventTime > 7200000) finishedClass = "is-finished";
+                    }
+
+                    let logoHtml = "";
+                    if (showLogos) {
+                        const logoUrl = logoCache[comp.toLowerCase()] || 'https://via.placeholder.com/20?text=TV';
+                        logoHtml = `<img src="${logoUrl}" style="width:18px; height:18px; vertical-align:middle; margin-right:8px; border-radius:3px;">`;
+                    }
+                    
                     return `
-                        <tr class="searchable-row" data-search="${searchString}">
+                        <tr class="searchable-row ${finishedClass}" data-search="${searchString}">
                             <td><span class="badge">${item.fecha || '--'}</span><br><b>${item.hora || '--'}</b></td>
-                            <td style="color: var(--primary); font-weight: 500;">${comp}</td>
+                            <td style="color: var(--primary); font-weight: 500;">${logoHtml}${comp}</td>
                             <td style="font-size: 0.75rem; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${Utils.escapeHTML(item.infoHtml || '')}">${Utils.escapeHTML(cleanHtml)}</td>
                             <td><span class="badge" style="background:var(--bg-surface);">${item.canales ? item.canales.length : 0} refs</span></td>
                         </tr>
