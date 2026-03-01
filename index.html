@@ -2,15 +2,18 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso QR</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Acceso QR - TV</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* Variables de color exactas de tu archivo */
         :root {
             --bg-color: #121212;
+            --card-bg: #1e1e1e;
             --accent-blue: #448aff;
             --text-main: #ffffff;
-            --card-bg: #1e1e1e;
         }
 
         body {
@@ -24,101 +27,121 @@
             margin: 0;
         }
 
-        .btn-qr {
+        /* Estilo del botón principal */
+        .btn-qr-trigger {
             background-color: var(--accent-blue);
             color: white;
             border: none;
             padding: 15px 30px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(68, 138, 255, 0.3);
-            transition: transform 0.2s;
+            transition: transform 0.2s, background-color 0.2s;
         }
 
-        .btn-qr:active {
+        .btn-qr-trigger:hover {
+            background-color: #357ae8;
+        }
+
+        .btn-qr-trigger:active {
             transform: scale(0.95);
         }
 
-        /* Estilos del Modal (basados en tu archivo original) */
+        /* Estilos del MODAL copiados de tu archivo */
         .modal {
-            display: none;
+            display: none; 
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
+            background: rgba(0,0,0,0.9);
+            z-index: 10000;
             justify-content: center;
             align-items: center;
+            backdrop-filter: blur(5px);
         }
 
         .modal-content {
             background: var(--card-bg);
-            padding: 20px;
-            border-radius: 15px;
+            padding: 30px;
+            border-radius: 20px;
             text-align: center;
             max-width: 90%;
+            width: 320px;
+            border: 1px solid #333;
         }
 
         #qrcode {
             background: white;
-            padding: 10px;
-            border-radius: 10px;
-            margin: 15px 0;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px auto;
             display: inline-block;
         }
 
-        .close-btn {
-            margin-top: 10px;
-            background: #444;
+        #qrcode img {
+            display: block;
+        }
+
+        .close-modal {
+            margin-top: 15px;
+            background: #333;
             color: white;
             border: none;
-            padding: 8px 20px;
-            border-radius: 5px;
+            padding: 10px 25px;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
 
-    <button class="btn-qr" onclick="openQR()">ABRIR CÓDIGO QR</button>
+    <button class="btn-qr-trigger" onclick="showQR()">MOSTRAR CÓDIGO QR</button>
 
-    <div id="qrModal" class="modal" onclick="closeQR()">
+    <div id="qrModal" class="modal" onclick="hideQR()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h2 style="margin-top:0">Escanear para ver TV</h2>
+            <h3 style="margin:0 0 10px 0;">Escanear para TV</h3>
+            <p style="font-size:14px; color:#888; margin-bottom:10px;">Apunta con la cámara de tu móvil para abrir la aplicación</p>
             <div id="qrcode"></div>
-            <p style="font-size: 14px; color: #888;">Apunta con la cámara de tu móvil</p>
-            <button class="close-btn" onclick="closeQR()">Cerrar</button>
+            <button class="close-modal" onclick="hideQR()">Cerrar</button>
         </div>
     </div>
 
     <script>
-        function openQR() {
+        function showQR() {
             const modal = document.getElementById('qrModal');
             const qrContainer = document.getElementById('qrcode');
             
-            // Limpiamos contenido previo si existe
+            // Limpiar contenido previo
             qrContainer.innerHTML = '';
             
-            // Generamos el QR (puedes cambiar window.location.href por la URL de tu app)
+            // Generar QR con la misma configuración de tu archivo
+            // Nota: Usa window.location.href para que el QR sea de ESTA página, 
+            // o escribe entre comillas la URL de tu web de TV.
             new QRCode(qrContainer, {
-                text: window.location.href, 
+                text: window.location.href,
                 width: 200,
                 height: 200,
-                colorDark : "#000000",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
             });
 
             modal.style.display = 'flex';
         }
 
-        function closeQR() {
+        function hideQR() {
             document.getElementById('qrModal').style.display = 'none';
         }
+
+        // Permitir cerrar con la tecla Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') hideQR();
+        });
     </script>
 </body>
 </html>
