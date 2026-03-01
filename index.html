@@ -3,555 +3,918 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Pro - Panel de Control TV</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Admin Pro Workspace - TV App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     
     <style>
         :root {
-            --bg-color: #0d0d0d;
-            --card-bg: #1a1a1a;
-            --card-hover: #222222;
-            --accent-blue: #448aff;
-            --text-main: #ffffff;
-            --text-muted: #888888;
+            --bg-base: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-surface-hover: #334155;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
             --danger: #ef4444;
-            --warning: #f59e0b;
+            --danger-hover: #dc2626;
             --success: #10b981;
-            --border: #333333;
-            --radius: 12px;
+            --warning: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --sidebar-width: 260px;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg-base);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
             display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* --- Header & Tabs --- */
-        header {
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border);
-            padding: 20px 20px 0 20px;
-            position: sticky;
-            top: 0;
+        /* --- Sidebar --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
             z-index: 100;
         }
 
-        .header-title {
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            justify-content: space-between;
         }
 
-        h1 { font-size: 1.4rem; margin: 0; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 8px;}
-        
-        .tabs {
-            display: flex;
-            overflow-x: auto;
-            scrollbar-width: none;
-            gap: 20px;
-        }
-        .tabs::-webkit-scrollbar { display: none; }
-        
-        .tab-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            font-weight: 600;
-            padding: 10px 0;
-            cursor: pointer;
-            white-space: nowrap;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
-        }
-        .tab-btn.active {
-            color: var(--text-main);
-            border-bottom: 3px solid var(--accent-blue);
-        }
-
-        /* --- Main Content --- */
-        main {
-            padding: 20px;
-            flex: 1;
-            max-width: 800px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
-        .tab-content.active { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- Cards & Settings --- */
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 20px;
-            border: 1px solid var(--border);
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-
-        .card-header {
+        .sidebar-header h1 {
+            font-size: 1.2rem;
             font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-            color: var(--text-main);
+            color: var(--primary);
             display: flex;
             align-items: center;
             gap: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
         }
 
-        .setting-row {
+        .nav-menu {
+            padding: 15px 10px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .nav-item {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 12px 15px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.15); color: var(--primary); border-right: 3px solid var(--primary); border-radius: 8px 0 0 8px;}
+
+        /* --- Main Content --- */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .topbar {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .setting-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .view-section { display: none; animation: fadeIn 0.4s ease; max-width: 1000px; margin: 0 auto; }
+        .view-section.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Cards & Grid --- */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--text-main); margin: 10px 0 5px 0; }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;}
+
+        /* --- Forms & Inputs --- */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: var(--text-main); }
+        .form-group .hint { display: block; font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
         
-        .setting-info strong { display: block; margin-bottom: 4px; font-size: 0.95rem; }
-        .setting-info span { color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; display: block;}
-
-        /* --- Inputs & Buttons --- */
-        input[type="color"] { 
-            -webkit-appearance: none; border: none; width: 40px; height: 40px; 
-            border-radius: 8px; cursor: pointer; background: none; 
+        .input-control {
+            width: 100%; padding: 10px 15px; border-radius: var(--radius-md);
+            border: 1px solid var(--border); background: var(--bg-base);
+            color: var(--text-main); font-family: inherit; font-size: 0.95rem;
+            outline: none; transition: border-color 0.2s;
         }
+        .input-control:focus { border-color: var(--primary); }
+
+        .row-flex { display: flex; gap: 15px; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05);}
+        .row-flex:last-child { border-bottom: none; }
+
+        /* --- Toggles & Colors --- */
+        input[type="color"] { -webkit-appearance: none; border: none; width: 45px; height: 45px; border-radius: var(--radius-md); cursor: pointer; background: none; }
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-        input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 8px; }
+        input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); border-radius: var(--radius-md); }
 
-        .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .3s; border-radius: 24px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--accent-blue); }
-        input:checked + .slider:before { transform: translateX(22px); }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-base); border: 1px solid var(--border); transition: .3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: var(--text-muted); transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: rgba(59, 130, 246, 0.2); border-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(24px); background-color: var(--primary); }
 
+        /* --- Buttons --- */
         .btn {
-            background: #333; color: white; border: 1px solid var(--border);
-            padding: 10px 16px; border-radius: 8px; cursor: pointer;
-            font-weight: 600; font-size: 0.85rem; transition: 0.2s;
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            font-family: inherit;
+            padding: 10px 20px; border-radius: var(--radius-md); font-weight: 600; font-size: 0.9rem;
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            transition: all 0.2s; border: 1px solid transparent; font-family: inherit;
         }
-        .btn:hover { background: #444; }
-        .btn:active { transform: scale(0.97); }
-        .btn-primary { background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; }
-        .btn-primary:hover { background: #2b70f0; }
+        .btn:active { transform: translateY(1px); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: var(--bg-surface-hover); border-color: var(--border); color: var(--text-main); }
+        .btn-secondary:hover { background: #475569; }
         .btn-danger { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); color: var(--danger); }
         .btn-danger:hover { background: var(--danger); color: white; }
-        .btn-success { background: rgba(16, 185, 129, 0.1); border-color: var(--success); color: var(--success); }
-        .btn-success:hover { background: var(--success); color: white; }
-        .btn-block { width: 100%; margin-top: 10px; padding: 12px; }
+        .btn-warning { background: rgba(245, 158, 11, 0.1); border-color: var(--warning); color: var(--warning); }
+        .btn-warning:hover { background: var(--warning); color: black; }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+        .btn-block { width: 100%; }
 
-        /* --- Tables & Lists --- */
-        .table-container { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
-        th { background: #111; color: var(--text-muted); padding: 12px; font-weight: 600; white-space: nowrap; }
-        td { padding: 12px; border-top: 1px solid var(--border); background: #1a1a1a; vertical-align: middle; }
-        tr:hover td { background: var(--card-hover); }
-        
-        .input-sm {
-            background: #000; border: 1px solid var(--border); color: white;
-            padding: 6px; border-radius: 6px; width: 60px; text-align: center; font-family: monospace;
-        }
-        
-        .search-box {
-            width: 100%; padding: 12px 15px; background: #000; border: 1px solid var(--border);
-            color: white; border-radius: 8px; margin-bottom: 15px; font-family: inherit; outline: none;
-        }
-        .search-box:focus { border-color: var(--accent-blue); }
+        /* --- Tables --- */
+        .table-wrapper { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-base); }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+        th { background: rgba(255,255,255,0.02); padding: 12px 15px; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        td { padding: 12px 15px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text-main); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .mono { font-family: 'Fira Code', monospace; font-size: 0.8rem; }
+        .badge { background: var(--bg-surface-hover); padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; border: 1px solid var(--border); }
 
-        /* --- Code & Textareas --- */
-        textarea {
-            width: 100%; background: #000; border: 1px solid var(--border);
-            color: #00ffcc; padding: 15px; border-radius: 8px;
-            font-family: 'Courier New', monospace; font-size: 0.85rem;
-            resize: vertical; outline: none; line-height: 1.4;
+        /* --- Code Editor --- */
+        .code-editor {
+            width: 100%; height: 300px; background: #000; border: 1px solid var(--border);
+            color: #32d74b; padding: 15px; border-radius: var(--radius-md);
+            font-family: 'Fira Code', monospace; font-size: 0.85rem;
+            resize: vertical; outline: none; line-height: 1.5; tab-size: 4;
         }
-        textarea:focus { border-color: var(--warning); }
+        .code-editor:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+
+        /* --- Progress Bar --- */
+        .progress-container { width: 100%; background: var(--bg-base); border-radius: 10px; height: 10px; border: 1px solid var(--border); overflow: hidden; margin-top: 10px; }
+        .progress-bar { height: 100%; background: var(--primary); transition: width 0.4s ease; }
 
         /* --- Utils --- */
-        .badge { background: #333; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-family: monospace; color: #ccc;}
-        #qr-container { background: white; padding: 15px; border-radius: 12px; display: none; margin: 20px auto; width: fit-content; text-align: center;}
-        #reader { width: 100%; border-radius: 12px; overflow: hidden; display: none; margin-bottom: 15px; border: 2px solid var(--accent-blue);}
+        .search-box { display: flex; gap: 10px; margin-bottom: 15px; }
+        .section-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 20px; color: white; display: flex; justify-content: space-between; align-items: center;}
         
+        #qr-container { background: white; padding: 20px; border-radius: var(--radius-lg); display: none; margin: 20px auto; width: fit-content; text-align: center; }
+        #reader { width: 100%; border-radius: var(--radius-lg); overflow: hidden; display: none; margin-bottom: 15px; border: 2px solid var(--primary); }
+        
+        /* Toast */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
         .toast {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
-            background: var(--card-bg); color: white; padding: 12px 24px; border: 1px solid var(--border);
-            border-radius: 50px; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.5); font-size: 0.9rem;
-            display: flex; align-items: center; gap: 8px; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: var(--bg-surface); border: 1px solid var(--border); color: white;
+            padding: 12px 20px; border-radius: var(--radius-md); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+            display: flex; align-items: center; gap: 10px; font-size: 0.9rem;
+            transform: translateX(120%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.show { transform: translateX(0); }
 
-        .back-btn { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; padding: 0; display: flex; align-items: center;}
-        .back-btn:hover { color: white; }
-
-        @media (max-width: 600px) {
-            .action-buttons { display: flex; flex-direction: column; gap: 10px; }
-            .action-buttons .btn { width: 100%; }
+        /* Mobile Adjustments */
+        .menu-toggle { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; left: -100%; height: 100%; z-index: 1000; box-shadow: 10px 0 15px rgba(0,0,0,0.5); }
+            .sidebar.open { left: 0; }
+            .menu-toggle { display: block; }
+            .grid-cards { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="header-title">
-            <h1><span style="font-size: 1.8rem;">⚙️</span> Admin Pro</h1>
-            <button class="back-btn" onclick="window.location.href='index.html'" title="Volver a la App">✖️</button>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1>⚙️ Admin Pro</h1>
+            <button class="menu-toggle" onclick="toggleSidebar()" style="font-size: 1rem;">✖</button>
         </div>
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('ui')">🎨 Apariencia</button>
-            <button class="tab-btn" onclick="switchTab('data')">💾 Datos & Caché</button>
-            <button class="tab-btn" onclick="switchTab('rating')">⭐ Reputación</button>
-            <button class="tab-btn" onclick="switchTab('sync')">🔄 Sync & Backup</button>
-            <button class="tab-btn" onclick="switchTab('dev')">🛠️ Dev Tools</button>
+        <nav class="nav-menu">
+            <button class="nav-item active" onclick="switchView('dashboard')">📊 Dashboard</button>
+            <button class="nav-item" onclick="switchView('ui')">🎨 Interfaz y Tema</button>
+            <button class="nav-item" onclick="switchView('events')">🗓️ Visor de Eventos</button>
+            <button class="nav-item" onclick="switchView('links')">🔗 Gestor AceStream</button>
+            <button class="nav-item" onclick="switchView('rating')">⭐ Motor de Reputación</button>
+            <button class="nav-item" onclick="switchView('sessions')">⏱️ Sesiones e Historial</button>
+            <button class="nav-item" onclick="switchView('data')">💾 Almacenamiento Local</button>
+            <button class="nav-item" onclick="switchView('sync')">🔄 Sincronización</button>
+            <button class="nav-item" onclick="switchView('dev')" style="color: var(--warning);">🛠️ Dev Tools (Raw)</button>
+        </nav>
+        <div style="padding: 20px; border-top: 1px solid var(--border);">
+            <button class="btn btn-secondary btn-block" onclick="window.location.href='index.html'">◀ Volver a la App</button>
         </div>
-    </header>
+    </aside>
 
-    <main>
-        <section id="tab-ui" class="tab-content active">
-            <div class="card">
-                <div class="card-header">Personalización de Interfaz</div>
-                
-                <div class="setting-row">
-                    <div class="setting-info">
-                        <strong>Color de Acento Principal</strong>
-                        <span>Define el color global utilizado en botones, iconos y bordes activos de la app.</span>
+    <main class="main-content">
+        <header class="topbar">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <h2 id="view-title" style="font-size: 1.1rem; font-weight: 600;">Dashboard General</h2>
+            </div>
+            <span class="badge mono" id="app-version">Index v2 Core</span>
+        </header>
+
+        <div class="content-area">
+            
+            <section id="view-dashboard" class="view-section active">
+                <div class="grid-cards">
+                    <div class="card">
+                        <div class="stat-label">Eventos en Caché</div>
+                        <div class="stat-value" id="dash-events">0</div>
+                        <div class="stat-label" style="font-size: 0.7rem;">En event_data_cache</div>
                     </div>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <input type="text" id="colorHex" class="input-sm" style="width: 80px;" readonly>
-                        <input type="color" id="accentColorPicker" onchange="UI.updateColor(this.value)">
+                    <div class="card">
+                        <div class="stat-label">Enlaces AceStream</div>
+                        <div class="stat-value" id="dash-links">0</div>
+                        <div class="stat-label" style="font-size: 0.7rem;">IDs únicos cacheados</div>
+                    </div>
+                    <div class="card">
+                        <div class="stat-label">Registros de Reputación</div>
+                        <div class="stat-value" id="dash-ratings">0</div>
+                        <div class="stat-label" style="font-size: 0.7rem;">Canales evaluados</div>
+                    </div>
+                    <div class="card">
+                        <div class="stat-label">Uso de LocalStorage</div>
+                        <div class="stat-value" id="dash-storage">0 KB</div>
+                        <div class="progress-container"><div class="progress-bar" id="dash-storage-bar" style="width: 0%"></div></div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 style="margin-bottom: 15px;">Acciones Rápidas</h3>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="switchView('sync')">Exportar Configuración</button>
+                        <button class="btn btn-danger" onclick="CacheMgr.clearTempSessions()">Limpiar Variables Temporales</button>
+                        <button class="btn btn-secondary" onclick="location.reload()">Refrescar Admin</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-ui" class="view-section">
+                <div class="card">
+                    <h3 class="section-title">Personalización Visual</h3>
+                    
+                    <div class="row-flex">
+                        <div>
+                            <label style="font-weight: 600;">Color de Acento Principal</label>
+                            <span class="form-group hint">Color para botones, iconos de carga y bordes activos.</span>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="text" id="colorHex" class="input-control mono" style="width: 100px; text-align: center;" readonly>
+                            <input type="color" id="accentColorPicker" onchange="UIMgr.updateAccent(this.value)">
+                        </div>
+                    </div>
+
+                    <div class="row-flex">
+                        <div>
+                            <label style="font-weight: 600;">Mostrar Logos de Canales</label>
+                            <span class="form-group hint">Variable 'settings_show_logos' (Requiere soporte en index.html).</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="showLogosToggle" onchange="UIMgr.updateLogoToggle(this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+                        <button class="btn btn-secondary" onclick="UIMgr.resetTheme()">↺ Restaurar Valores por Defecto</button>
                     </div>
                 </div>
 
-                <div class="setting-row">
-                    <div class="setting-info">
-                        <strong>Mostrar Logos de Canales</strong>
-                        <span>Si se desactiva, se mostrará el nombre del canal en texto plano, mejorando el rendimiento.</span>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="showLogosToggle" onchange="UI.updateLogoToggle(this.checked)">
-                        <span class="slider"></span>
-                    </label>
+                <div class="card" style="margin-top: 20px;">
+                    <h3 class="section-title">Inyección de CSS <span class="badge">Avanzado</span></h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Guarda CSS personalizado en `admin_custom_css`. Puedes programar tu index.html para leer esta llave y aplicarla al vuelo.</p>
+                    <textarea id="customCssInput" class="code-editor" placeholder="/* Escribe tu CSS aquí */&#10;.event-card { border-radius: 15px; }"></textarea>
+                    <button class="btn btn-primary btn-block" style="margin-top: 15px;" onclick="UIMgr.saveCustomCSS()">💾 Guardar CSS Injectado</button>
                 </div>
-                
-                <button class="btn btn-block" onclick="UI.resetTheme()">↺ Restaurar Tema por Defecto</button>
-            </div>
-        </section>
+            </section>
 
-        <section id="tab-data" class="tab-content">
-            <div class="card">
-                <div class="card-header">Gestor de Almacenamiento Local</div>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
-                    Administra el espacio utilizado por la aplicación. Borrar la caché forzará a la app a descargar los datos nuevamente en el próximo inicio.
-                </p>
-
-                <div id="cacheList">
+            <section id="view-events" class="view-section">
+                <div class="card">
+                    <h3 class="section-title">Eventos Cacheados <span class="badge" id="event-count">0</span></h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Datos parseados extraídos de la fuente y listos para mostrar.</p>
+                    
+                    <div class="search-box">
+                        <input type="text" id="searchEvents" class="input-control" placeholder="Buscar por competición o equipo..." onkeyup="EventsMgr.filter()">
                     </div>
 
-                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--danger);">
-                    <div class="setting-info" style="margin-bottom: 15px;">
-                        <strong style="color: var(--danger);">Zona Peligrosa</strong>
-                        <span>Elimina todas las configuraciones, reputación y cachés. La app quedará como recién instalada.</span>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha y Hora</th>
+                                    <th>Competición</th>
+                                    <th>Detalles (InfoHtml crudo)</th>
+                                    <th>Canales (Array)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eventsTableBody">
+                                </tbody>
+                        </table>
                     </div>
-                    <button class="btn btn-danger btn-block" onclick="DataMgr.factoryReset()">⚠️ Factory Reset (Borrar Todo)</button>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section id="tab-rating" class="tab-content">
-            <div class="card">
-                <div class="card-header">Editor de Reputación (Inteligencia de Canales)</div>
-                <input type="text" id="ratingSearch" class="search-box" placeholder="🔍 Buscar canal por nombre..." onkeyup="RatingMgr.filter()">
-                
-                <div class="table-container">
-                    <table id="ratingsTable">
-                        <thead>
-                            <tr>
-                                <th>Canal (ID)</th>
-                                <th style="text-align: center;">Puntuación</th>
-                                <th style="text-align: right;">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ratingsBody">
-                            </tbody>
-                    </table>
+            <section id="view-links" class="view-section">
+                <div class="card">
+                    <h3 class="section-title">Base de Datos de Enlaces <button class="btn btn-danger btn-sm" onclick="LinksMgr.clearAll()">🗑️ Borrar Caché</button></h3>
+                    <div class="search-box">
+                        <input type="text" id="searchLinks" class="input-control" placeholder="Buscar canal..." onkeyup="LinksMgr.filter()">
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nombre del Canal</th>
+                                    <th>ID AceStream</th>
+                                    <th>Fuente</th>
+                                    <th>Test</th>
+                                </tr>
+                            </thead>
+                            <tbody id="linksTableBody">
+                                </tbody>
+                        </table>
+                    </div>
                 </div>
-                <button class="btn btn-danger btn-block" style="margin-top: 15px;" onclick="RatingMgr.resetAll()">♻️ Reiniciar toda la Reputación</button>
-            </div>
-        </section>
+            </section>
 
-        <section id="tab-sync" class="tab-content">
-            <div class="card">
-                <div class="card-header">Sincronización QR (Rápida)</div>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
-                    Transfiere tus ajustes visuales y la reputación a otro móvil. (No incluye datos de caché pesados).
-                </p>
-
-                <div id="reader"></div>
-                
-                <div class="action-buttons" style="display: flex; gap: 10px; margin-bottom: 20px;">
-                    <button class="btn btn-primary" style="flex: 1;" onclick="SyncMgr.generateQR()">📱 Mostrar mi QR</button>
-                    <button class="btn btn-success" style="flex: 1;" onclick="SyncMgr.startScanner()">📸 Escanear QR</button>
+            <section id="view-rating" class="view-section">
+                <div class="card">
+                    <h3 class="section-title">Inteligencia de Canales (Reputación) <button class="btn btn-danger btn-sm" onclick="RatingMgr.resetAll()">♻️ Reiniciar Todo</button></h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Ajusta manualmente la reputación que la app ha aprendido sobre cada ID.</p>
+                    
+                    <div class="search-box">
+                        <input type="text" id="searchRatings" class="input-control" placeholder="Buscar canal por nombre..." onkeyup="RatingMgr.filter()">
+                    </div>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Canal / ID</th>
+                                    <th style="text-align: center;">Puntuación (1-5)</th>
+                                    <th style="text-align: right;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ratingsTableBody">
+                                </tbody>
+                        </table>
+                    </div>
                 </div>
+            </section>
 
-                <div id="qr-container">
-                    <div id="qrcode"></div>
-                    <p style="color: black; font-size: 0.75rem; font-weight: bold; margin-top: 10px;">ESCÁNEAME</p>
+            <section id="view-sessions" class="view-section">
+                <div class="card">
+                    <h3 class="section-title">Historial de Reproducción <button class="btn btn-warning btn-sm" onclick="SessionMgr.clearAll()">🧹 Limpiar Todo</button></h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">La app recuerda qué canal probaste por última vez (last_idx_) y cuándo (last_ts_) para la función "Siguiente mejor enlace".</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Canal Normalizado</th>
+                                    <th>Último Índice Probado</th>
+                                    <th>Hace cuánto tiempo</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sessionsTableBody">
+                                </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="card">
-                <div class="card-header">Copia de Seguridad Real (Archivo)</div>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
-                    Exporta el 100% de tu configuración actual (incluyendo historiales y estados) en un archivo local.
-                </p>
-                <div class="action-buttons" style="display: flex; gap: 10px;">
-                    <button class="btn" style="flex: 1;" onclick="SyncMgr.exportBackup()">💾 Exportar Backup (.json)</button>
-                    <label class="btn" style="flex: 1; margin: 0; cursor: pointer;">
-                        📂 Importar Backup
-                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="SyncMgr.importBackup(event)">
-                    </label>
+            <section id="view-data" class="view-section">
+                <div class="card">
+                    <h3 class="section-title">Gestor de Memoria (LocalStorage)</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Desglose exacto de lo que ocupa la aplicación en la memoria del navegador.</p>
+                    
+                    <div id="cacheListContainer">
+                        </div>
+
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--danger);">
+                        <h4 style="color: var(--danger); margin-bottom: 10px;">Zona de Riesgo Extremo</h4>
+                        <button class="btn btn-danger btn-block" onclick="CacheMgr.factoryReset()">⚠️ FACTORY RESET (Eliminar Toda la Base de Datos)</button>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section id="tab-dev" class="tab-content">
-            <div class="card" style="border-color: var(--warning);">
-                <div class="card-header" style="color: var(--warning);">Entorno de Desarrollo (LocalStorage)</div>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
-                    Editor en crudo de la base de datos interna de la app. <b>Advertencia:</b> Modificar esto sin conocimientos puede corromper la app.
-                </p>
-                
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                    <span style="font-size: 0.8rem; font-family: monospace;">Estructura JSON (Raw)</span>
-                    <button class="btn" style="padding: 4px 10px; font-size: 0.7rem;" onclick="DevMgr.loadRaw()">↻ Recargar</button>
+            <section id="view-sync" class="view-section">
+                <div class="grid-cards">
+                    <div class="card">
+                        <h3 style="margin-bottom: 15px; color: var(--primary);">📲 Sincronización QR Ligeras</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">Transfiere ajustes visuales y la base de reputación entre móviles escaneando este código.</p>
+                        
+                        <div id="reader"></div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-primary" style="flex: 1;" onclick="SyncMgr.generateQR()">Generar QR</button>
+                            <button class="btn btn-success" style="flex: 1;" onclick="SyncMgr.startScanner()">Escanear QR</button>
+                        </div>
+                        <div id="qr-container">
+                            <div id="qrcode"></div>
+                            <p style="color: black; font-size: 0.8rem; font-weight: bold; margin-top: 10px;">Apunta tu cámara aquí</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="margin-bottom: 15px; color: var(--success);">💾 Backup Físico Completo</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">Descarga un archivo JSON con el 100% de la configuración, historiales y cachés para guardarlo de forma segura.</p>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <button class="btn btn-secondary" onclick="SyncMgr.exportJSON()">Descargar Archivo (.json)</button>
+                            <label class="btn btn-primary" style="margin: 0; text-align: center; cursor: pointer;">
+                                Importar Archivo
+                                <input type="file" accept=".json" style="display: none;" onchange="SyncMgr.importJSON(event)">
+                            </label>
+                        </div>
+                    </div>
                 </div>
+            </section>
 
-                <textarea id="rawStorage" rows="18"></textarea>
-                
-                <button class="btn btn-block" style="background: var(--warning); color: black; border: none; margin-top: 15px; font-weight: bold;" onclick="DevMgr.saveRaw()">Guardar Cambios Crudos</button>
-            </div>
-        </section>
+            <section id="view-dev" class="view-section">
+                <div class="card" style="border-color: var(--warning);">
+                    <div class="section-title" style="color: var(--warning);">
+                        Editor JSON Crudo (Modo Dios)
+                        <button class="btn btn-secondary btn-sm" onclick="DevMgr.loadRaw()">↻ Recargar</button>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Modifica cualquier variable de la aplicación en formato JSON puro. Un error de sintaxis corromperá la app.</p>
+                    
+                    <textarea id="rawStorageEditor" class="code-editor" style="height: 450px;"></textarea>
+                    
+                    <button class="btn btn-warning btn-block" style="margin-top: 15px; color: black;" onclick="DevMgr.saveRaw()">⚠️ Sobrescribir Base de Datos Completa</button>
+                </div>
+            </section>
+
+        </div>
     </main>
 
-    <div id="toast" class="toast">
-        <span id="toast-icon">✅</span>
-        <span id="toast-msg">Mensaje</span>
-    </div>
+    <div class="toast-container" id="toastContainer"></div>
 
     <script>
         // --- Core Utilities ---
         const Utils = {
-            showToast: (msg, type = 'success') => {
-                const toast = document.getElementById('toast');
-                document.getElementById('toast-msg').textContent = msg;
-                document.getElementById('toast-icon').textContent = type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️';
-                toast.className = 'toast show';
-                setTimeout(() => toast.className = 'toast', 3000);
+            toast: (msg, type = 'success') => {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️';
+                if (type === 'error') toast.style.borderLeft = '4px solid var(--danger)';
+                if (type === 'warning') toast.style.borderLeft = '4px solid var(--warning)';
+                if (type === 'success') toast.style.borderLeft = '4px solid var(--success)';
+                
+                toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
+                container.appendChild(toast);
+                
+                setTimeout(() => toast.classList.add('show'), 10);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
             },
-            getSizeStr: (str) => {
-                const bytes = new Blob([str]).size;
+            getSize: (str) => new Blob([str]).size,
+            formatSize: (bytes) => {
                 if (bytes < 1024) return bytes + ' B';
                 if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
                 return (bytes / 1048576).toFixed(2) + ' MB';
             },
-            confirmAction: (msg) => confirm(msg)
+            escapeHTML: (str) => {
+                return str.replace(/[&<>'"]/g, tag => ({
+                    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+                }[tag]));
+            },
+            timeAgo: (ts) => {
+                const seconds = Math.floor((Date.now() - ts) / 1000);
+                if (seconds < 60) return seconds + " segs";
+                if (seconds < 3600) return Math.floor(seconds/60) + " mins";
+                if (seconds < 86400) return Math.floor(seconds/3600) + " horas";
+                return Math.floor(seconds/86400) + " días";
+            }
         };
 
-        // --- Tab Navigation ---
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-            document.querySelector(`.tab-btn[onclick="switchTab('${tabId}')"]`).classList.add('active');
+        // --- Navigation ---
+        const titles = {
+            'dashboard': 'Dashboard General', 'ui': 'Interfaz y Tema', 'events': 'Visor de Eventos',
+            'links': 'Gestor AceStream', 'rating': 'Motor de Reputación', 'sessions': 'Historial de Sesiones',
+            'data': 'Almacenamiento Local', 'sync': 'Sincronización', 'dev': 'Herramientas de Desarrollador'
+        };
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             
-            if(tabId === 'data') DataMgr.render();
-            if(tabId === 'rating') RatingMgr.render();
-            if(tabId === 'dev') DevMgr.loadRaw();
+            document.getElementById(`view-${viewId}`).classList.add('active');
+            document.querySelector(`.nav-item[onclick="switchView('${viewId}')"]`).classList.add('active');
+            document.getElementById('view-title').textContent = titles[viewId] || 'Workspace';
+
+            if(window.innerWidth <= 768) toggleSidebar(); // auto-close on mobile
+
+            // Initialize specific managers
+            if(viewId === 'dashboard') DashboardMgr.init();
+            if(viewId === 'ui') UIMgr.init();
+            if(viewId === 'events') EventsMgr.render();
+            if(viewId === 'links') LinksMgr.render();
+            if(viewId === 'rating') RatingMgr.render();
+            if(viewId === 'sessions') SessionMgr.render();
+            if(viewId === 'data') CacheMgr.render();
+            if(viewId === 'dev') DevMgr.loadRaw();
         }
 
-        // --- UI Manager ---
-        const UI = {
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // --- Modules ---
+
+        const DashboardMgr = {
             init: () => {
-                const savedColor = localStorage.getItem('custom_accent_color') || '#448aff';
+                const events = JSON.parse(localStorage.getItem('event_data_cache')) || [];
+                document.getElementById('dash-events').textContent = events.length;
+
+                const ace = JSON.parse(localStorage.getItem('ace_ids_cache')) || { data: [] };
+                const linksCount = Array.isArray(ace) ? ace.length : (ace.data ? ace.data.length : 0);
+                document.getElementById('dash-links').textContent = linksCount;
+
+                const ratings = JSON.parse(localStorage.getItem('ace_autorating_v1')) || {};
+                document.getElementById('dash-ratings').textContent = Object.keys(ratings).length;
+
+                let totalBytes = 0;
+                for(let key in localStorage) {
+                    if(localStorage.hasOwnProperty(key)) totalBytes += Utils.getSize(localStorage[key]);
+                }
+                document.getElementById('dash-storage').textContent = Utils.formatSize(totalBytes);
+                
+                // Chrome max localstorage is typically 5MB
+                const percent = Math.min(100, (totalBytes / (5 * 1024 * 1024)) * 100);
+                const bar = document.getElementById('dash-storage-bar');
+                bar.style.width = percent + '%';
+                bar.style.backgroundColor = percent > 80 ? 'var(--danger)' : percent > 50 ? 'var(--warning)' : 'var(--primary)';
+            }
+        };
+
+        const UIMgr = {
+            init: () => {
+                const savedColor = localStorage.getItem('custom_accent_color') || '#3b82f6';
                 document.getElementById('accentColorPicker').value = savedColor;
                 document.getElementById('colorHex').value = savedColor.toUpperCase();
-                document.documentElement.style.setProperty('--accent-blue', savedColor);
                 
                 const showLogos = localStorage.getItem('settings_show_logos') !== 'false';
                 document.getElementById('showLogosToggle').checked = showLogos;
+
+                const customCSS = localStorage.getItem('admin_custom_css') || '';
+                document.getElementById('customCssInput').value = customCSS;
             },
-            updateColor: (color) => {
+            updateAccent: (color) => {
                 localStorage.setItem('custom_accent_color', color);
                 document.getElementById('colorHex').value = color.toUpperCase();
-                document.documentElement.style.setProperty('--accent-blue', color);
-                Utils.showToast('Color actualizado');
+                Utils.toast('Color primario guardado');
             },
             updateLogoToggle: (checked) => {
                 localStorage.setItem('settings_show_logos', checked);
-                Utils.showToast(checked ? 'Logos activados' : 'Logos ocultos');
+                Utils.toast(checked ? 'Logos habilitados' : 'Logos ocultados');
+            },
+            saveCustomCSS: () => {
+                const css = document.getElementById('customCssInput').value;
+                localStorage.setItem('admin_custom_css', css);
+                Utils.toast('CSS Inyectado con éxito');
             },
             resetTheme: () => {
                 localStorage.removeItem('custom_accent_color');
                 localStorage.removeItem('settings_show_logos');
-                UI.init();
-                Utils.showToast('Tema restaurado');
+                localStorage.removeItem('admin_custom_css');
+                UIMgr.init();
+                Utils.toast('Tema reiniciado');
             }
         };
 
-        // --- Data & Cache Manager ---
-        const DataMgr = {
-            cachesToTrack: [
-                { key: 'event_data_cache', name: 'Datos de Eventos TV', icon: '🗓️' },
-                { key: 'ace_ids_cache', name: 'Lista de Enlaces AceStream', icon: '🔗' },
-                { key: 'logo_cache', name: 'Caché de Logos/Imágenes', icon: '🖼️' },
-                { key: 'ace_autorating_v1', name: 'Base de Datos de Reputación', icon: '⭐' }
-            ],
+        const EventsMgr = {
             render: () => {
-                const list = document.getElementById('cacheList');
-                list.innerHTML = '';
-                
-                DataMgr.cachesToTrack.forEach(item => {
-                    const data = localStorage.getItem(item.key);
-                    const size = data ? Utils.getSizeStr(data) : 'Vacío';
-                    const isEmpty = !data;
+                const data = JSON.parse(localStorage.getItem('event_data_cache')) || [];
+                document.getElementById('event-count').textContent = data.length;
+                const tbody = document.getElementById('eventsTableBody');
+                tbody.innerHTML = '';
 
-                    list.innerHTML += `
-                        <div class="setting-row">
-                            <div class="setting-info">
-                                <strong>${item.icon} ${item.name}</strong>
-                                <span>Clave: <span class="badge">${item.key}</span> | Peso: ${size}</span>
-                            </div>
-                            <button class="btn ${isEmpty ? '' : 'btn-danger'}" ${isEmpty ? 'disabled' : ''} 
-                                    onclick="DataMgr.clearKey('${item.key}')">🗑️</button>
-                        </div>
+                if(data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No hay eventos en caché</td></tr>`;
+                    return;
+                }
+
+                data.forEach(item => {
+                    const cleanHtml = item.infoHtml ? item.infoHtml.replace(/<[^>]*>?/gm, ' ') : 'N/A';
+                    tbody.innerHTML += `
+                        <tr class="searchable-row" data-search="${(item.competition + ' ' + cleanHtml).toLowerCase()}">
+                            <td><span class="badge">${item.fecha}</span><br><b>${item.hora}</b></td>
+                            <td style="color: var(--primary); font-weight: 500;">${item.competition}</td>
+                            <td style="font-size: 0.75rem; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${Utils.escapeHTML(item.infoHtml)}">${Utils.escapeHTML(cleanHtml)}</td>
+                            <td><span class="badge" style="background:var(--bg-surface);">${item.canales ? item.canales.length : 0} refs</span></td>
+                        </tr>
                     `;
                 });
-
-                // Añadir fila para variables de sesión/temporales
-                const tempKeys = Object.keys(localStorage).filter(k => k.startsWith('last_idx_') || k.startsWith('last_ts_') || k === 'search_query');
-                list.innerHTML += `
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <strong>🧹 Datos de Sesión Temporal</strong>
-                            <span>Limpiar búsquedas y estado de reproducción (${tempKeys.length} items)</span>
-                        </div>
-                        <button class="btn btn-danger" ${tempKeys.length===0?'disabled':''} onclick="DataMgr.clearSession()">🗑️</button>
-                    </div>
-                `;
             },
-            clearKey: (key) => {
-                if(Utils.confirmAction(`¿Seguro que deseas borrar ${key}?`)) {
-                    localStorage.removeItem(key);
-                    DataMgr.render();
-                    Utils.showToast('Caché eliminada');
-                }
-            },
-            clearSession: () => {
-                Object.keys(localStorage).forEach(k => {
-                    if(k.startsWith('last_idx_') || k.startsWith('last_ts_') || k === 'search_query' || k === 'ace_current_session') {
-                        localStorage.removeItem(k);
-                    }
+            filter: () => {
+                const term = document.getElementById('searchEvents').value.toLowerCase();
+                document.querySelectorAll('#eventsTableBody .searchable-row').forEach(row => {
+                    row.style.display = row.dataset.search.includes(term) ? '' : 'none';
                 });
-                DataMgr.render();
-                Utils.showToast('Sesión limpiada');
+            }
+        };
+
+        const LinksMgr = {
+            render: () => {
+                const cacheObj = JSON.parse(localStorage.getItem('ace_ids_cache')) || { data: [] };
+                const data = Array.isArray(cacheObj) ? cacheObj : (cacheObj.data || []);
+                const tbody = document.getElementById('linksTableBody');
+                tbody.innerHTML = '';
+
+                if(data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Sin enlaces cacheados</td></tr>`;
+                    return;
+                }
+
+                data.forEach(item => {
+                    tbody.innerHTML += `
+                        <tr class="searchable-row" data-search="${(item.name).toLowerCase()}">
+                            <td style="font-weight: 600;">${item.name}</td>
+                            <td class="mono" style="color: var(--text-muted);">${item.id}</td>
+                            <td><span class="badge">${item.source || 'Desconocido'}</span></td>
+                            <td><a href="acestream://${item.id}" class="btn btn-primary btn-sm" style="text-decoration:none;">Probar</a></td>
+                        </tr>
+                    `;
+                });
             },
-            factoryReset: () => {
-                if(Utils.confirmAction("¡ATENCIÓN! Esto borrará absolutamente todo. ¿Estás completamente seguro?")) {
-                    localStorage.clear();
-                    Utils.showToast('Sistema reseteado por completo');
-                    setTimeout(() => location.reload(), 1500);
+            filter: () => {
+                const term = document.getElementById('searchLinks').value.toLowerCase();
+                document.querySelectorAll('#linksTableBody .searchable-row').forEach(row => {
+                    row.style.display = row.dataset.search.includes(term) ? '' : 'none';
+                });
+            },
+            clearAll: () => {
+                if(confirm("¿Eliminar todos los enlaces? La app los descargará nuevamente en el próximo inicio.")) {
+                    localStorage.removeItem('ace_ids_cache');
+                    LinksMgr.render();
+                    Utils.toast('Caché de enlaces eliminada');
                 }
             }
         };
 
-        // --- Rating Manager ---
         const RatingMgr = {
             db: {},
             render: () => {
                 RatingMgr.db = JSON.parse(localStorage.getItem('ace_autorating_v1')) || {};
-                const tbody = document.getElementById('ratingsBody');
+                const tbody = document.getElementById('ratingsTableBody');
                 tbody.innerHTML = '';
                 
                 const entries = Object.entries(RatingMgr.db);
                 if(entries.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Sin datos de reputación todavía</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">El motor aún no tiene datos de aprendizaje.</td></tr>`;
                     return;
                 }
+
+                // Sort by score descending
+                entries.sort((a, b) => {
+                    const scoreA = typeof a[1] === 'object' ? a[1].score : a[1];
+                    const scoreB = typeof b[1] === 'object' ? b[1].score : b[1];
+                    return scoreB - scoreA;
+                });
 
                 entries.forEach(([id, data]) => {
                     const name = typeof data === 'object' ? (data.name || 'Desconocido') : 'Desconocido';
                     const score = typeof data === 'object' ? data.score : data;
                     const safeName = name.replace(/'/g, "&apos;");
                     
+                    let color = score >= 4 ? 'var(--success)' : score <= 2 ? 'var(--danger)' : 'var(--warning)';
+
                     tbody.innerHTML += `
-                        <tr class="rating-row" data-name="${name.toLowerCase()}">
+                        <tr class="searchable-row" data-search="${name.toLowerCase()}">
                             <td>
                                 <b>${name}</b><br>
-                                <span style="font-size:0.65rem; font-family:monospace; color:var(--text-muted);">${id.substring(0,15)}...</span>
+                                <span class="mono" style="font-size:0.7rem; color:var(--text-muted);">${id.substring(0,18)}...</span>
                             </td>
                             <td style="text-align:center;">
-                                <input type="number" step="0.1" min="1" max="5" value="${parseFloat(score).toFixed(1)}" 
-                                    class="input-sm" id="score_${id}">
+                                <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                                    <input type="number" step="0.1" min="1" max="5" value="${parseFloat(score).toFixed(1)}" 
+                                        class="input-control mono" id="score_${id}" style="width: 70px; text-align: center; color: ${color}; font-weight: bold; padding: 5px;">
+                                    <span style="color: ${color}">★</span>
+                                </div>
                             </td>
                             <td style="text-align:right;">
-                                <button class="btn btn-success" style="padding: 6px; font-size: 0.7rem;" onclick="RatingMgr.save('${id}', '${safeName}')">💾</button>
-                                <button class="btn btn-danger" style="padding: 6px; font-size: 0.7rem;" onclick="RatingMgr.delete('${id}')">❌</button>
+                                <button class="btn btn-secondary btn-sm" onclick="RatingMgr.save('${id}', '${safeName}')">💾 Guardar</button>
+                                <button class="btn btn-danger btn-sm" onclick="RatingMgr.delete('${id}')">🗑️</button>
                             </td>
                         </tr>
                     `;
                 });
             },
             filter: () => {
-                const term = document.getElementById('ratingSearch').value.toLowerCase();
-                document.querySelectorAll('.rating-row').forEach(row => {
-                    row.style.display = row.dataset.name.includes(term) ? '' : 'none';
+                const term = document.getElementById('searchRatings').value.toLowerCase();
+                document.querySelectorAll('#ratingsTableBody .searchable-row').forEach(row => {
+                    row.style.display = row.dataset.search.includes(term) ? '' : 'none';
                 });
             },
             save: (id, name) => {
                 const newScore = parseFloat(document.getElementById('score_' + id).value);
-                if(isNaN(newScore) || newScore < 1 || newScore > 5) return Utils.showToast('Valor inválido (1-5)', 'error');
-                
+                if(isNaN(newScore) || newScore < 1 || newScore > 5) return Utils.toast('Valor debe ser entre 1.0 y 5.0', 'error');
                 RatingMgr.db[id] = { name: name, score: newScore };
                 localStorage.setItem('ace_autorating_v1', JSON.stringify(RatingMgr.db));
-                Utils.showToast('Puntuación actualizada');
+                RatingMgr.render(); // Re-render for color update
+                Utils.toast('Puntuación ajustada');
             },
             delete: (id) => {
-                if(Utils.confirmAction('¿Eliminar este canal del registro?')) {
+                if(confirm('¿Olvidar lo aprendido para este ID?')) {
                     delete RatingMgr.db[id];
                     localStorage.setItem('ace_autorating_v1', JSON.stringify(RatingMgr.db));
                     RatingMgr.render();
-                    Utils.showToast('Registro eliminado');
+                    Utils.toast('Registro eliminado');
                 }
             },
             resetAll: () => {
-                if(Utils.confirmAction('¿Borrar TODO el historial de aprendizaje y puntuaciones?')) {
+                if(confirm('¡ATENCIÓN! Esto borrará TODO el historial de aprendizaje del motor. ¿Estás seguro?')) {
                     localStorage.removeItem('ace_autorating_v1');
                     RatingMgr.render();
-                    Utils.showToast('Reputación reiniciada');
+                    Utils.toast('Motor de reputación reseteado', 'warning');
                 }
             }
         };
 
-        // --- Sync & Backup Manager ---
+        const SessionMgr = {
+            render: () => {
+                const tbody = document.getElementById('sessionsTableBody');
+                tbody.innerHTML = '';
+                let hasData = false;
+
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('last_idx_')) {
+                        hasData = true;
+                        const channelName = key.replace('last_idx_', '');
+                        const idx = localStorage.getItem(key);
+                        const ts = localStorage.getItem('last_ts_' + channelName);
+                        const timeStr = ts ? Utils.timeAgo(parseInt(ts)) : 'Desconocido';
+
+                        tbody.innerHTML += `
+                            <tr>
+                                <td style="font-weight: 500; color: var(--primary);">${channelName.toUpperCase()}</td>
+                                <td><span class="badge" style="background:var(--bg-surface); font-size: 1rem;">${idx}</span></td>
+                                <td>${timeStr}</td>
+                                <td><button class="btn btn-danger btn-sm" onclick="SessionMgr.delete('${channelName}')">Borrar Historial</button></td>
+                            </tr>
+                        `;
+                    }
+                });
+
+                if (!hasData) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No hay sesiones guardadas.</td></tr>`;
+                }
+            },
+            delete: (channelName) => {
+                localStorage.removeItem('last_idx_' + channelName);
+                localStorage.removeItem('last_ts_' + channelName);
+                SessionMgr.render();
+                Utils.toast(`Historial de ${channelName} eliminado`);
+            },
+            clearAll: () => {
+                if(confirm("¿Limpiar todo el historial de reproducción rápido?")) {
+                    Object.keys(localStorage).forEach(key => {
+                        if (key.startsWith('last_idx_') || key.startsWith('last_ts_')) {
+                            localStorage.removeItem(key);
+                        }
+                    });
+                    SessionMgr.render();
+                    Utils.toast('Sesiones limpiadas');
+                }
+            }
+        };
+
+        const CacheMgr = {
+            render: () => {
+                const container = document.getElementById('cacheListContainer');
+                container.innerHTML = '';
+                
+                const knownKeys = {
+                    'event_data_cache': { name: 'Eventos TV', desc: 'JSON de la programación extraída' },
+                    'ace_ids_cache': { name: 'Enlaces AceStream', desc: 'IDs crudos cacheados' },
+                    'logo_cache': { name: 'Caché de Logos', desc: 'Mapeo de nombres a URLs de GitHub' },
+                    'ace_autorating_v1': { name: 'Base de Datos Rating', desc: 'Puntuaciones de inteligencia' }
+                };
+
+                let otherKeysCount = 0;
+                let otherKeysSize = 0;
+
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    const val = localStorage.getItem(key);
+                    const size = Utils.getSize(val);
+                    const fSize = Utils.formatSize(size);
+
+                    if (knownKeys[key]) {
+                        container.innerHTML += `
+                            <div class="row-flex" style="background: var(--bg-surface-hover); padding: 15px; border-radius: var(--radius-md); margin-bottom: 10px;">
+                                <div>
+                                    <div style="font-weight: 600; color: white;">${knownKeys[key].name} <span class="badge mono" style="margin-left:5px;">${key}</span></div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">${knownKeys[key].desc} | Peso: <b>${fSize}</b></div>
+                                </div>
+                                <button class="btn btn-danger btn-sm" onclick="CacheMgr.deleteKey('${key}')">Eliminar</button>
+                            </div>
+                        `;
+                    } else {
+                        otherKeysCount++;
+                        otherKeysSize += size;
+                    }
+                }
+
+                if (otherKeysCount > 0) {
+                    container.innerHTML += `
+                        <div class="row-flex" style="margin-top: 20px;">
+                            <div>
+                                <div style="font-weight: 600;">Otras variables menores</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">${otherKeysCount} items (sesiones, colores, busquedas) | Peso: ${Utils.formatSize(otherKeysSize)}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            deleteKey: (key) => {
+                if(confirm(`¿Borrar la llave ${key}?`)) {
+                    localStorage.removeItem(key);
+                    CacheMgr.render();
+                    Utils.toast('Llave eliminada');
+                }
+            },
+            clearTempSessions: () => {
+                Object.keys(localStorage).forEach(k => {
+                    if(k.startsWith('last_idx_') || k.startsWith('last_ts_') || k === 'search_query' || k === 'ace_current_session') {
+                        localStorage.removeItem(k);
+                    }
+                });
+                Utils.toast('Sesiones y búsquedas temporales limpiadas');
+            },
+            factoryReset: () => {
+                if(confirm("¡ATENCIÓN! Vas a vaciar el LocalStorage por completo. La app volverá al estado de instalación limpia. ¿Continuar?")) {
+                    localStorage.clear();
+                    Utils.toast('FACTORY RESET COMPLETADO', 'warning');
+                    setTimeout(() => location.reload(), 1500);
+                }
+            }
+        };
+
         let html5QrCode;
         const SyncMgr = {
             generateQR: () => {
@@ -559,8 +922,9 @@
                 const qrDiv = document.getElementById('qrcode');
                 qrDiv.innerHTML = "";
                 qrContainer.style.display = 'block';
+                document.getElementById('reader').style.display = 'none';
 
-                // Solo sincronizamos configuraciones ligeras para evitar desbordar el QR
+                // Solo sincronizamos lo esencial (Config visual y Rating)
                 const config = {
                     ui_accent: localStorage.getItem('custom_accent_color'),
                     ui_logos: localStorage.getItem('settings_show_logos'),
@@ -569,7 +933,7 @@
 
                 const dataString = JSON.stringify(config);
                 if (dataString.length > 2500) {
-                    Utils.showToast('Datos demasiado grandes para QR. Usa el Backup de Archivo.', 'warning');
+                    Utils.toast('Tu base de Rating es muy grande para un QR. Usa el Backup físico.', 'error');
                     qrContainer.style.display = 'none';
                     return;
                 }
@@ -581,98 +945,94 @@
                 readerDiv.style.display = 'block';
                 document.getElementById('qr-container').style.display = 'none';
                 
+                if(html5QrCode) {
+                    html5QrCode.clear();
+                }
+
                 html5QrCode = new Html5Qrcode("reader");
                 html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, 
                     (decodedText) => {
                         html5QrCode.stop().then(() => {
                             readerDiv.style.display = 'none';
-                            SyncMgr.processImport(decodedText);
+                            try {
+                                const data = JSON.parse(decodedText);
+                                if (data.ui_accent || data.ratings) {
+                                    if(confirm("Se detectó configuración válida. ¿Sobrescribir los ajustes actuales?")) {
+                                        if (data.ui_accent) localStorage.setItem('custom_accent_color', data.ui_accent);
+                                        if (data.ui_logos !== undefined) localStorage.setItem('settings_show_logos', data.ui_logos);
+                                        if (data.ratings) localStorage.setItem('ace_autorating_v1', JSON.stringify(data.ratings));
+                                        Utils.toast("Configuración aplicada con éxito");
+                                    }
+                                } else throw new Error();
+                            } catch (e) {
+                                Utils.toast("El QR no contiene datos de esta app", 'error');
+                            }
                         });
                     }
-                ).catch(err => Utils.showToast("Error cámara: " + err, 'error'));
+                ).catch(err => Utils.toast("Error al abrir cámara: " + err, 'error'));
             },
-            processImport: (rawJson) => {
-                try {
-                    const data = JSON.parse(rawJson);
-                    if (Utils.confirmAction("Se ha detectado configuración válida. ¿Deseas aplicarla y sobrescribir la actual?")) {
-                        if (data.ui_accent) localStorage.setItem('custom_accent_color', data.ui_accent);
-                        if (data.ui_logos !== undefined) localStorage.setItem('settings_show_logos', data.ui_logos);
-                        if (data.ratings) localStorage.setItem('ace_autorating_v1', JSON.stringify(data.ratings));
-                        
-                        Utils.showToast("Sincronización QR completada. Recargando...");
-                        setTimeout(() => location.reload(), 1500);
-                    }
-                } catch (e) {
-                    Utils.showToast("El código no contiene datos válidos", 'error');
-                }
-            },
-            exportBackup: () => {
+            exportJSON: () => {
                 const dump = JSON.stringify(localStorage, null, 2);
                 const blob = new Blob([dump], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `TV_Backup_${new Date().toISOString().split('T')[0]}.json`;
+                a.download = `TV_Index_Backup_${new Date().toISOString().split('T')[0]}.json`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                Utils.showToast('Backup descargado');
+                Utils.toast('Backup JSON exportado');
             },
-            importBackup: (event) => {
+            importJSON: (event) => {
                 const file = event.target.files[0];
                 if (!file) return;
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     try {
                         const data = JSON.parse(e.target.result);
-                        if(Utils.confirmAction(`¿Restaurar copia de seguridad? Esto sobrescribirá todos los datos actuales.`)) {
+                        if(confirm(`¿Estás seguro de restaurar este backup? Sobrescribirá TODOS los datos actuales.`)) {
                             localStorage.clear();
                             Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
-                            Utils.showToast('Restauración completa. Recargando...');
+                            Utils.toast('Restauración completa. Recargando...', 'success');
                             setTimeout(() => location.reload(), 1500);
                         }
                     } catch (error) {
-                        Utils.showToast('Archivo de backup corrupto o inválido', 'error');
+                        Utils.toast('El archivo no es un JSON válido', 'error');
                     }
-                    event.target.value = ''; // Reset input
+                    event.target.value = '';
                 };
                 reader.readAsText(file);
             }
         };
 
-        // --- Dev Tools Manager ---
         const DevMgr = {
             loadRaw: () => {
-                const dump = JSON.stringify(localStorage, null, 2);
-                document.getElementById('rawStorage').value = dump;
+                document.getElementById('rawStorageEditor').value = JSON.stringify(localStorage, null, 4);
             },
             saveRaw: () => {
                 try {
-                    const rawStr = document.getElementById('rawStorage').value;
-                    const parsed = JSON.parse(rawStr); // Validar JSON
+                    const rawStr = document.getElementById('rawStorageEditor').value;
+                    const parsed = JSON.parse(rawStr); 
                     
-                    if(Utils.confirmAction("Estás a punto de forzar datos crudos en el sistema. ¿Continuar?")) {
+                    if(confirm("CUIDADO: Estás sobrescribiendo la base de datos cruda. ¿Estás seguro de que el formato es correcto?")) {
                         localStorage.clear();
                         Object.keys(parsed).forEach(k => {
-                            // Ensure values are strings for localStorage
                             let val = typeof parsed[k] === 'object' ? JSON.stringify(parsed[k]) : String(parsed[k]);
                             localStorage.setItem(k, val);
                         });
-                        Utils.showToast('Base de datos sobrescrita');
-                        UI.init(); // Refresh local UI state
+                        Utils.toast('¡Base de datos inyectada con éxito!', 'warning');
                     }
                 } catch (e) {
-                    Utils.showToast('JSON Inválido: Revisa la sintaxis', 'error');
+                    Utils.toast('Error de sintaxis JSON. Revisa el código.', 'error');
                 }
             }
         };
 
-        // Inicialización
+        // Initialize default view
         document.addEventListener('DOMContentLoaded', () => {
-            UI.init();
+            switchView('dashboard');
         });
-
     </script>
 </body>
 </html>
