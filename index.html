@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Panel de Control TV</title>
+    <title>Admin Pro - Panel de Control TV</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
-            --bg-color: #0f0f0f;
-            --card-bg: #1e1e1e;
+            --bg-color: #0a0a0a;
+            --card-bg: #161616;
             --accent-blue: #448aff;
             --text-main: #ffffff;
-            --text-muted: #888888;
+            --text-muted: #a0a0a0;
             --danger: #ff4444;
             --success: #00c851;
+            --border: #2a2a2a;
         }
 
         body {
@@ -25,128 +27,129 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding-bottom: 100px;
         }
 
         .admin-container {
             width: 100%;
-            max-width: 600px;
+            max-width: 700px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 25px;
         }
 
-        h1 { font-size: 1.5rem; color: var(--accent-blue); margin-bottom: 5px; }
-        p.subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 0; }
+        header { border-bottom: 2px solid var(--accent-blue); padding-bottom: 15px; margin-bottom: 10px; }
+        h1 { font-size: 1.8rem; margin: 0; }
+        p.subtitle { color: var(--text-muted); font-size: 0.9rem; margin: 5px 0 0 0; }
 
         .card {
             background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .card-title {
             font-weight: 700;
-            margin-bottom: 15px;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
+            gap: 12px;
+            color: var(--accent-blue);
         }
 
         .setting-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #2a2a2a;
+            padding: 15px 0;
+            border-bottom: 1px solid #222;
         }
 
         .setting-row:last-child { border-bottom: none; }
 
         /* Controles */
-        input[type="color"] {
-            border: none;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            background: none;
+        input[type="color"] { border: none; width: 45px; height: 45px; cursor: pointer; background: none; }
+        
+        input[type="text"], textarea {
+            background: #222;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            font-family: monospace;
         }
 
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-
         .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #333;
-            transition: .4s;
-            border-radius: 24px;
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333; transition: .4s; border-radius: 26px;
         }
-
         .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px; width: 18px;
-            left: 3px; bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
+            position: absolute; content: ""; height: 20px; width: 20px;
+            left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;
         }
-
         input:checked + .slider { background-color: var(--accent-blue); }
-        input:checked + .slider:before { transform: translateX(26px); }
+        input:checked + .slider:before { transform: translateX(24px); }
 
-        button {
+        .btn {
             background: #333;
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
+            padding: 12px 20px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
             transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
         }
-
-        button:hover { opacity: 0.8; }
+        .btn:hover { background: #444; transform: translateY(-1px); }
+        .btn-primary { background: var(--accent-blue); }
         .btn-danger { background: var(--danger); }
+        .btn-success { background: var(--success); }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-            margin-top: 10px;
+        /* QR y Export */
+        #qr-container {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 20px auto;
         }
 
-        th { text-align: left; color: var(--text-muted); padding: 8px; }
-        td { padding: 8px; border-top: 1px solid #2a2a2a; }
-
-        .badge {
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            background: var(--accent-blue);
+        .sync-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
         }
+
+        /* Tablas */
+        .scroll-area { max-height: 300px; overflow-y: auto; margin-top: 10px; border-radius: 8px; background: #0c0c0c; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { text-align: left; color: var(--text-muted); padding: 12px; position: sticky; top: 0; background: #1a1a1a; }
+        td { padding: 12px; border-top: 1px solid #222; }
 
         .toast {
-            position: fixed;
-            bottom: 20px;
-            background: var(--success);
-            padding: 10px 20px;
-            border-radius: 8px;
-            display: none;
-            animation: fadeIn 0.3s;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: var(--success); color: white; padding: 12px 30px;
+            border-radius: 50px; display: none; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .search-box { margin-bottom: 10px; }
+
+        @media (max-width: 600px) {
+            .sync-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -154,17 +157,23 @@
     <div class="admin-container">
         <header>
             <h1>Panel de Administración</h1>
-            <p class="subtitle">Gestiona los ajustes globales de tu aplicación TV</p>
+            <p class="subtitle">Configuración avanzada y sincronización entre dispositivos</p>
         </header>
 
         <section class="card">
-            <div class="card-title">🎨 Personalización</div>
+            <div class="card-title">🎨 Apariencia y UI</div>
             <div class="setting-row">
-                <span>Color de acento</span>
+                <div>
+                    <strong>Color de Acento</strong>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Define el color global de la interfaz</div>
+                </div>
                 <input type="color" id="accentColorPicker" onchange="updateAccentColor(this.value)">
             </div>
             <div class="setting-row">
-                <span>Mostrar logos de canales</span>
+                <div>
+                    <strong>Logos de Canales</strong>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Mostrar imágenes en la lista</div>
+                </div>
                 <label class="switch">
                     <input type="checkbox" id="showLogosToggle" onchange="updateLogoVisibility(this.checked)">
                     <span class="slider"></span>
@@ -173,36 +182,73 @@
         </section>
 
         <section class="card">
-            <div class="card-title">💾 Almacenamiento Local (Caché)</div>
-            <div style="overflow-x: auto;">
-                <table id="storageTable">
+            <div class="card-title">🔄 Sincronización Express</div>
+            <p class="subtitle" style="margin-bottom: 15px;">Pasa tu configuración y reputación a otro dispositivo al instante.</p>
+            
+            <div style="text-align: center;">
+                <div id="qr-container" style="display: none;">
+                    <div id="qrcode"></div>
+                    <p style="color: black; font-size: 0.7rem; font-weight: bold; margin-top: 10px;">ESCÁNEAME CON OTRO MÓVIL</p>
+                </div>
+            </div>
+
+            <div class="sync-grid">
+                <button class="btn btn-primary" onclick="generateSyncQR()">📱 Generar QR de Sincro</button>
+                <button class="btn" onclick="copyConfigJSON()">📋 Copiar JSON al Portapapeles</button>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 8px;">Importar configuración (Pega aquí el texto):</label>
+                <textarea id="importArea" rows="3" placeholder='{"custom_accent_color": "#448aff", ...}'></textarea>
+                <button class="btn btn-success" style="width: 100%; margin-top: 10px;" onclick="importConfig()">📥 Aplicar Configuración Importada</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-title">⭐ Inteligencia de Canales</div>
+            <div class="search-box">
+                <input type="text" id="searchRating" placeholder="Filtrar canales por nombre..." oninput="renderRatings()">
+            </div>
+            <div class="scroll-area">
+                <table id="ratingsTable">
+                    <thead>
+                        <tr>
+                            <th>Canal / ID</th>
+                            <th style="text-align: right;">Puntuación</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ratingsBody"></tbody>
+                </table>
+            </div>
+            <div class="sync-grid" style="margin-top: 15px;">
+                <button class="btn btn-danger" onclick="resetRatings()">♻️ Reiniciar Todo</button>
+                <button class="btn" onclick="renderRatings()">🔄 Refrescar Lista</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-title">💾 Diagnóstico de Memoria</div>
+            <div class="scroll-area">
+                <table>
                     <thead>
                         <tr>
                             <th>Clave</th>
+                            <th>Tamaño aprox.</th>
                             <th>Acción</th>
                         </tr>
                     </thead>
                     <tbody id="storageBody"></tbody>
                 </table>
             </div>
-            <div style="margin-top: 20px; display: flex; gap: 10px;">
-                <button onclick="location.reload()">🔄 Refrescar</button>
-                <button class="btn-danger" onclick="clearAllData()">🗑️ Borrar Todo</button>
+            <div style="margin-top: 15px;">
+                <button class="btn btn-danger" style="width: 100%;" onclick="clearAllData()">🗑️ Borrar Caché y Datos Completos</button>
             </div>
         </section>
 
-        <section class="card">
-            <div class="card-title">⭐ Reputación de Canales (IDs)</div>
-            <p class="subtitle">Puntuaciones automáticas basadas en tu uso:</p>
-            <div id="ratingsList" style="max-height: 200px; overflow-y: auto; font-size: 0.85rem;">
-                </div>
-            <button style="margin-top:15px; width: 100%;" onclick="resetRatings()">Reiniciar Puntuaciones</button>
-        </section>
-
-        <button onclick="window.location.href='index.html'" style="margin-bottom: 50px;">⬅️ Volver a la App</button>
+        <button class="btn" onclick="window.location.href='index.html'" style="width: 100%; padding: 15px; background: #222;">⬅️ Volver a la Aplicación Principal</button>
     </div>
 
-    <div id="toast" class="toast">¡Ajuste guardado!</div>
+    <div id="toast" class="toast">¡Hecho!</div>
 
     <script>
         // --- INICIALIZACIÓN ---
@@ -212,21 +258,20 @@
             renderRatings();
         });
 
-        function showToast(msg) {
+        function showToast(msg, isError = false) {
             const t = document.getElementById('toast');
-            t.textContent = msg || "¡Ajuste guardado!";
+            t.textContent = msg || "¡Guardado!";
+            t.style.background = isError ? "var(--danger)" : "var(--success)";
             t.style.display = 'block';
-            setTimeout(() => { t.style.display = 'none'; }, 2000);
+            setTimeout(() => { t.style.display = 'none'; }, 2500);
         }
 
-        // --- GESTIÓN DE AJUSTES ---
+        // --- GESTIÓN DE AJUSTES BÁSICOS ---
         function loadSettings() {
-            // Color
             const savedColor = localStorage.getItem('custom_accent_color') || '#448aff';
             document.getElementById('accentColorPicker').value = savedColor;
             document.documentElement.style.setProperty('--accent-blue', savedColor);
 
-            // Logos (Por defecto true)
             const showLogos = localStorage.getItem('settings_show_logos') !== 'false';
             document.getElementById('showLogosToggle').checked = showLogos;
         }
@@ -239,27 +284,127 @@
 
         function updateLogoVisibility(visible) {
             localStorage.setItem('settings_show_logos', visible);
-            showToast(visible ? "Logos activados" : "Logos desactivados");
+            showToast(visible ? "Logos habilitados" : "Logos ocultos");
         }
 
-        // --- GESTIÓN DE STORAGE ---
+        // --- EXPORTACIÓN / IMPORTACIÓN (SINCRONIZACIÓN) ---
+        function getFullConfig() {
+            const config = {
+                custom_accent_color: localStorage.getItem('custom_accent_color'),
+                settings_show_logos: localStorage.getItem('settings_show_logos'),
+                ace_autorating_v1: JSON.parse(localStorage.getItem('ace_autorating_v1')) || {}
+            };
+            return JSON.stringify(config);
+        }
+
+        function generateSyncQR() {
+            const qrContainer = document.getElementById('qr-container');
+            const qrDiv = document.getElementById('qrcode');
+            qrDiv.innerHTML = ""; // Limpiar anterior
+            
+            qrContainer.style.display = 'block';
+            
+            // Nota: Los QR tienen límite de datos. Filtramos los más importantes si es muy largo.
+            new QRCode(qrDiv, {
+                text: getFullConfig(),
+                width: 200,
+                height: 200,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.L
+            });
+            window.scrollTo({ top: 100, behavior: 'smooth' });
+        }
+
+        function copyConfigJSON() {
+            const data = getFullConfig();
+            navigator.clipboard.writeText(data).then(() => {
+                showToast("JSON copiado al portapapeles");
+            });
+        }
+
+        function importConfig() {
+            const area = document.getElementById('importArea');
+            if (!area.value.trim()) return;
+
+            try {
+                const data = JSON.parse(area.value);
+                
+                if (data.custom_accent_color) localStorage.setItem('custom_accent_color', data.custom_accent_color);
+                if (data.settings_show_logos !== undefined) localStorage.setItem('settings_show_logos', data.settings_show_logos);
+                if (data.ace_autorating_v1) localStorage.setItem('ace_autorating_v1', JSON.stringify(data.ace_autorating_v1));
+
+                showToast("Sincronización exitosa. Recargando...");
+                setTimeout(() => location.reload(), 1500);
+            } catch (e) {
+                showToast("Error: El formato JSON no es válido", true);
+            }
+        }
+
+        // --- GESTIÓN DE REPUTACIÓN ---
+        function renderRatings() {
+            const body = document.getElementById('ratingsBody');
+            const filter = document.getElementById('searchRating').value.toLowerCase();
+            const db = JSON.parse(localStorage.getItem('ace_autorating_v1')) || {};
+            
+            body.innerHTML = '';
+            
+            const entries = Object.entries(db);
+            if (entries.length === 0) {
+                body.innerHTML = '<tr><td colspan="2" style="text-align:center; color:var(--text-muted)">Sin datos aún</td></tr>';
+                return;
+            }
+
+            entries.forEach(([id, data]) => {
+                const name = typeof data === 'object' ? data.name : 'Desconocido';
+                const score = typeof data === 'object' ? data.score : data;
+
+                if (name.toLowerCase().includes(filter) || id.includes(filter)) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <div style="font-weight:600">${name}</div>
+                            <div style="font-size:0.7rem; color:var(--text-muted); font-family:monospace">${id.substring(0,12)}...</div>
+                        </td>
+                        <td style="text-align:right; font-weight:bold; color:var(--accent-blue); font-size:1rem;">
+                            ★ ${score.toFixed(1)}
+                        </td>
+                    `;
+                    body.appendChild(row);
+                }
+            });
+        }
+
+        function resetRatings() {
+            if(confirm("¿Restablecer la inteligencia de todos los canales? Perderás el aprendizaje de qué señales funcionan mejor.")) {
+                localStorage.removeItem('ace_autorating_v1');
+                renderRatings();
+                showToast("Reputación reiniciada");
+            }
+        }
+
+        // --- STORAGE DIAGNOSTICS ---
         function renderStorage() {
             const body = document.getElementById('storageBody');
             body.innerHTML = '';
             
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
+                const val = localStorage.getItem(key);
+                const size = (val.length * 2 / 1024).toFixed(2); // KB aproximados
+                
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><code>${key}</code></td>
-                    <td><button onclick="deleteKey('${key}')">Eliminar</button></td>
+                    <td style="color:var(--text-muted)">${size} KB</td>
+                    <td><button class="btn" style="padding:5px 10px; font-size:0.7rem;" onclick="deleteKey('${key}')">Eliminar</button></td>
                 `;
                 body.appendChild(row);
             }
         }
 
         function deleteKey(key) {
-            if(confirm(`¿Borrar la clave ${key}?`)) {
+            if(confirm(`¿Borrar permanentemente ${key}?`)) {
                 localStorage.removeItem(key);
                 renderStorage();
                 showToast("Dato eliminado");
@@ -267,42 +412,9 @@
         }
 
         function clearAllData() {
-            if(confirm("¿Estás seguro? Esto borrará toda la caché, logos y favoritos.")) {
+            if(confirm("¡ATENCIÓN! Esto borrará favoritos, caché de logos, reputación y ajustes. ¿Continuar?")) {
                 localStorage.clear();
                 location.reload();
-            }
-        }
-
-        // --- REPUTACIÓN ---
-        function renderRatings() {
-            const list = document.getElementById('ratingsList');
-            const db = JSON.parse(localStorage.getItem('ace_autorating_v1')) || {};
-            
-            if (Object.keys(db).length === 0) {
-                list.innerHTML = '<p style="color:var(--text-muted)">No hay datos de reputación aún.</p>';
-                return;
-            }
-
-            let html = '<table>';
-            for (const [id, data] of Object.entries(db)) {
-                const name = typeof data === 'object' ? data.name : 'Desconocido';
-                const score = typeof data === 'object' ? data.score : data;
-                html += `
-                    <tr>
-                        <td>${name} <br> <small style="color:var(--text-muted)">${id.substring(0,8)}...</small></td>
-                        <td style="text-align:right; font-weight:bold; color:var(--accent-blue)">★ ${score.toFixed(1)}</td>
-                    </tr>
-                `;
-            }
-            html += '</table>';
-            list.innerHTML = html;
-        }
-
-        function resetRatings() {
-            if(confirm("¿Deseas reiniciar la reputación de todos los canales a 3.0?")) {
-                localStorage.removeItem('ace_autorating_v1');
-                renderRatings();
-                showToast("Reputación reseteada");
             }
         }
     </script>
