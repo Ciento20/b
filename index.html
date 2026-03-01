@@ -13,11 +13,34 @@
         #events-container.search-mode-active .event-card {
             width: 100%;
         }
-        </style></head><body>
+        
+        /* Estilos QR Sync */
+        #qr-sync-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:3000; flex-direction:column; align-items:center; justify-content:center; padding:20px; text-align:center; }
+        #qr-reader { width: 100%; max-width: 400px; border-radius: 12px; overflow: hidden; background: #000; margin-bottom: 20px; }
+        #qr-canvas { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        .qr-btn-close { position:absolute; top:20px; right:20px; font-size:2rem; color:white; cursor:pointer; background:none; border:none; }
+        .qr-info { color: var(--accent-blue); margin-bottom: 20px; font-size: 0.9rem; font-weight: 600; }
+        </style>
+        <script src="https://unpkg.com/html5-qrcode"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script></head><body>
     <div id="loader-container">
         <div class="loader-bar"></div>
     </div><div id="status"><div class="spinner"></div></div><div id="searchContainer" style="display:none;width:95%;max-width:500px;margin:10px auto 0 auto;gap:8px;align-items:center;padding-bottom:10px;"><div style="position:relative;flex:1;display:flex;align-items:center"><input type="text" id="globalSearchInput" placeholder="Buscar canal, equipo o competición..." style="width:100%;padding:12px 40px 12px 16px;border-radius:12px;border:1px solid var(--border-color);background:var(--card-bg);color:#fff;font-size:.9rem;outline:0"><span id="clearSearch" style="position:absolute;right:12px;color:var(--text-muted);cursor:pointer;display:none;font-size:1.2rem;user-select:none">&times;</span></div></div><div id="events-container"></div>
-<div id="noResultsContainer" style="display:none;text-align:center;padding:40px;color:var(--text-muted)"><div><div style="font-size:3rem;margin-bottom:10px">📡</div><div style="font-weight:700;font-size:1.1rem;color:var(--text-main)">Sin resultados</div><div style="font-size:.85rem;margin-top:5px;opacity:.8">Intenta con otra búsqueda</div></div></div><div id="ids-modal" class="modal-overlay" onclick="UIManager.closeModal(event)"><div class="modal-content" onclick="event.stopPropagation()"><div id="modal-title" class="modal-title">Canales</div><div id="ids-list" class="ids-list"></div></div></div><nav class="bottom-nav"><div class="nav-item active" id="nav-home" onclick='UIManager.switchTab("home")'><span class="nav-icon">🗓️</span><span>EVENTOS</span></div><div class="nav-item" id="nav-channels" onclick='UIManager.switchTab("channels")'><span class="nav-icon">🔍</span><span>BUSCAR</span></div></nav><script>const CONFIG = {
+<div id="noResultsContainer" style="display:none;text-align:center;padding:40px;color:var(--text-muted)"><div><div style="font-size:3rem;margin-bottom:10px">📡</div><div style="font-weight:700;font-size:1.1rem;color:var(--text-main)">Sin resultados</div><div style="font-size:.85rem;margin-top:5px;opacity:.8">Intenta con otra búsqueda</div></div></div><div id="ids-modal" class="modal-overlay" onclick="UIManager.closeModal(event)"><div class="modal-content" onclick="event.stopPropagation()"><div id="modal-title" class="modal-title">Canales</div><div id="ids-list" class="ids-list"></div></div></div>
+
+    
+    <div id="qr-sync-modal">
+        <button class="qr-btn-close" onclick="QRManager.close()">&times;</button>
+        <div class="qr-info">SINCRONIZACIÓN DE DISPOSITIVOS</div>
+        
+        <div id="qr-canvas"></div>
+        <p style="font-size:0.7rem; opacity:0.7; margin-bottom:30px;">Escanea este código desde otro dispositivo para clonar tus puntuaciones</p>
+        
+        <div style="width:80%; height:1px; background:rgba(255,255,255,0.1); margin-bottom:30px;"></div>
+        
+        <div id="qr-reader"></div>
+        <p id="qr-status" style="font-size:0.8rem; color:var(--accent-blue)">Cámara lista para escanear</p>
+    </div><nav class="bottom-nav"><div class="nav-item active" id="nav-home" onclick='UIManager.switchTab("home")'><span class="nav-icon">🗓️</span><span>EVENTOS</span></div><div class="nav-item" id="nav-channels" onclick='UIManager.switchTab("channels")'><span class="nav-icon">🔍</span><span>BUSCAR</span></div></nav><script>const CONFIG = {
             BASE_URL: 'https://www.futbolenlatv.es',
             TARGET_URL: 'https://www.futbolenlatv.es/deporte',
             GIST_LOGOS: 'https://gist.githubusercontent.com/Ciento20/f7847e86d06e5011706fa76f2dab90be/raw/',
@@ -34,21 +57,35 @@
         };        const RatingEngine = {
             DB_KEY: 'ace_autorating_v1',
             SESSION_KEY: 'ace_current_session',
-            PENDING_KEY: 'ace_pending_penalties_list', // Cambiado a lista para múltiples fallos
+            PENDING_KEY: 'ace_pending_penalties_list',
             interval: null,
 
             getDB() { return JSON.parse(localStorage.getItem(this.DB_KEY)) || {}; },
-            getScore(id) { return this.getDB()[id] || 3.0; },            saveScore(id, delta) {
-                if (delta < 0) return; // Ignorar penalizaciones por zapping
+            
+            getScore(id) { 
+                const entry = this.getDB()[id];
+                if (!entry) return 3.0;
+                return (typeof entry === 'object') ? (entry.score || 3.0) : entry;
+            },
+
+            saveScore(id, delta, name = "") {
                 const db = this.getDB();
-                db[id] = Math.max(1.0, Math.min(5.0, (db[id] || 3.0) + delta));
+                let entry = db[id];
+
+                // Normalizar entrada (migración de legacy a objeto)
+                if (!entry || typeof entry !== 'object') {
+                    entry = { score: entry || 3.0, name: name || "Desconocido" };
+                }
+                
+                if (name) entry.name = name;
+                entry.score = Math.max(1.0, Math.min(5.0, entry.score + delta));
+                
+                db[id] = entry;
                 localStorage.setItem(this.DB_KEY, JSON.stringify(db));
             },
 
             trackStart(id, channelName, index = 0) {
-                // 1. Antes de iniciar, comprobamos si la sesión anterior fue un 'fracaso' (zapping)
                 this.checkPreviousSession();
-                
                 const now = Date.now();
                 this.stopRealTimeUpdate();
                 
@@ -62,8 +99,10 @@
                 
                 localStorage.setItem(this.SESSION_KEY, JSON.stringify(sessionData));
                 this.startRealTimeUpdate();
-            },            processFocusReturn(newChannelName) {
-                localStorage.removeItem(this.PENDING_KEY); // Resetear sin penalizar al volver
+            },
+
+            processFocusReturn(newChannelName) {
+                localStorage.removeItem(this.PENDING_KEY);
             },
 
             checkPreviousSession() {
@@ -72,35 +111,28 @@
                 
                 const durationSec = (Date.now() - session.start) / 1000;
                 
-                // Si el canal duró menos de 90 segundos, es un fallo de estabilidad/zapping
                 if (durationSec < 90) {
-                    const db = this.getDB();
-                    // Penalizamos directamente el ID que acaba de fallar
-                    db[session.id] = Math.max(1.0, (db[session.id] || 3.0) - 0.5);
-                    localStorage.setItem(this.DB_KEY, JSON.stringify(db));
+                    // Penalización persistente con nombre
+                    this.saveScore(session.id, -0.5, session.channelName);
                     
-                    // Guardamos en pendientes para que la UI lo marque visualmente de inmediato
                     localStorage.setItem(this.PENDING_KEY, JSON.stringify({
                         id: session.id,
                         timestamp: Date.now()
                     }));
                 } else {
-                    // Si duró suficiente, limpiamos marcas de error previas
                     localStorage.removeItem(this.PENDING_KEY);
                 }
-            },            startRealTimeUpdate() {
+            },
+
+            startRealTimeUpdate() {
                 if (this.interval) clearInterval(this.interval);
                 this.interval = setInterval(() => {
                     const session = JSON.parse(localStorage.getItem(this.SESSION_KEY));
                     if (!session) return this.stopRealTimeUpdate();
                     const min = (Date.now() - session.start) / 60000;
-                    let delta = 0;
+                    
                     if (min >= 30 && (min - session.lastProcessedMin) >= 30) {
-                        delta = 1.0;
-                    }
-
-                    if (delta > 0) {
-                        this.saveScore(session.id, delta);
+                        this.saveScore(session.id, 1.0, session.channelName);
                         session.lastProcessedMin = Math.floor(min / 30) * 30;
                         localStorage.setItem(this.SESSION_KEY, JSON.stringify(session));
                     }
@@ -116,13 +148,15 @@
             if (rawUpper.includes("ACB EVENTO 01")) name = "DAZN BALONCESTO";
             if (rawUpper.includes("ACB EVENTO 02")) name = "DAZN BALONCESTO 2";
             if (rawUpper.includes("M. DEPORTES")) name = "M+ DEPORTES";
-            let cleaned = name.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (rawUpper.includes("M+ ELLAS VAMOS")) name = "M+ ELLAS";
+            if (rawUpper.includes("M+ ELLAS VAMOS")) name = "M+ ELLAS";
+            let cleaned = name.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\(SOLO EVENTOS\)/gi, "").replace(/\( SOLO EVENTOS \)/gi, "");
             if (cleaned.includes("LIGA DE CAMPEONES") && !cleaned.includes("M+")) {
                 cleaned = cleaned.replace("LIGA DE CAMPEONES", "M+ LIGA DE CAMPEONES");
             }
             cleaned = cleaned.replace(/PLUS\+/g, "PLUS").replace(/\bMOVISTAR\b/g, "M+").replace(/\bM\./g, "M+").replace(/\(ES\)/gi, "").replace(/\bLA LIGA\b/g, "LALIGA").replace(/\bHYPERMOTION\b/g, "LALIGA TV HYPERMOTION").replace(/\bBAR\b/gi, "").replace(/\b(HD|FHD|4K|1080P|720P)\b/gi, "").replace(/\*/g, "").replace(/\s+/g, " ").trim();
             if (cleaned.includes("CALCIO EVENTOS")) { cleaned = cleaned.replace("CALCIO EVENTOS", "SKY SPORTS CALCIO EVENTOS"); }
-            if (cleaned.includes("(1RFEF) (SOLO EVENTOS)")) { cleaned = "PRIMERA FEDERACION"; }
+            if (cleaned.includes("(1RFEF)")) { cleaned = "PRIMERA FEDERACION"; }
             if (cleaned.includes("DAZN LALIGA")) {
                 cleaned = cleaned.replace(/\b1\b/g, "");
             }
@@ -504,7 +538,7 @@
                 let lastDate = "";
                 renderedList.forEach((item, idx) => {
                     if (item.fecha !== lastDate) {
-                        htmlBuffer += `<div class="date-header">${item.fecha}</div>`;
+                        htmlBuffer += `<div class="date-header" ondblclick="document.getElementById('real-time-marker')?.scrollIntoView({behavior: 'smooth', block: 'center'})">${item.fecha}</div>`;
                         lastDate = item.fecha;
                     }
                     const isLastFinished = idx === lastFinishedIdx;
@@ -525,7 +559,7 @@
                     `;
                     if (isLastFinished) {
                         const now = new Date();
-                        const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');                        htmlBuffer += `<div class="date-header" style="position:static; background:transparent; margin:10px 0; animation: blink-marker 2s infinite; z-index:1;"><span class="date-number" id="real-time-marker" style="margin:0">${timeStr}</span></div><style>@keyframes blink-marker{0%,100%{opacity:1}50%{opacity:0.2}}</style>`;
+                        const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');                        htmlBuffer += `<div class="date-header" id="time-marker-container" style="position:static; background:transparent; margin:10px 0; animation: blink-marker 2s infinite; z-index:1;"><span class="date-number" id="real-time-marker" style="margin:0">${timeStr}</span></div><style>@keyframes blink-marker{0%,100%{opacity:1}50%{opacity:0.2}}</style>`;
                     }
                 });
                 this.container.innerHTML = htmlBuffer;
@@ -615,8 +649,8 @@
     let contentHtml = '';
     if (title === 'OTROS CANALES') {
         const regions = [
-            { keys: ['[US]', '(US)'], flag: '🇺🇸', id: 'us' },
-            { keys: ['[UK]', '(UK)'], flag: '🇬🇧', id: 'uk' },
+            
+            
             { keys: ['[BE]', '(BE)'], flag: '🇧🇪', id: 'be' },
             { keys: ['[DE]', '(DE)'], flag: '🇩🇪', id: 'de' },
             { keys: ['[TR]', '(TR)'], flag: '🇹🇷', id: 'tr' },
@@ -677,14 +711,8 @@
                 const safeName = name.replace(/'/g, "\\'");
                 let badgeHtml = '';
                 const upperName = clean.toUpperCase();
-
-                if (upperName.includes('BALONCESTO')) {
-                    badgeHtml = '<div style="position: absolute; right: 15.4%; top: 50.5%; transform: translateY(-50%); font-size: 36.7px; line-height: 1; z-index: 0; opacity: 0.9;">🏀</div>';
-                }
-
-                if (upperName.includes('VAMOS 2')) {
-                    badgeHtml = '<div style="position: absolute; left: 28px; bottom: 12px; color: #1ec33c; font-weight: 900; font-size: 1.5rem; z-index: 2;">2</div>';
-                }
+                const isSpecialEurosport = upperName.includes('EUROSPORT 1') || upperName.includes('EUROSPORT 2');
+                const logoStyle = isSpecialEurosport ? 'width:95%; height:95%; transform: scale(1.28); padding-left: 8px;' : 'width:80%; height:80%;';
 
                 return `<div class="channel-button" 
                              onclick="UIManager.handleChannelClick(event, '${safeName}')"
@@ -695,7 +723,7 @@
                              ontouchmove="const moveY = Math.abs(event.touches[0].clientY - UIManager.touchStartY); if(moveY > 10) UIManager.clearLongPress();"
                              ontouchend="UIManager.clearLongPress()">
                         ${badgeHtml}
-                        ${logoUrl ? `<img src="${logoUrl}" class="channel-logo" style="position:relative; z-index:2; pointer-events:none;" onerror="this.outerHTML='<span>${clean}</span>'">` : `<span style="position:relative; z-index:2; pointer-events:none;">${clean}</span>`}
+                        ${logoUrl ? `<img src="${logoUrl}" class="channel-logo" style="position:relative; z-index:2; pointer-events:none; ${logoStyle}" onerror="this.outerHTML='<span>${clean}</span>'">` : `<span style="position:relative; z-index:2; pointer-events:none;">${clean}</span>`}
                     </div>`;
             },            longPressTimer: null,
             isLongPress: false,
@@ -805,6 +833,71 @@
                 cBtn.style.display = 'block';
             }
             UIManager.switchTab(currentTab);
+            const QRManager = {
+                html5QrCode: null,
+                
+                async open() {
+                    document.getElementById('qr-sync-modal').style.display = 'flex';
+                    // Generar QR con la base de datos actual
+                    const data = localStorage.getItem('ace_autorating_v1') || '{}';
+                    document.getElementById('qr-canvas').innerHTML = '';
+                    new QRCode(document.getElementById('qr-canvas'), {
+                        text: data,
+                        width: 256,
+                        height: 256,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.L
+                    });
+
+                    // Iniciar Escáner
+                    this.html5QrCode = new Html5Qrcode("qr-reader");
+                    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+                    
+                    try {
+                        await this.html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
+                            this.handleScan(decodedText);
+                        });
+                    } catch (err) {
+                        document.getElementById('qr-status').textContent = "Error: No se pudo acceder a la cámara";
+                    }
+                },
+
+                handleScan(data) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        const currentDB = RatingEngine.getDB();
+                        // Fusionar bases de datos (mantener la puntuación más alta)
+                        Object.keys(parsed).forEach(id => {
+                            if (!currentDB[id] || parsed[id].score > currentDB[id].score) {
+                                currentDB[id] = parsed[id];
+                            }
+                        });
+                        localStorage.setItem('ace_autorating_v1', JSON.stringify(currentDB));
+                        alert("¡Datos sincronizados con éxito!");
+                        this.close();
+                        location.reload();
+                    } catch (e) {
+                        document.getElementById('qr-status').textContent = "Código QR no válido";
+                    }
+                },
+
+                close() {
+                    if (this.html5QrCode) {
+                        this.html5QrCode.stop().catch(() => {});
+                    }
+                    document.getElementById('qr-sync-modal').style.display = 'none';
+                }
+            };
+
+            gInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && gInput.value.toUpperCase() === '/PE') {
+                    e.preventDefault();
+                    gInput.value = '';
+                    QRManager.open();
+                }
+            });
+
             gInput.addEventListener('input', (e) => {
                 cBtn.style.display = e.target.value ? 'block' : 'none';
                 clearTimeout(sT);
@@ -923,9 +1016,7 @@
                 const blob = new Blob([swCode], {type: 'text/javascript'});
                 navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
             });
-        }
-
-        window.syncMarker = () => {
+        }        window.syncMarker = () => {
             const marker = document.getElementById('real-time-marker');
             const now = new Date();
             const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
@@ -933,33 +1024,29 @@
                 marker.textContent = timeStr;
             }
             return timeStr;
-        };
-
-        const startMasterClock = () => {
+        };        const startMasterClock = () => {
             const forceUpdate = () => {
-                // 1. Actualizar la lógica de datos
-                if (typeof UIManager !== 'undefined') {
-                    UIManager.lastEventsHTML = ''; // Forzar regeneración de HTML
+                // Actualización quirúrgica del texto del marcador
+                window.syncMarker();
+                
+                // El refresh completo solo ocurre si el marcador NO existe o si hay cambios de estado reales,
+                // pero para el cambio de minuto basta con actualizar el texto del elemento.
+                if (typeof UIManager !== 'undefined' && state.tvSearchTerm === '' && !document.getElementById('real-time-marker')) {
                     UIManager.refresh();
                 }
-                // 2. Actualizar el reloj visual inmediatamente
-                const timeStr = window.syncMarker();
-                console.log('Update ejecutado a las: ' + timeStr);
             };
 
-            // Ejecutar cada vez que cambia el minuto exacto
             const scheduleNext = () => {
                 const now = new Date();
                 const msUntilNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
                 
                 setTimeout(() => {
                     forceUpdate();
-                    scheduleNext(); // Re-programar para el siguiente minuto exacto
+                    scheduleNext();
                 }, msUntilNextMinute);
             };
 
             scheduleNext();
-            // Ejecución inmediata al cargar para asegurar que el reloj no espere al primer minuto
             window.syncMarker();
         };
         startMasterClock();
@@ -967,7 +1054,7 @@
         // Lógica de autorefresco a las 00:00:03
         const scheduleMidnightRefresh = () => {
             const now = new Date();
-            const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+            const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 5, 0);
             const msUntilRefresh = midnight.getTime() - now.getTime();
             
             setTimeout(() => {
