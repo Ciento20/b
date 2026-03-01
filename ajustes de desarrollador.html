@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Panel de Control TV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f0f0f;
+            --card-bg: #1e1e1e;
+            --accent-blue: #448aff;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --danger: #ff4444;
+            --success: #00c851;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .admin-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h1 { font-size: 1.5rem; color: var(--accent-blue); margin-bottom: 5px; }
+        p.subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 0; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #333;
+        }
+
+        .card-title {
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .setting-row:last-child { border-bottom: none; }
+
+        /* Controles */
+        input[type="color"] {
+            border: none;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            background: none;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px; width: 18px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--accent-blue); }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        button {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        button:hover { opacity: 0.8; }
+        .btn-danger { background: var(--danger); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            margin-top: 10px;
+        }
+
+        th { text-align: left; color: var(--text-muted); padding: 8px; }
+        td { padding: 8px; border-top: 1px solid #2a2a2a; }
+
+        .badge {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            background: var(--accent-blue);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            background: var(--success);
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <header>
+            <h1>Panel de Administración</h1>
+            <p class="subtitle">Gestiona los ajustes globales de tu aplicación TV</p>
+        </header>
+
+        <section class="card">
+            <div class="card-title">🎨 Personalización</div>
+            <div class="setting-row">
+                <span>Color de acento</span>
+                <input type="color" id="accentColorPicker" onchange="updateAccentColor(this.value)">
+            </div>
+            <div class="setting-row">
+                <span>Mostrar logos de canales</span>
+                <label class="switch">
+                    <input type="checkbox" id="showLogosToggle" onchange="updateLogoVisibility(this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-title">💾 Almacenamiento Local (Caché)</div>
+            <div style="overflow-x: auto;">
+                <table id="storageTable">
+                    <thead>
+                        <tr>
+                            <th>Clave</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="storageBody"></tbody>
+                </table>
+            </div>
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button onclick="location.reload()">🔄 Refrescar</button>
+                <button class="btn-danger" onclick="clearAllData()">🗑️ Borrar Todo</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-title">⭐ Reputación de Canales (IDs)</div>
+            <p class="subtitle">Puntuaciones automáticas basadas en tu uso:</p>
+            <div id="ratingsList" style="max-height: 200px; overflow-y: auto; font-size: 0.85rem;">
+                </div>
+            <button style="margin-top:15px; width: 100%;" onclick="resetRatings()">Reiniciar Puntuaciones</button>
+        </section>
+
+        <button onclick="window.location.href='index.html'" style="margin-bottom: 50px;">⬅️ Volver a la App</button>
+    </div>
+
+    <div id="toast" class="toast">¡Ajuste guardado!</div>
+
+    <script>
+        // --- INICIALIZACIÓN ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            renderStorage();
+            renderRatings();
+        });
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg || "¡Ajuste guardado!";
+            t.style.display = 'block';
+            setTimeout(() => { t.style.display = 'none'; }, 2000);
+        }
+
+        // --- GESTIÓN DE AJUSTES ---
+        function loadSettings() {
+            // Color
+            const savedColor = localStorage.getItem('custom_accent_color') || '#448aff';
+            document.getElementById('accentColorPicker').value = savedColor;
+            document.documentElement.style.setProperty('--accent-blue', savedColor);
+
+            // Logos (Por defecto true)
+            const showLogos = localStorage.getItem('settings_show_logos') !== 'false';
+            document.getElementById('showLogosToggle').checked = showLogos;
+        }
+
+        function updateAccentColor(color) {
+            localStorage.setItem('custom_accent_color', color);
+            document.documentElement.style.setProperty('--accent-blue', color);
+            showToast("Color actualizado");
+        }
+
+        function updateLogoVisibility(visible) {
+            localStorage.setItem('settings_show_logos', visible);
+            showToast(visible ? "Logos activados" : "Logos desactivados");
+        }
+
+        // --- GESTIÓN DE STORAGE ---
+        function renderStorage() {
+            const body = document.getElementById('storageBody');
+            body.innerHTML = '';
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><code>${key}</code></td>
+                    <td><button onclick="deleteKey('${key}')">Eliminar</button></td>
+                `;
+                body.appendChild(row);
+            }
+        }
+
+        function deleteKey(key) {
+            if(confirm(`¿Borrar la clave ${key}?`)) {
+                localStorage.removeItem(key);
+                renderStorage();
+                showToast("Dato eliminado");
+            }
+        }
+
+        function clearAllData() {
+            if(confirm("¿Estás seguro? Esto borrará toda la caché, logos y favoritos.")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // --- REPUTACIÓN ---
+        function renderRatings() {
+            const list = document.getElementById('ratingsList');
+            const db = JSON.parse(localStorage.getItem('ace_autorating_v1')) || {};
+            
+            if (Object.keys(db).length === 0) {
+                list.innerHTML = '<p style="color:var(--text-muted)">No hay datos de reputación aún.</p>';
+                return;
+            }
+
+            let html = '<table>';
+            for (const [id, data] of Object.entries(db)) {
+                const name = typeof data === 'object' ? data.name : 'Desconocido';
+                const score = typeof data === 'object' ? data.score : data;
+                html += `
+                    <tr>
+                        <td>${name} <br> <small style="color:var(--text-muted)">${id.substring(0,8)}...</small></td>
+                        <td style="text-align:right; font-weight:bold; color:var(--accent-blue)">★ ${score.toFixed(1)}</td>
+                    </tr>
+                `;
+            }
+            html += '</table>';
+            list.innerHTML = html;
+        }
+
+        function resetRatings() {
+            if(confirm("¿Deseas reiniciar la reputación de todos los canales a 3.0?")) {
+                localStorage.removeItem('ace_autorating_v1');
+                renderRatings();
+                showToast("Reputación reseteada");
+            }
+        }
+    </script>
+</body>
+</html>
