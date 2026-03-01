@@ -6,6 +6,8 @@
     <title>Admin Pro - Panel de Control TV</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    
     <style>
         :root {
             --bg-color: #0a0a0a;
@@ -60,6 +62,16 @@
             color: var(--accent-blue);
         }
 
+        /* Estilos para el Escáner */
+        #reader {
+            width: 100%;
+            background: black;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: none; /* Oculto por defecto */
+        }
+
         .setting-row {
             display: flex;
             justify-content: space-between;
@@ -68,9 +80,6 @@
             border-bottom: 1px solid #222;
         }
 
-        .setting-row:last-child { border-bottom: none; }
-
-        /* Controles */
         input[type="color"] { border: none; width: 45px; height: 45px; cursor: pointer; background: none; }
         
         input[type="text"], textarea {
@@ -117,7 +126,6 @@
         .btn-danger { background: var(--danger); }
         .btn-success { background: var(--success); }
 
-        /* QR y Export */
         #qr-container {
             background: white;
             padding: 15px;
@@ -129,11 +137,10 @@
         .sync-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 10px;
             margin-top: 15px;
         }
 
-        /* Tablas */
         .scroll-area { max-height: 300px; overflow-y: auto; margin-top: 10px; border-radius: 8px; background: #0c0c0c; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         th { text-align: left; color: var(--text-muted); padding: 12px; position: sticky; top: 0; background: #1a1a1a; }
@@ -144,8 +151,6 @@
             background: var(--success); color: white; padding: 12px 30px;
             border-radius: 50px; display: none; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-
-        .search-box { margin-bottom: 10px; }
 
         @media (max-width: 600px) {
             .sync-grid { grid-template-columns: 1fr; }
@@ -183,8 +188,11 @@
 
         <section class="card">
             <div class="card-title">🔄 Sincronización Express</div>
-            <p class="subtitle" style="margin-bottom: 15px;">Pasa tu configuración y reputación a otro dispositivo al instante.</p>
+            <p class="subtitle" style="margin-bottom: 15px;">Sincroniza tus datos escaneando o compartiendo el código.</p>
             
+            <div id="reader"></div>
+            <div id="reader-results"></div>
+
             <div style="text-align: center;">
                 <div id="qr-container" style="display: none;">
                     <div id="qrcode"></div>
@@ -193,22 +201,19 @@
             </div>
 
             <div class="sync-grid">
-                <button class="btn btn-primary" onclick="generateSyncQR()">📱 Generar QR de Sincro</button>
-                <button class="btn" onclick="copyConfigJSON()">📋 Copiar JSON al Portapapeles</button>
+                <button class="btn btn-primary" onclick="generateSyncQR()">📱 Mostrar mi QR</button>
+                <button class="btn btn-success" id="btn-scan" onclick="startScanner()">📸 Escanear QR Ajeno</button>
             </div>
 
             <div style="margin-top: 20px;">
-                <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 8px;">Importar configuración (Pega aquí el texto):</label>
-                <textarea id="importArea" rows="3" placeholder='{"custom_accent_color": "#448aff", ...}'></textarea>
-                <button class="btn btn-success" style="width: 100%; margin-top: 10px;" onclick="importConfig()">📥 Aplicar Configuración Importada</button>
+                <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 8px;">O pega el código JSON manualmente:</label>
+                <textarea id="importArea" rows="2" placeholder='{"custom_accent_color": ...}'></textarea>
+                <button class="btn" style="width: 100%; margin-top: 8px;" onclick="importConfig()">📥 Importar Manual</button>
             </div>
         </section>
 
         <section class="card">
             <div class="card-title">⭐ Inteligencia de Canales</div>
-            <div class="search-box">
-                <input type="text" id="searchRating" placeholder="Filtrar canales por nombre..." oninput="renderRatings()">
-            </div>
             <div class="scroll-area">
                 <table id="ratingsTable">
                     <thead>
@@ -221,57 +226,87 @@
                 </table>
             </div>
             <div class="sync-grid" style="margin-top: 15px;">
-                <button class="btn btn-danger" onclick="resetRatings()">♻️ Reiniciar Todo</button>
-                <button class="btn" onclick="renderRatings()">🔄 Refrescar Lista</button>
+                <button class="btn btn-danger" onclick="resetRatings()">♻️ Reiniciar</button>
+                <button class="btn" onclick="renderRatings()">🔄 Refrescar</button>
             </div>
         </section>
 
-        <section class="card">
-            <div class="card-title">💾 Diagnóstico de Memoria</div>
-            <div class="scroll-area">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Clave</th>
-                            <th>Tamaño aprox.</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="storageBody"></tbody>
-                </table>
-            </div>
-            <div style="margin-top: 15px;">
-                <button class="btn btn-danger" style="width: 100%;" onclick="clearAllData()">🗑️ Borrar Caché y Datos Completos</button>
-            </div>
-        </section>
-
-        <button class="btn" onclick="window.location.href='index.html'" style="width: 100%; padding: 15px; background: #222;">⬅️ Volver a la Aplicación Principal</button>
+        <button class="btn" onclick="window.location.href='index.html'" style="width: 100%; padding: 15px; background: #222;">⬅️ Volver a la App</button>
     </div>
 
     <div id="toast" class="toast">¡Hecho!</div>
 
     <script>
+        let html5QrCode; // Variable global para el escáner
+
         // --- INICIALIZACIÓN ---
         document.addEventListener('DOMContentLoaded', () => {
             loadSettings();
-            renderStorage();
             renderRatings();
         });
 
         function showToast(msg, isError = false) {
             const t = document.getElementById('toast');
-            t.textContent = msg || "¡Guardado!";
+            t.textContent = msg;
             t.style.background = isError ? "var(--danger)" : "var(--success)";
             t.style.display = 'block';
             setTimeout(() => { t.style.display = 'none'; }, 2500);
         }
 
-        // --- GESTIÓN DE AJUSTES BÁSICOS ---
+        // --- LÓGICA DEL ESCÁNER ---
+        function startScanner() {
+            const readerDiv = document.getElementById('reader');
+            readerDiv.style.display = 'block';
+            
+            html5QrCode = new Html5Qrcode("reader");
+            
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            // Iniciar cámara trasera
+            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+            .catch(err => {
+                showToast("Error al abrir cámara: " + err, true);
+                readerDiv.style.display = 'none';
+            });
+        }
+
+        function onScanSuccess(decodedText) {
+            // Detener escáner inmediatamente para evitar lecturas múltiples
+            html5QrCode.stop().then(() => {
+                document.getElementById('reader').style.display = 'none';
+                processImportedData(decodedText);
+            });
+        }
+
+        function processImportedData(rawJson) {
+            try {
+                const data = JSON.parse(rawJson);
+                
+                // PREGUNTA DE CONFIRMACIÓN
+                const confirmApply = confirm("¡QR detectado! ¿Quieres aplicar esta nueva configuración? Los ajustes actuales se sobrescribirán.");
+                
+                if (confirmApply) {
+                    applySettings(data);
+                }
+            } catch (e) {
+                showToast("El QR no contiene datos válidos", true);
+            }
+        }
+
+        function applySettings(data) {
+            if (data.custom_accent_color) localStorage.setItem('custom_accent_color', data.custom_accent_color);
+            if (data.settings_show_logos !== undefined) localStorage.setItem('settings_show_logos', data.settings_show_logos);
+            if (data.ace_autorating_v1) localStorage.setItem('ace_autorating_v1', JSON.stringify(data.ace_autorating_v1));
+
+            showToast("Sincronización exitosa");
+            setTimeout(() => location.reload(), 1200);
+        }
+
+        // --- FUNCIONES EXISTENTES ---
         function loadSettings() {
             const savedColor = localStorage.getItem('custom_accent_color') || '#448aff';
             document.getElementById('accentColorPicker').value = savedColor;
             document.documentElement.style.setProperty('--accent-blue', savedColor);
-
             const showLogos = localStorage.getItem('settings_show_logos') !== 'false';
             document.getElementById('showLogosToggle').checked = showLogos;
         }
@@ -284,137 +319,50 @@
 
         function updateLogoVisibility(visible) {
             localStorage.setItem('settings_show_logos', visible);
-            showToast(visible ? "Logos habilitados" : "Logos ocultos");
-        }
-
-        // --- EXPORTACIÓN / IMPORTACIÓN (SINCRONIZACIÓN) ---
-        function getFullConfig() {
-            const config = {
-                custom_accent_color: localStorage.getItem('custom_accent_color'),
-                settings_show_logos: localStorage.getItem('settings_show_logos'),
-                ace_autorating_v1: JSON.parse(localStorage.getItem('ace_autorating_v1')) || {}
-            };
-            return JSON.stringify(config);
+            showToast(visible ? "Logos activados" : "Logos ocultos");
         }
 
         function generateSyncQR() {
             const qrContainer = document.getElementById('qr-container');
             const qrDiv = document.getElementById('qrcode');
-            qrDiv.innerHTML = ""; // Limpiar anterior
-            
+            qrDiv.innerHTML = "";
             qrContainer.style.display = 'block';
-            
-            // Nota: Los QR tienen límite de datos. Filtramos los más importantes si es muy largo.
+
+            const config = {
+                custom_accent_color: localStorage.getItem('custom_accent_color'),
+                settings_show_logos: localStorage.getItem('settings_show_logos'),
+                ace_autorating_v1: JSON.parse(localStorage.getItem('ace_autorating_v1')) || {}
+            };
+
             new QRCode(qrDiv, {
-                text: getFullConfig(),
+                text: JSON.stringify(config),
                 width: 200,
                 height: 200,
-                colorDark : "#000000",
-                colorLight : "#ffffff",
                 correctLevel : QRCode.CorrectLevel.L
             });
-            window.scrollTo({ top: 100, behavior: 'smooth' });
-        }
-
-        function copyConfigJSON() {
-            const data = getFullConfig();
-            navigator.clipboard.writeText(data).then(() => {
-                showToast("JSON copiado al portapapeles");
-            });
+            window.scrollTo({ top: 200, behavior: 'smooth' });
         }
 
         function importConfig() {
-            const area = document.getElementById('importArea');
-            if (!area.value.trim()) return;
-
-            try {
-                const data = JSON.parse(area.value);
-                
-                if (data.custom_accent_color) localStorage.setItem('custom_accent_color', data.custom_accent_color);
-                if (data.settings_show_logos !== undefined) localStorage.setItem('settings_show_logos', data.settings_show_logos);
-                if (data.ace_autorating_v1) localStorage.setItem('ace_autorating_v1', JSON.stringify(data.ace_autorating_v1));
-
-                showToast("Sincronización exitosa. Recargando...");
-                setTimeout(() => location.reload(), 1500);
-            } catch (e) {
-                showToast("Error: El formato JSON no es válido", true);
-            }
+            const val = document.getElementById('importArea').value;
+            if (val) processImportedData(val);
         }
 
-        // --- GESTIÓN DE REPUTACIÓN ---
         function renderRatings() {
             const body = document.getElementById('ratingsBody');
-            const filter = document.getElementById('searchRating').value.toLowerCase();
             const db = JSON.parse(localStorage.getItem('ace_autorating_v1')) || {};
-            
             body.innerHTML = '';
-            
-            const entries = Object.entries(db);
-            if (entries.length === 0) {
-                body.innerHTML = '<tr><td colspan="2" style="text-align:center; color:var(--text-muted)">Sin datos aún</td></tr>';
-                return;
-            }
-
-            entries.forEach(([id, data]) => {
-                const name = typeof data === 'object' ? data.name : 'Desconocido';
-                const score = typeof data === 'object' ? data.score : data;
-
-                if (name.toLowerCase().includes(filter) || id.includes(filter)) {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>
-                            <div style="font-weight:600">${name}</div>
-                            <div style="font-size:0.7rem; color:var(--text-muted); font-family:monospace">${id.substring(0,12)}...</div>
-                        </td>
-                        <td style="text-align:right; font-weight:bold; color:var(--accent-blue); font-size:1rem;">
-                            ★ ${score.toFixed(1)}
-                        </td>
-                    `;
-                    body.appendChild(row);
-                }
+            Object.entries(db).forEach(([id, data]) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${data.name || id}</td><td style="text-align:right">★ ${data.score.toFixed(1)}</td>`;
+                body.appendChild(row);
             });
         }
 
         function resetRatings() {
-            if(confirm("¿Restablecer la inteligencia de todos los canales? Perderás el aprendizaje de qué señales funcionan mejor.")) {
+            if(confirm("¿Borrar reputación de canales?")) {
                 localStorage.removeItem('ace_autorating_v1');
                 renderRatings();
-                showToast("Reputación reiniciada");
-            }
-        }
-
-        // --- STORAGE DIAGNOSTICS ---
-        function renderStorage() {
-            const body = document.getElementById('storageBody');
-            body.innerHTML = '';
-            
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                const val = localStorage.getItem(key);
-                const size = (val.length * 2 / 1024).toFixed(2); // KB aproximados
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><code>${key}</code></td>
-                    <td style="color:var(--text-muted)">${size} KB</td>
-                    <td><button class="btn" style="padding:5px 10px; font-size:0.7rem;" onclick="deleteKey('${key}')">Eliminar</button></td>
-                `;
-                body.appendChild(row);
-            }
-        }
-
-        function deleteKey(key) {
-            if(confirm(`¿Borrar permanentemente ${key}?`)) {
-                localStorage.removeItem(key);
-                renderStorage();
-                showToast("Dato eliminado");
-            }
-        }
-
-        function clearAllData() {
-            if(confirm("¡ATENCIÓN! Esto borrará favoritos, caché de logos, reputación y ajustes. ¿Continuar?")) {
-                localStorage.clear();
-                location.reload();
             }
         }
     </script>
