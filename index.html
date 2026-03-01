@@ -248,15 +248,21 @@
             <button class="menu-toggle" onclick="toggleSidebar()" style="font-size: 1rem;">✖</button>
         </div>
         <nav class="nav-menu">
-            <button class="nav-item active" onclick="switchView('dashboard')">📊 Dashboard</button>
-            <button class="nav-item" onclick="switchView('ui')">🎨 Interfaz y Tema</button>
-            <button class="nav-item" onclick="switchView('events')">🗓️ Visor de Eventos</button>
-            <button class="nav-item" onclick="switchView('links')">🔗 Gestor AceStream</button>
-            <button class="nav-item" onclick="switchView('rating')">⭐ Motor de Reputación</button>
-            <button class="nav-item" onclick="switchView('sessions')">⏱️ Sesiones e Historial</button>
-            <button class="nav-item" onclick="switchView('data')">💾 Almacenamiento Local</button>
-            <button class="nav-item" onclick="switchView('sync')">🔄 Sincronización</button>
-            <button class="nav-item" onclick="switchView('dev')" style="color: var(--warning);">🛠️ Dev Tools (Raw)</button>
+            <div style="font-size: 0.7rem; color: var(--text-muted); padding: 10px 15px; text-transform: uppercase; letter-spacing: 1px;">Monitor</div>
+            <button class="nav-item active" onclick="switchView('dashboard')">📊 Dashboard Core</button>
+            <button class="nav-item" onclick="switchView('events')">🗓️ Data Explorer</button>
+            <div style="font-size: 0.7rem; color: var(--text-muted); padding: 10px 15px; text-transform: uppercase; letter-spacing: 1px;">Ingeniería UI</div>
+            <button class="nav-item" onclick="switchView('ui')">🎨 Motor Visual</button>
+            <button class="nav-item" onclick="switchView('layout')">📐 Layout & UX</button>
+            <div style="font-size: 0.7rem; color: var(--text-muted); padding: 10px 15px; text-transform: uppercase; letter-spacing: 1px;">Backend & Red</div>
+            <button class="nav-item" onclick="switchView('network')">🌐 Fuentes de Red</button>
+            <button class="nav-item" onclick="switchView('links')">🔗 AceStream DB</button>
+            <button class="nav-item" onclick="switchView('rating')">🧠 Smart Rating</button>
+            <div style="font-size: 0.7rem; color: var(--text-muted); padding: 10px 15px; text-transform: uppercase; letter-spacing: 1px;">Sistema</div>
+            <button class="nav-item" onclick="switchView('sessions')">⏱️ Log de Sesiones</button>
+            <button class="nav-item" onclick="switchView('data')">💾 Storage Manager</button>
+            <button class="nav-item" onclick="switchView('sync')">🔄 Backup & Sync</button>
+            <button class="nav-item" onclick="switchView('dev')" style="color: var(--warning);">🛠️ Kernel Editor</button>
         </nav>
         <div style="padding: 20px; border-top: 1px solid var(--border);">
             <button class="btn btn-secondary btn-block" onclick="window.location.href='index.html'">◀ Volver a la App</button>
@@ -310,12 +316,12 @@
 
             <section id="view-ui" class="view-section">
                 <div class="card">
-                    <h3 class="section-title">Personalización Visual</h3>
+                    <h3 class="section-title">Motor Visual Pro</h3>
                     
                     <div class="row-flex">
                         <div>
-                            <label style="font-weight: 600;">Color de Acento Principal</label>
-                            <span class="form-group hint">Color para botones, iconos de carga y bordes activos.</span>
+                            <label style="font-weight: 600;">Paleta de Acento</label>
+                            <span class="form-group hint">Define la identidad cromática global (--accent-blue).</span>
                         </div>
                         <div style="display: flex; gap: 10px; align-items: center;">
                             <input type="text" id="colorHex" class="input-control mono" style="width: 100px; text-align: center;" readonly>
@@ -325,11 +331,22 @@
 
                     <div class="row-flex">
                         <div>
-                            <label style="font-weight: 600;">Mostrar Logos de Canales</label>
-                            <span class="form-group hint">Variable 'settings_show_logos' (Requiere soporte en index.html).</span>
+                            <label style="font-weight: 600;">Renderizado de Assets</label>
+                            <span class="form-group hint">Habilita la carga dinámica de logos desde el GIST remoto.</span>
                         </div>
                         <label class="switch">
                             <input type="checkbox" id="showLogosToggle" onchange="UIMgr.updateLogoToggle(this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="row-flex">
+                        <div>
+                            <label style="font-weight: 600;">Modo Oscuro Puro (AMOLED)</label>
+                            <span class="form-group hint">Fuerza el fondo a negro absoluto #000000.</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="amoledToggle" onchange="UIMgr.updateAmoled(this.checked)">
                             <span class="slider"></span>
                         </label>
                     </div>
@@ -344,6 +361,66 @@
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Guarda CSS personalizado en `admin_custom_css`. Puedes programar tu index.html para leer esta llave y aplicarla al vuelo.</p>
                     <textarea id="customCssInput" class="code-editor" placeholder="/* Escribe tu CSS aquí */&#10;.event-card { border-radius: 15px; }"></textarea>
                     <button class="btn btn-primary btn-block" style="margin-top: 15px;" onclick="UIMgr.saveCustomCSS()">💾 Guardar CSS Injectado</button>
+                </div>
+            </section>
+
+            <section id="view-layout" class="view-section">
+                <div class="card">
+                    <h3 class="section-title">Geometría y Comportamiento</h3>
+                    
+                    <div class="row-flex">
+                        <div>
+                            <label>Radio de Bordes (Rounded)</label>
+                            <input type="range" min="0" max="25" value="12" class="input-control" id="radiusRange" oninput="UIMgr.updateLayout('radius', this.value)">
+                        </div>
+                        <span class="badge mono" id="radiusVal">12px</span>
+                    </div>
+
+                    <div class="row-flex">
+                        <div>
+                            <label>Densidad de Tarjetas (Eventos)</label>
+                            <select class="input-control" onchange="UIMgr.updateLayout('density', this.value)" id="densitySelect">
+                                <option value="compact">Compacto (Mínimo espacio)</option>
+                                <option value="normal" selected>Normal (Equilibrado)</option>
+                                <option value="large">Espacioso (TV Mode)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row-flex">
+                        <div>
+                            <label>Opacidad de Finalizados</label>
+                            <input type="range" min="10" max="100" value="50" class="input-control" oninput="UIMgr.updateLayout('finishedOpacity', this.value)">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-network" class="view-section">
+                <div class="card">
+                    <h3 class="section-title">Endpoints de Datos</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Configura de dónde obtiene la App la información en tiempo real.</p>
+                    
+                    <div class="form-group">
+                        <label>URL Fuente de Eventos</label>
+                        <input type="text" class="input-control mono" id="net-events-url" placeholder="https://...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>GIST Logos (Raw URL)</label>
+                        <input type="text" class="input-control mono" id="net-logos-url" placeholder="https://gist...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Proxy de Backup</label>
+                        <select class="input-control" id="net-proxy-select">
+                            <option value="allorigins">AllOrigins (CORS)</option>
+                            <option value="codetabs">CodeTabs (Fast)</option>
+                            <option value="corsproxy">CorsProxy.io</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary btn-block" onclick="NetworkMgr.save()">💾 Aplicar Cambios de Red</button>
                 </div>
             </section>
 
@@ -611,6 +688,18 @@
             }
         };
 
+        const NetworkMgr = {
+            save: () => {
+                const cfg = {
+                    events: document.getElementById('net-events-url').value,
+                    logos: document.getElementById('net-logos-url').value,
+                    proxy: document.getElementById('net-proxy-select').value
+                };
+                localStorage.setItem('network_custom_config', JSON.stringify(cfg));
+                Utils.toast('Configuración de red actualizada');
+            }
+        };
+
         const UIMgr = {
             init: () => {
                 const savedColor = localStorage.getItem('custom_accent_color') || '#3b82f6';
@@ -620,8 +709,27 @@
                 const showLogos = localStorage.getItem('settings_show_logos') !== 'false';
                 document.getElementById('showLogosToggle').checked = showLogos;
 
+                const amoled = localStorage.getItem('settings_amoled') === 'true';
+                document.getElementById('amoledToggle').checked = amoled;
+
                 const customCSS = localStorage.getItem('admin_custom_css') || '';
                 document.getElementById('customCssInput').value = customCSS;
+
+                // Load Layout Settings
+                const layout = JSON.parse(localStorage.getItem('settings_layout_pro')) || { radius: 12, density: 'normal' };
+                document.getElementById('radiusRange').value = layout.radius;
+                document.getElementById('radiusVal').textContent = layout.radius + 'px';
+                document.getElementById('densitySelect').value = layout.density;
+            },
+            updateAmoled: (checked) => {
+                localStorage.setItem('settings_amoled', checked);
+                Utils.toast(checked ? 'Modo AMOLED activado' : 'Modo AMOLED desactivado');
+            },
+            updateLayout: (key, val) => {
+                const layout = JSON.parse(localStorage.getItem('settings_layout_pro')) || { radius: 12, density: 'normal', finishedOpacity: 50 };
+                layout[key] = val;
+                if(key === 'radius') document.getElementById('radiusVal').textContent = val + 'px';
+                localStorage.setItem('settings_layout_pro', JSON.stringify(layout));
             },
             updateAccent: (color) => {
                 localStorage.setItem('custom_accent_color', color);
@@ -644,31 +752,34 @@
                 UIMgr.init();
                 Utils.toast('Tema reiniciado');
             }
-        };
-
-        const EventsMgr = {
+        };        const EventsMgr = {
             render: () => {
                 const data = JSON.parse(localStorage.getItem('event_data_cache')) || [];
                 document.getElementById('event-count').textContent = data.length;
                 const tbody = document.getElementById('eventsTableBody');
-                tbody.innerHTML = '';
 
                 if(data.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No hay eventos en caché</td></tr>`;
                     return;
                 }
 
-                data.forEach(item => {
+                // Optimización: Batch Rendering para evitar congelación del hilo principal
+                const htmlContent = data.map(item => {
                     const cleanHtml = item.infoHtml ? item.infoHtml.replace(/<[^>]*>?/gm, ' ') : 'N/A';
-                    tbody.innerHTML += `
-                        <tr class="searchable-row" data-search="${(item.competition + ' ' + cleanHtml).toLowerCase()}">
-                            <td><span class="badge">${item.fecha}</span><br><b>${item.hora}</b></td>
-                            <td style="color: var(--primary); font-weight: 500;">${item.competition}</td>
-                            <td style="font-size: 0.75rem; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${Utils.escapeHTML(item.infoHtml)}">${Utils.escapeHTML(cleanHtml)}</td>
+                    const comp = item.competition || 'Sin competición';
+                    const searchString = Utils.escapeHTML((comp + ' ' + cleanHtml).toLowerCase());
+                    
+                    return `
+                        <tr class="searchable-row" data-search="${searchString}">
+                            <td><span class="badge">${item.fecha || '--'}</span><br><b>${item.hora || '--'}</b></td>
+                            <td style="color: var(--primary); font-weight: 500;">${comp}</td>
+                            <td style="font-size: 0.75rem; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${Utils.escapeHTML(item.infoHtml || '')}">${Utils.escapeHTML(cleanHtml)}</td>
                             <td><span class="badge" style="background:var(--bg-surface);">${item.canales ? item.canales.length : 0} refs</span></td>
                         </tr>
                     `;
-                });
+                }).join('');
+
+                tbody.innerHTML = htmlContent;
             },
             filter: () => {
                 const term = document.getElementById('searchEvents').value.toLowerCase();
