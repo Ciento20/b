@@ -458,13 +458,13 @@
                     </div>
 
                     <div class="table-wrapper">
-                        <table>
-                            <thead>
+                        <table>                            <thead>
                                 <tr>
                                     <th>Nombre del Canal</th>
                                     <th>ID AceStream</th>
                                     <th>Fuente</th>
                                     <th>Test</th>
+                                    <th style="text-align: right;">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="linksTableBody">
@@ -857,10 +857,8 @@
                 const cacheObj = JSON.parse(localStorage.getItem('ace_ids_cache')) || { data: [] };
                 const data = Array.isArray(cacheObj) ? cacheObj : (cacheObj.data || []);
                 const tbody = document.getElementById('linksTableBody');
-                tbody.innerHTML = '';
-
-                if(data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Sin enlaces cacheados</td></tr>`;
+                tbody.innerHTML = '';                if(data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Sin enlaces cacheados</td></tr>`;
                     return;
                 }
 
@@ -871,9 +869,22 @@
                             <td class="mono" style="color: var(--text-muted);">${item.id}</td>
                             <td><span class="badge">${item.source || 'Desconocido'}</span></td>
                             <td><a href="acestream://${item.id}" class="btn btn-primary btn-sm" style="text-decoration:none;">Probar</a></td>
+                            <td style="text-align:right;"><button class="btn btn-danger btn-sm" onclick="LinksMgr.deleteItem('${item.id}')">🗑️</button></td>
                         </tr>
                     `;
                 });
+            },
+            deleteItem: (id) => {
+                if(confirm('¿Eliminar este enlace de la base de datos?')) {
+                    let cacheObj = JSON.parse(localStorage.getItem('ace_ids_cache')) || { data: [] };
+                    let isArray = Array.isArray(cacheObj);
+                    let data = isArray ? cacheObj : (cacheObj.data || []);
+                    data = data.filter(item => item.id !== id);
+                    localStorage.setItem('ace_ids_cache', JSON.stringify(isArray ? data : { data: data }));
+                    LinksMgr.render();
+                    DashboardMgr.init();
+                    Utils.toast('Enlace eliminado con éxito');
+                }
             },
             filter: () => {
                 const term = document.getElementById('searchLinks').value.toLowerCase();
