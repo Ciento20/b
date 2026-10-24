@@ -64,11 +64,13 @@ label.s{display:block;color:var(--mu);font-size:12px;margin:8px 0 3px}
 <script>
 const $=id=>document.getElementById(id);
 const F=[['Original',0,'sin cambiar'],['Apaisado',16/9,'16:9'],['Póster',2/3,'2:3'],['Cuadrado',1,'1:1'],['Retrato',4/5,'4:5'],['Panorama',3,'3:1']];
-let ratio=0,tr=true,tm;
+let ratio=0,tr=true,tm,HOST='https://wsrv.nl',note='';
+function norm(u){u=u.trim().replace(/^["']|["']$/g,'');note='';if(u&&!/^https?:\/\//i.test(u))u='https://'+u;
+const m=u.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/(?:blob|raw)\/(.+)$/i);if(m){u='https://raw.githubusercontent.com/'+m[1]+'/'+m[2]+'/'+m[3].split('?')[0];note=' (enlace de GitHub convertido a archivo directo)'}return u}
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2200)}
 F.forEach((f,i)=>{const b=document.createElement('button');b.className='chip'+(i?'':' on');b.innerHTML=f[0]+'<small>'+f[2]+'</small>';
 b.onclick=()=>{ratio=f[1];[...$('fmt').children].forEach(x=>x.classList.remove('on'));b.classList.add('on');go()};$('fmt').appendChild(b)});
-function build(){let u=$('src').value.trim();if(!u)return '';
+function build(){let u=norm($('src').value);if(!u)return '';
 const P=['url='+encodeURIComponent(u)];
 if(ratio){const w=Math.max(16,Math.min(8000,+$('w').value||1000));P.push('w='+w,'h='+Math.round(w/ratio),'fit='+$('fit').value);
 if($('fit').value==='contain'&&$('we').checked)P.push('we');
@@ -76,20 +78,24 @@ P.push('cbg='+(tr?'0000':$('bg').value.slice(1)))}
 else if(!tr)P.push('bg='+$('bg').value.slice(1));
 if($('mask').value)P.push('mask='+$('mask').value,'mbg='+(tr?'0000':$('bg').value.slice(1)));
 if($('out').value==='webp')P.push('output=webp','ll');else P.push('output=png');
-return 'https://wsrv.nl/?'+P.join('&')}
-function go(){clearTimeout(tm);tm=setTimeout(()=>{const u=build();
+return HOST+'/?'+P.join('&')}
+function go(){clearTimeout(tm);tm=setTimeout(run,250)}
+function run(alt){const u=build();
 $('empty').style.display=u?'none':'';$('res').style.display=u?'block':'none';$('cv').style.display=u?'inline-block':'none';
-if(!u)return;$('o').value=u;$('info').textContent='Generando vista previa…';$('pv').src=u},250)}
-$('pv').onload=()=>{$('info').textContent=$('pv').naturalWidth+' × '+$('pv').naturalHeight+' px · '+($('out').value==='png'?'PNG':'WebP')+' · sin pérdida'+(tr?' · transparencia conservada':'')};
-$('pv').onerror=()=>{$('info').textContent='Comprobando…';const t=new Image();
-t.onload=()=>{$('info').textContent='wsrv.nl no pudo procesar esa imagen. Comprueba que la URL es pública y apunta directamente a un archivo de imagen (.png, .jpg, .svg…).'};
-t.onerror=()=>{$('info').textContent='Este visor bloquea las imágenes externas, por eso no hay vista previa. La URL de arriba es válida: cópiala o ábrela en el navegador (Chrome, Safari…).'};
-t.src='https://wsrv.nl/?url=wsrv.nl/lichtenstein.jpg&w=16&output=png'};
+if(!u)return;$('o').value=u;$('info').textContent='Generando…'+note;$('pv').src=u;check(u,alt)}
+async function check(u,alt){try{const r=await fetch(u);
+if(!r.ok){let t='';try{t=(await r.text()).replace(/\s+/g,' ').slice(0,160)}catch(e){}
+if(u===$('o').value)$('info').textContent='El servicio respondió '+r.status+(t?': '+t:'')+'. Comprueba que la URL de la imagen es pública y lleva directamente a un archivo de imagen (no a una página).'}}
+catch(e){if(u!==$('o').value)return;
+if(!alt&&HOST==='https://wsrv.nl'){HOST='https://images.weserv.nl';$('info').textContent='wsrv.nl no responde desde tu red; probando images.weserv.nl…';return run(true)}
+$('info').textContent='No se puede conectar con el servicio de imágenes desde tu red o navegador. Prueba con datos móviles o otra red; algunas redes bloquean este servicio.'}}
+$('pv').onload=()=>{$('info').textContent=$('pv').naturalWidth+' × '+$('pv').naturalHeight+' px · '+($('out').value==='png'?'PNG':'WebP')+' · sin pérdida'+(tr?' · transparencia conservada':'')+note};
+$('pv').onerror=()=>{};
 ['src','w','fit','we','mask','out'].forEach(i=>{$(i).addEventListener('input',go);$(i).addEventListener('change',go)});
 $('src').addEventListener('paste',()=>setTimeout(go,30));
 $('bg').oninput=()=>{tr=false;$('tr').classList.remove('on');go()};
 $('tr').onclick=()=>{tr=!tr;$('tr').classList.toggle('on',tr);go()};
-$('load').onclick=()=>{if(!$('src').value.trim())return toast('Pega primero una URL');go()};
+$('load').onclick=()=>{if(!$('src').value.trim())return toast('Pega primero una URL');HOST='https://wsrv.nl';run()};
 $('src').addEventListener('keydown',e=>{if(e.key==='Enter')$('load').click()});
 $('clr').onclick=()=>{$('src').value='';go()};
 $('cp').onclick=async()=>{try{await navigator.clipboard.writeText($('o').value);toast('URL copiada')}catch(e){$('o').select();toast('Selecciona y copia')}};
